@@ -105,12 +105,20 @@
         document.getElementById("backToLoginBtn").addEventListener("click", () => {
             signupSection.classList.add("hidden");
             document.getElementById("signinSection").classList.remove("hidden");
+
+            // Clear Sign Up fields when coming back to Login
+            signupUsername.value = '';
+            signupPassword.value = '';
         });
 
         // Go back to Sign-In screen from admin dashboard
         document.getElementById("backToSignInBtn").addEventListener("click", () => {
             authSection.classList.remove("hidden"); // Show the sign-in section
             adminDashboard.classList.add("hidden"); // Hide the admin dashboard
+
+            // Clear Admin Login fields when coming back to Sign In
+            adminUsername.value = '';
+            adminPassword.value = '';
         });
 
         // Sign-up a new user
