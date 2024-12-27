@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Save, Retrieve, and Export Project Data</title>
+  <title>Project Data Management</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     .input-section {
@@ -99,6 +99,7 @@
 
   <!-- Export Buttons -->
   <button id="exportConsolidated">Export Consolidated Data</button>
+  <button id="exportFiltered">Export Filtered Data</button>
   
   <script>
     // Initialize savedData from localStorage
@@ -127,7 +128,14 @@
         return;
       }
 
-      const project = { StructureName: structureName, Work: work, Location: location, Manpower: [], Equipment: [], Materials: [] };
+      const project = { 
+        StructureName: structureName, 
+        Work: work, 
+        Location: location, 
+        Manpower: [], 
+        Equipment: [], 
+        Materials: [] 
+      };
 
       savedData.push(project);
       localStorage.setItem("projectData", JSON.stringify(savedData));
@@ -161,10 +169,31 @@
 
     // Export data to Excel (consolidated)
     document.getElementById("exportConsolidated").addEventListener("click", () => {
-      const ws = XLSX.utils.json_to_sheet(savedData);
+      const ws = XLSX.utils.json_to_sheet(savedData.map(data => ({
+        ...data, 
+        Manpower: JSON.stringify(data.Manpower), 
+        Equipment: JSON.stringify(data.Equipment), 
+        Materials: JSON.stringify(data.Materials)
+      })));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Project Data");
       XLSX.writeFile(wb, "consolidated_project_data.xlsx");
+    });
+
+    // Export filtered data to Excel (based on search)
+    document.getElementById("exportFiltered").addEventListener("click", () => {
+      const searchName = document.getElementById("searchName").value.trim().toLowerCase();
+      const filteredData = savedData.filter(data => data.StructureName.toLowerCase().includes(searchName));
+
+      const ws = XLSX.utils.json_to_sheet(filteredData.map(data => ({
+        ...data, 
+        Manpower: JSON.stringify(data.Manpower), 
+        Equipment: JSON.stringify(data.Equipment), 
+        Materials: JSON.stringify(data.Materials)
+      })));
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Filtered Project Data");
+      XLSX.writeFile(wb, `filtered_project_data_${searchName}.xlsx`);
     });
 
     // Export individual data
@@ -203,41 +232,45 @@
       savedData[lastIndex].Manpower.push(manpower);
       localStorage.setItem("projectData", JSON.stringify(savedData));
 
-      document.getElementById("manpowerSection").classList.add("hidden");
-      displayData();
+      document.getElementById("manpowerBadge").value = "";
+      document.getElementById("manpowerName").value = "";
+      document.getElementById("manpowerJob").value = "";
+      document.getElementById("manpowerHours").value = "";
+      document.getElementById("manpowerOvertime").value = "";
+      document.getElementById("manpowerHoliday").value = "";
     });
 
     // Save equipment data
     document.getElementById("saveEquipment").addEventListener("click", () => {
-      const equipmentName = document.getElementById("equipmentName").value.trim();
-      const quantity = document.getElementById("equipmentQty").value.trim();
+      const name = document.getElementById("equipmentName").value.trim();
+      const qty = document.getElementById("equipmentQty").value.trim();
 
-      const equipment = { Name: equipmentName, Quantity: quantity };
+      const equipment = { Name: name, Quantity: qty };
 
       const lastIndex = savedData.length - 1;
       savedData[lastIndex].Equipment.push(equipment);
       localStorage.setItem("projectData", JSON.stringify(savedData));
 
-      document.getElementById("equipmentSection").classList.add("hidden");
-      displayData();
+      document.getElementById("equipmentName").value = "";
+      document.getElementById("equipmentQty").value = "";
     });
 
     // Save material data
     document.getElementById("saveMaterial").addEventListener("click", () => {
-      const materialName = document.getElementById("materialName").value.trim();
-      const quantity = document.getElementById("materialQty").value.trim();
+      const name = document.getElementById("materialName").value.trim();
+      const qty = document.getElementById("materialQty").value.trim();
 
-      const material = { Name: materialName, Quantity: quantity };
+      const material = { Name: name, Quantity: qty };
 
       const lastIndex = savedData.length - 1;
       savedData[lastIndex].Materials.push(material);
       localStorage.setItem("projectData", JSON.stringify(savedData));
 
-      document.getElementById("materialSection").classList.add("hidden");
-      displayData();
+      document.getElementById("materialName").value = "";
+      document.getElementById("materialQty").value = "";
     });
 
-    // Initial data display
+    // Initialize data display
     displayData();
   </script>
 </body>
