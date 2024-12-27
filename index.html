@@ -110,7 +110,7 @@
         // Go back to login screen from admin dashboard
         document.getElementById("backToSigninFromAdminBtn").addEventListener("click", () => {
             adminDashboard.classList.add("hidden");
-            adminSection.classList.remove("hidden");
+            document.getElementById("signinSection").classList.remove("hidden");
         });
 
         // Sign-up a new user
@@ -143,8 +143,9 @@
                 // Check if it's an admin login first
                 if (username === "heyman" && password === "12345678") {
                     adminLoggedIn = true;
-                    adminSection.classList.add("hidden");
-                    adminDashboard.classList.remove("hidden");
+                    authSection.classList.add("hidden"); // Hide the login section
+                    adminSection.classList.add("hidden"); // Hide the admin section
+                    adminDashboard.classList.remove("hidden"); // Show the admin dashboard
                     displaySignupRequests();
                     return;
                 }
@@ -169,8 +170,8 @@
 
             if (adminUsernameInput === "heyman" && adminPasswordInput === "12345678") {
                 adminLoggedIn = true;
-                adminSection.classList.add("hidden");
-                adminDashboard.classList.remove("hidden");
+                adminSection.classList.add("hidden"); // Hide admin login
+                adminDashboard.classList.remove("hidden"); // Show admin dashboard
                 displaySignupRequests();
             } else {
                 adminError.textContent = "Invalid admin credentials.";
