@@ -59,6 +59,7 @@
 
     <!-- Admin Dashboard (After Admin Login) -->
     <div id="adminDashboard" class="hidden">
+        <span class="back-btn" id="backToSigninFromAdminBtn">← Back to Sign-In</span> <!-- Back Button -->
         <h2>Admin Dashboard</h2>
         <h3>Sign-Up Requests</h3>
         <ul id="signupRequestsList"></ul>
@@ -102,6 +103,12 @@
         document.getElementById("backToLoginBtn").addEventListener("click", () => {
             signupSection.classList.add("hidden");
             document.getElementById("signinSection").classList.remove("hidden");
+        });
+
+        // Go back to login screen from admin dashboard
+        document.getElementById("backToSigninFromAdminBtn").addEventListener("click", () => {
+            adminDashboard.classList.add("hidden");
+            adminSection.classList.remove("hidden");
         });
 
         // Sign-up a new user
