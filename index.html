@@ -175,46 +175,6 @@
       authSection.classList.remove("hidden");
     });
 
-    // Check if the user is an admin or a registered user
-    const checkAdminAccess = () => {
-      if (adminLoggedIn) {
-        authSection.classList.add("hidden");
-        adminSection.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-        displaySignupRequests();
-      } else {
-        adminSection.classList.remove("hidden");
-      }
-    };
-
-    // Display signup requests in the admin dashboard
-    const displaySignupRequests = () => {
-      signupRequestsList.innerHTML = '';
-      users.forEach((user, index) => {
-        if (!user.isApproved) {
-          const listItem = document.createElement("li");
-          listItem.textContent = `Username: ${user.username}`;
-          listItem.innerHTML += ` <button onclick="approveSignup(${index})">Approve</button>`;
-          listItem.innerHTML += ` <button onclick="rejectSignup(${index})">Reject</button>`;
-          signupRequestsList.appendChild(listItem);
-        }
-      });
-    };
-
-    // Approve a user signup
-    const approveSignup = (index) => {
-      users[index].isApproved = true;
-      localStorage.setItem("users", JSON.stringify(users));
-      displaySignupRequests();
-    };
-
-    // Reject a user signup
-    const rejectSignup = (index) => {
-      users.splice(index, 1);
-      localStorage.setItem("users", JSON.stringify(users));
-      displaySignupRequests();
-    };
-
     // Sign-up a new user
     signupBtn.addEventListener("click", () => {
       const username = signupUsername.value.trim();
@@ -292,14 +252,19 @@
           structureName: structure,
           work: workDetails,
           location: loc,
-          manpower: manpowerDetails,
+                    manpower: manpowerDetails,
           equipment: equipmentDetails,
           materials: materialsDetails,
         };
 
+        // Add the project data to the savedData array
         projectData.push(project);
         localStorage.setItem("projectData", JSON.stringify(projectData));
+
+        // Add the project to the table
         addToTable(project);
+
+        // Clear the form inputs
         resetProjectForm();
       } else {
         alert("Please fill in all fields.");
@@ -337,10 +302,54 @@
       XLSX.writeFile(wb, "project_data.xlsx");
     });
 
-    // Initially, display data if available in local storage
-    projectData.forEach(addToTable);
+    // Function to check admin access and show relevant information
+    const checkAdminAccess = () => {
+      if (adminLoggedIn) {
+        adminSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
 
-    // Initialize the app to show the appropriate sections
+        // Display sign-up requests pending approval
+        displaySignupRequests();
+      }
+    };
+
+    // Display pending sign-up requests for admin approval
+    const displaySignupRequests = () => {
+      signupRequestsList.innerHTML = "";
+      users.filter(user => !user.isApproved).forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = `${user.username} (Pending Approval)`;
+        const approveBtn = document.createElement("button");
+        approveBtn.textContent = "Approve";
+        approveBtn.addEventListener("click", () => approveUser(user));
+        const rejectBtn = document.createElement("button");
+        rejectBtn.textContent = "Reject";
+        rejectBtn.addEventListener("click", () => rejectUser(user));
+
+        li.appendChild(approveBtn);
+        li.appendChild(rejectBtn);
+        signupRequestsList.appendChild(li);
+      });
+    };
+
+    // Approve user and update the approval status
+    const approveUser = (user) => {
+      user.isApproved = true;
+      localStorage.setItem("users", JSON.stringify(users));
+      displaySignupRequests();  // Refresh the list of pending users
+    };
+
+    // Reject user and remove from the list
+    const rejectUser = (user) => {
+      const index = users.indexOf(user);
+      if (index !== -1) {
+        users.splice(index, 1);
+        localStorage.setItem("users", JSON.stringify(users));
+        displaySignupRequests();  // Refresh the list of pending users
+      }
+    };
+
+    // Initialize the app based on the current state
     const initApp = () => {
       if (adminLoggedIn) {
         checkAdminAccess();
@@ -349,9 +358,8 @@
       }
     };
 
-    // Start the app
+    // Start the app when the page loads
     initApp();
   </script>
-
 </body>
 </html>
