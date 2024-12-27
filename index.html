@@ -72,14 +72,53 @@
   <div id="mainApp" class="hidden">
     <h1>Welcome to the Project Data Management App</h1>
     <button id="logoutBtn">Logout</button>
+
     <div id="projectSection">
       <h2>Enter Project Information</h2>
-      <!-- Your project input fields go here -->
+
+      <!-- Project data entry form -->
+      <label for="structureName">Structure Name:</label>
+      <input type="text" id="structureName" placeholder="Enter Structure Name" required><br><br>
+
+      <label for="work">Work:</label>
+      <input type="text" id="work" placeholder="Enter Work" required><br><br>
+
+      <label for="location">Location:</label>
+      <input type="text" id="location" placeholder="Enter Location" required><br><br>
+
+      <label for="manpower">Manpower:</label>
+      <button id="addManpowerBtn">Add Manpower</button><br><br>
+
+      <label for="equipment">Equipment:</label>
+      <button id="addEquipmentBtn">Add Equipment</button><br><br>
+
+      <label for="materials">Materials:</label>
+      <button id="addMaterialsBtn">Add Materials</button><br><br>
+
+      <button id="saveDataBtn">Save Data</button>
+
+      <h3>Saved Data:</h3>
+      <table id="savedDataTable">
+        <thead>
+          <tr>
+            <th>Structure Name</th>
+            <th>Work</th>
+            <th>Location</th>
+            <th>Manpower</th>
+            <th>Equipment</th>
+            <th>Materials</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <button id="exportBtn">Export to Excel</button>
     </div>
   </div>
 
   <script>
     let users = JSON.parse(localStorage.getItem("users")) || [];
+    let projectData = JSON.parse(localStorage.getItem("projectData")) || [];
     let adminLoggedIn = false;
     let currentUser = null;
 
@@ -87,6 +126,8 @@
     const signinBtn = document.getElementById("signinBtn");
     const adminLoginBtn = document.getElementById("adminLoginBtn");
     const logoutBtn = document.getElementById("logoutBtn");
+    const saveDataBtn = document.getElementById("saveDataBtn");
+    const exportBtn = document.getElementById("exportBtn");
 
     const signupUsername = document.getElementById("signupUsername");
     const signupPassword = document.getElementById("signupPassword");
@@ -94,6 +135,13 @@
     const signinPassword = document.getElementById("signinPassword");
     const adminUsername = document.getElementById("adminUsername");
     const adminPassword = document.getElementById("adminPassword");
+
+    const structureName = document.getElementById("structureName");
+    const work = document.getElementById("work");
+    const location = document.getElementById("location");
+    const manpower = document.getElementById("manpower");
+    const equipment = document.getElementById("equipment");
+    const materials = document.getElementById("materials");
 
     const signupError = document.getElementById("signupError");
     const signinError = document.getElementById("signinError");
@@ -103,6 +151,8 @@
     const adminSection = document.getElementById("adminSection");
     const adminDashboard = document.getElementById("adminDashboard");
     const mainApp = document.getElementById("mainApp");
+    const savedDataTable = document.getElementById("savedDataTable").getElementsByTagName('tbody')[0];
+
     const signupRequestsList = document.getElementById("signupRequestsList");
 
     // Check if the user is an admin or a registered user
@@ -177,6 +227,7 @@
         currentUser = user;
         authSection.classList.add("hidden");
         mainApp.classList.remove("hidden");
+        displaySavedData();
       } else {
         signinError.textContent = "Invalid credentials or account not approved by admin.";
       }
@@ -199,6 +250,49 @@
       mainApp.classList.add("hidden");
       adminLoggedIn = false;
       currentUser = null;
+    });
+
+    // Save project data
+    saveDataBtn.addEventListener("click", () => {
+      const project = {
+        structureName: structureName.value,
+        work: work.value,
+        location: location.value,
+        manpower: manpower.value,
+        equipment: equipment.value,
+        materials: materials.value,
+      };
+      projectData.push(project);
+      localStorage.setItem("projectData", JSON.stringify(projectData));
+      structureName.value = '';
+      work.value = '';
+      location.value = '';
+      manpower.value = '';
+      equipment.value = '';
+      materials.value = '';
+      displaySavedData();
+    });
+
+    // Display saved project data
+    const displaySavedData = () => {
+      savedDataTable.innerHTML = '';
+      projectData.forEach(data => {
+        const row = savedDataTable.insertRow();
+        row.insertCell(0).textContent = data.structureName;
+        row.insertCell(1).textContent = data.work;
+        row.insertCell(2).textContent = data.location;
+        row.insertCell(3).textContent = data.manpower;
+        row.insertCell(4).textContent = data.equipment;
+        row.insertCell(5).textContent = data.materials;
+      });
+    };
+
+    // Export data to Excel
+    exportBtn.addEventListener("click", () => {
+      const ws = XLSX.utils.json_to_sheet(projectData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Project Data");
+      XLSX.writeFile(wb, "project_data.xlsx");
     });
 
     // Initialize the app
