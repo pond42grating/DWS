@@ -17,7 +17,7 @@
 
     <!-- Authentication Section (Sign-In and Sign-Up) -->
     <div id="authSection">
-        <div class="auth-section">
+        <div class="auth-section" id="signinSection">
             <h2>Sign In</h2>
             <label for="signinUsername">Username:</label>
             <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
@@ -94,14 +94,14 @@
 
         // Show sign-up form
         document.getElementById("goToSignupBtn").addEventListener("click", () => {
-            authSection.classList.add("hidden");
+            document.getElementById("signinSection").classList.add("hidden");
             signupSection.classList.remove("hidden");
         });
 
         // Go back to login screen from sign-up
         document.getElementById("backToLoginBtn").addEventListener("click", () => {
             signupSection.classList.add("hidden");
-            authSection.classList.remove("hidden");
+            document.getElementById("signinSection").classList.remove("hidden");
         });
 
         // Sign-up a new user
