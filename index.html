@@ -61,7 +61,7 @@
 
     <!-- Admin Dashboard (After Admin Login) -->
     <div id="adminDashboard" class="hidden">
-        <span class="back-btn" id="backToSigninFromAdminBtn">← Back to Sign-In</span> <!-- Back Button -->
+        <span class="back-btn" id="backToSignInBtn">← Back to Sign In</span> <!-- Back Button to Sign In -->
         <h2>Admin Dashboard</h2>
         <h3>Sign-Up Requests</h3>
         <ul id="signupRequestsList"></ul>
@@ -107,16 +107,10 @@
             document.getElementById("signinSection").classList.remove("hidden");
         });
 
-        // Go back to login screen from admin dashboard
-        document.getElementById("backToSigninFromAdminBtn").addEventListener("click", () => {
-            // Reset the login form
-            signinUsername.value = '';
-            signinPassword.value = '';
-            signinError.textContent = '';
-
-            // Make sure all relevant sections are visible
-            document.getElementById("signinSection").classList.remove("hidden");
-            adminDashboard.classList.add("hidden"); // Hide Admin Dashboard
+        // Go back to Sign-In screen from admin dashboard
+        document.getElementById("backToSignInBtn").addEventListener("click", () => {
+            adminSection.classList.remove("hidden"); // Show the sign-in section
+            adminDashboard.classList.add("hidden"); // Hide the admin dashboard
         });
 
         // Sign-up a new user
