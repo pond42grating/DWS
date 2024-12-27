@@ -235,69 +235,86 @@
 
     // Admin login
     adminLoginBtn.addEventListener("click", () => {
-      if (adminUsername.value === "heyman" && adminPassword.value === "12345678") {
+      const username = adminUsername.value.trim();
+      const password = adminPassword.value.trim();
+
+      // Admin credentials check
+      if (username === "heyman" && password === "12345678") {
         adminLoggedIn = true;
-        adminError.textContent = "";
         checkAdminAccess();
       } else {
-        adminError.textContent = "Invalid admin credentials!";
+        adminError.textContent = "Invalid Admin credentials.";
       }
     });
 
-    // Logout functionality
+    // Log out
     logoutBtn.addEventListener("click", () => {
       authSection.classList.remove("hidden");
       mainApp.classList.add("hidden");
-      adminLoggedIn = false;
+      adminDashboard.classList.add("hidden");
+      signinUsername.value = "";
+      signinPassword.value = "";
       currentUser = null;
     });
 
     // Save project data
     saveDataBtn.addEventListener("click", () => {
       const project = {
-        structureName: structureName.value,
-        work: work.value,
-        location: location.value,
-        manpower: manpower.value,
-        equipment: equipment.value,
-        materials: materials.value,
+        structureName: structureName.value.trim(),
+        work: work.value.trim(),
+        location: location.value.trim(),
+        manpower: manpower.value.trim(),
+        equipment: equipment.value.trim(),
+        materials: materials.value.trim(),
       };
-      projectData.push(project);
-      localStorage.setItem("projectData", JSON.stringify(projectData));
-      structureName.value = '';
-      work.value = '';
-      location.value = '';
-      manpower.value = '';
-      equipment.value = '';
-      materials.value = '';
-      displaySavedData();
+
+      if (project.structureName && project.work && project.location) {
+        projectData.push(project);
+        localStorage.setItem("projectData", JSON.stringify(projectData));
+
+        // Clear the form fields
+        structureName.value = "";
+        work.value = "";
+        location.value = "";
+        manpower.value = "";
+        equipment.value = "";
+        materials.value = "";
+
+        displaySavedData();
+      } else {
+        alert("Please fill out all required fields.");
+      }
     });
 
-    // Display saved project data
-    const displaySavedData = () => {
-      savedDataTable.innerHTML = '';
-      projectData.forEach(data => {
-        const row = savedDataTable.insertRow();
-        row.insertCell(0).textContent = data.structureName;
-        row.insertCell(1).textContent = data.work;
-        row.insertCell(2).textContent = data.location;
-        row.insertCell(3).textContent = data.manpower;
-        row.insertCell(4).textContent = data.equipment;
-        row.insertCell(5).textContent = data.materials;
+    // Display saved data in the table
+    function displaySavedData() {
+      savedDataTable.innerHTML = "";
+      projectData.forEach(project => {
+        const row = savedDataTable.insertRow
+                const row = savedDataTable.insertRow();
+        row.insertCell(0).textContent = project.structureName;
+        row.insertCell(1).textContent = project.work;
+        row.insertCell(2).textContent = project.location;
+        row.insertCell(3).textContent = project.manpower;
+        row.insertCell(4).textContent = project.equipment;
+        row.insertCell(5).textContent = project.materials;
       });
-    };
+    }
 
-    // Export data to Excel
+    // Export to Excel
     exportBtn.addEventListener("click", () => {
-      const ws = XLSX.utils.json_to_sheet(projectData);
       const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(projectData);
       XLSX.utils.book_append_sheet(wb, ws, "Project Data");
-      XLSX.writeFile(wb, "project_data.xlsx");
+
+      // Download the Excel file
+      XLSX.writeFile(wb, "ProjectData.xlsx");
     });
 
-    // Initialize the app
-    checkAdminAccess();
-
+    // Initial check if admin or user is logged in
+    if (adminLoggedIn) {
+      checkAdminAccess();
+    }
   </script>
 </body>
 </html>
