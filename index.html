@@ -109,6 +109,11 @@
 
         // Go back to login screen from admin dashboard
         document.getElementById("backToSigninFromAdminBtn").addEventListener("click", () => {
+            // Reset the login form
+            signinUsername.value = '';
+            signinPassword.value = '';
+            signinError.textContent = '';
+
             adminDashboard.classList.add("hidden");
             document.getElementById("signinSection").classList.remove("hidden");
         });
