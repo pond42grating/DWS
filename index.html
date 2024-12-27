@@ -124,11 +124,13 @@
   </div>
 
   <script>
+    // Initialize storage for users and project data
     let users = JSON.parse(localStorage.getItem("users")) || [];
     let projectData = JSON.parse(localStorage.getItem("projectData")) || [];
     let adminLoggedIn = false;
     let currentUser = null;
 
+    // DOM Elements
     const signupBtn = document.getElementById("signupBtn");
     const signinBtn = document.getElementById("signinBtn");
     const adminLoginBtn = document.getElementById("adminLoginBtn");
@@ -223,51 +225,89 @@
       const adminUsernameInput = adminUsername.value.trim();
       const adminPasswordInput = adminPassword.value.trim();
 
-      if (adminUsernameInput === "heyman" && adminPasswordInput === "12345678") {
+            if (adminUsernameInput === "heyman" && adminPasswordInput === "12345678") {
         adminLoggedIn = true;
-        checkAdminAccess();
+        adminSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
+        displaySignupRequests(); // Display the pending sign-up requests for admin
       } else {
         adminError.textContent = "Invalid admin credentials.";
       }
     });
 
-    // Logout user
+    // Admin approves or rejects users
+    const displaySignupRequests = () => {
+      signupRequestsList.innerHTML = "";
+      const pendingUsers = users.filter(user => !user.isApproved);
+      pendingUsers.forEach(user => {
+        const li = document.createElement("li");
+        li.textContent = `${user.username} (Pending Approval)`;
+
+        const approveBtn = document.createElement("button");
+        approveBtn.textContent = "Approve";
+        approveBtn.onclick = () => approveUser(user);
+
+        const rejectBtn = document.createElement("button");
+        rejectBtn.textContent = "Reject";
+        rejectBtn.onclick = () => rejectUser(user);
+
+        li.appendChild(approveBtn);
+        li.appendChild(rejectBtn);
+        signupRequestsList.appendChild(li);
+      });
+    };
+
+    // Approve user and update the approval status
+    const approveUser = (user) => {
+      user.isApproved = true;
+      localStorage.setItem("users", JSON.stringify(users));
+      displaySignupRequests();  // Refresh the list after approval
+    };
+
+    // Reject user and remove them from the list
+    const rejectUser = (user) => {
+      const index = users.indexOf(user);
+      if (index !== -1) {
+        users.splice(index, 1);
+        localStorage.setItem("users", JSON.stringify(users));
+        displaySignupRequests();  // Refresh the list after rejection
+      }
+    };
+
+    // Logout functionality
     logoutBtn.addEventListener("click", () => {
       currentUser = null;
       mainApp.classList.add("hidden");
       authSection.classList.remove("hidden");
+      savedDataTable.innerHTML = "";
     });
 
     // Save project data
     saveDataBtn.addEventListener("click", () => {
-      const structure = structureName.value.trim();
-      const workDetails = work.value.trim();
-      const loc = location.value.trim();
-      const manpowerDetails = manpower.value.trim();
-      const equipmentDetails = equipment.value.trim();
-      const materialsDetails = materials.value.trim();
+      const structureNameValue = structureName.value.trim();
+      const workValue = work.value.trim();
+      const locationValue = location.value.trim();
+      const manpowerValue = manpower.value.trim();
+      const equipmentValue = equipment.value.trim();
+      const materialsValue = materials.value.trim();
 
-      if (structure && workDetails && loc && manpowerDetails && equipmentDetails && materialsDetails) {
+      if (structureNameValue && workValue && locationValue && manpowerValue && equipmentValue && materialsValue) {
         const project = {
-          structureName: structure,
-          work: workDetails,
-          location: loc,
-                    manpower: manpowerDetails,
-          equipment: equipmentDetails,
-          materials: materialsDetails,
+          structureName: structureNameValue,
+          work: workValue,
+          location: locationValue,
+          manpower: manpowerValue,
+          equipment: equipmentValue,
+          materials: materialsValue
         };
 
-        // Add the project data to the savedData array
         projectData.push(project);
         localStorage.setItem("projectData", JSON.stringify(projectData));
 
-        // Add the project to the table
         addToTable(project);
-
-        // Clear the form inputs
         resetProjectForm();
       } else {
-        alert("Please fill in all fields.");
+        alert("Please fill in all fields before saving.");
       }
     });
 
@@ -282,7 +322,7 @@
       row.insertCell(5).textContent = project.materials;
     };
 
-    // Reset the project data form after submission
+    // Reset project data form after saving
     const resetProjectForm = () => {
       structureName.value = '';
       work.value = '';
@@ -302,63 +342,22 @@
       XLSX.writeFile(wb, "project_data.xlsx");
     });
 
-    // Function to check admin access and show relevant information
-    const checkAdminAccess = () => {
-      if (adminLoggedIn) {
-        adminSection.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-
-        // Display sign-up requests pending approval
-        displaySignupRequests();
-      }
-    };
-
-    // Display pending sign-up requests for admin approval
-    const displaySignupRequests = () => {
-      signupRequestsList.innerHTML = "";
-      users.filter(user => !user.isApproved).forEach(user => {
-        const li = document.createElement("li");
-        li.textContent = `${user.username} (Pending Approval)`;
-        const approveBtn = document.createElement("button");
-        approveBtn.textContent = "Approve";
-        approveBtn.addEventListener("click", () => approveUser(user));
-        const rejectBtn = document.createElement("button");
-        rejectBtn.textContent = "Reject";
-        rejectBtn.addEventListener("click", () => rejectUser(user));
-
-        li.appendChild(approveBtn);
-        li.appendChild(rejectBtn);
-        signupRequestsList.appendChild(li);
-      });
-    };
-
-    // Approve user and update the approval status
-    const approveUser = (user) => {
-      user.isApproved = true;
-      localStorage.setItem("users", JSON.stringify(users));
-      displaySignupRequests();  // Refresh the list of pending users
-    };
-
-    // Reject user and remove from the list
-    const rejectUser = (user) => {
-      const index = users.indexOf(user);
-      if (index !== -1) {
-        users.splice(index, 1);
-        localStorage.setItem("users", JSON.stringify(users));
-        displaySignupRequests();  // Refresh the list of pending users
-      }
-    };
-
     // Initialize the app based on the current state
     const initApp = () => {
       if (adminLoggedIn) {
-        checkAdminAccess();
+        adminSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
+        displaySignupRequests();
+      } else if (currentUser) {
+        mainApp.classList.remove("hidden");
+        authSection.classList.add("hidden");
+        projectData = JSON.parse(localStorage.getItem("projectData")) || [];
+        projectData.forEach(addToTable);
       } else {
         authSection.classList.remove("hidden");
       }
     };
 
-    // Start the app when the page loads
     initApp();
   </script>
 </body>
