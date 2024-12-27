@@ -3,279 +3,207 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Project Data Management</title>
+  <title>User and Admin Control</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    .input-section {
+    .input-section, .auth-section, .details-section {
       margin-bottom: 15px;
-    }
-    .details-section {
-      margin-top: 10px;
-      margin-bottom: 20px;
     }
     .hidden {
       display: none;
     }
+    .error {
+      color: red;
+    }
   </style>
 </head>
 <body>
-  <h1>Project Information</h1>
 
-  <!-- Input Fields for Project Data -->
-  <div class="input-section">
-    <label for="structureName">Structure Name:</label>
-    <input type="text" id="structureName" placeholder="Enter Structure Name" required><br><br>
+  <h1>User Registration and Admin Control</h1>
 
-    <label for="work">Work:</label>
-    <input type="text" id="work" placeholder="Enter Work" required><br><br>
+  <!-- Authentication Section (Sign-In and Sign-Up) -->
+  <div id="authSection">
+    <div class="auth-section">
+      <h2>Sign Up</h2>
+      <label for="signupUsername">Username:</label>
+      <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
 
-    <label for="location">Location:</label>
-    <input type="text" id="location" placeholder="Enter Location" required><br><br>
+      <label for="signupPassword">Password:</label>
+      <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
 
-    <!-- Buttons for Adding Manpower, Equipment, and Materials -->
-    <button id="addManpowerBtn">Add Manpower</button>
-    <button id="addEquipmentBtn">Add Equipment</button>
-    <button id="addMaterialBtn">Add Material</button>
-    <br><br>
+      <button id="signupBtn">Sign Up</button>
+      <p class="error" id="signupError"></p>
+    </div>
 
-    <button id="saveData">Save Data</button>
+    <div class="auth-section">
+      <h2>Sign In</h2>
+      <label for="signinUsername">Username:</label>
+      <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
+
+      <label for="signinPassword">Password:</label>
+      <input type="password" id="signinPassword" placeholder="Enter Password" required><br><br>
+
+      <button id="signinBtn">Sign In</button>
+      <p class="error" id="signinError"></p>
+    </div>
   </div>
 
-  <!-- Hidden Sections for Manpower, Equipment, and Material Input -->
-  <div id="manpowerSection" class="hidden">
-    <h3>Manpower Details</h3>
-    <label for="manpowerBadge">Badge Number:</label>
-    <input type="text" id="manpowerBadge" required><br><br>
-    
-    <label for="manpowerName">Name:</label>
-    <input type="text" id="manpowerName" required><br><br>
+  <!-- Admin Login Section -->
+  <div id="adminSection" class="hidden">
+    <h2>Admin Login</h2>
+    <label for="adminUsername">Admin Username:</label>
+    <input type="text" id="adminUsername" placeholder="Enter Admin Username" required><br><br>
 
-    <label for="manpowerJob">Job Title:</label>
-    <input type="text" id="manpowerJob" required><br><br>
+    <label for="adminPassword">Admin Password:</label>
+    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required><br><br>
 
-    <label for="manpowerHours">Normal Hours Worked:</label>
-    <input type="number" id="manpowerHours" required><br><br>
-
-    <label for="manpowerOvertime">Overtime Hours:</label>
-    <input type="number" id="manpowerOvertime" required><br><br>
-
-    <label for="manpowerHoliday">Holiday Hours:</label>
-    <input type="number" id="manpowerHoliday" required><br><br>
-
-    <button id="saveManpower">Save Manpower</button>
+    <button id="adminLoginBtn">Login as Admin</button>
+    <p class="error" id="adminError"></p>
   </div>
 
-  <div id="equipmentSection" class="hidden">
-    <h3>Equipment Details</h3>
-    <label for="equipmentName">Equipment Name:</label>
-    <input type="text" id="equipmentName" required><br><br>
-    
-    <label for="equipmentQty">Quantity:</label>
-    <input type="number" id="equipmentQty" required><br><br>
-
-    <button id="saveEquipment">Save Equipment</button>
+  <!-- Admin Dashboard (After Admin Login) -->
+  <div id="adminDashboard" class="hidden">
+    <h2>Admin Dashboard</h2>
+    <h3>Sign-Up Requests</h3>
+    <ul id="signupRequestsList"></ul>
   </div>
 
-  <div id="materialSection" class="hidden">
-    <h3>Material Details</h3>
-    <label for="materialName">Material Name:</label>
-    <input type="text" id="materialName" required><br><br>
-    
-    <label for="materialQty">Quantity:</label>
-    <input type="number" id="materialQty" required><br><br>
-
-    <button id="saveMaterial">Save Material</button>
+  <!-- Main App (Visible After User Sign-In) -->
+  <div id="mainApp" class="hidden">
+    <h1>Welcome to the Project Data Management App</h1>
+    <button id="logoutBtn">Logout</button>
+    <div id="projectSection">
+      <h2>Enter Project Information</h2>
+      <!-- Your project input fields go here -->
+    </div>
   </div>
 
-  <h2>Saved Data:</h2>
-  <ul id="userList"></ul>
-
-  <!-- Search Functionality -->
-  <div>
-    <label for="searchName">Search by Structure Name:</label>
-    <input type="text" id="searchName">
-    <button id="searchUser">Search</button>
-  </div>
-
-  <!-- Export Buttons -->
-  <button id="exportConsolidated">Export Consolidated Data</button>
-  <button id="exportFiltered">Export Filtered Data</button>
-  
   <script>
-    // Initialize savedData from localStorage
-    let savedData = JSON.parse(localStorage.getItem("projectData")) || [];
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+    let adminLoggedIn = false;
+    let currentUser = null;
 
-    // Function to display saved data
-    const displayData = () => {
-      const userList = document.getElementById("userList");
-      userList.innerHTML = ""; // Clear existing list
-      savedData.forEach((data, index) => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `Structure: ${data.StructureName}, Work: ${data.Work}, Location: ${data.Location}`;
-        listItem.innerHTML += ` <button onclick="exportData(${index})">Export Data</button>`;
-        userList.appendChild(listItem);
+    const signupBtn = document.getElementById("signupBtn");
+    const signinBtn = document.getElementById("signinBtn");
+    const adminLoginBtn = document.getElementById("adminLoginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    const signupUsername = document.getElementById("signupUsername");
+    const signupPassword = document.getElementById("signupPassword");
+    const signinUsername = document.getElementById("signinUsername");
+    const signinPassword = document.getElementById("signinPassword");
+    const adminUsername = document.getElementById("adminUsername");
+    const adminPassword = document.getElementById("adminPassword");
+
+    const signupError = document.getElementById("signupError");
+    const signinError = document.getElementById("signinError");
+    const adminError = document.getElementById("adminError");
+
+    const authSection = document.getElementById("authSection");
+    const adminSection = document.getElementById("adminSection");
+    const adminDashboard = document.getElementById("adminDashboard");
+    const mainApp = document.getElementById("mainApp");
+    const signupRequestsList = document.getElementById("signupRequestsList");
+
+    // Check if the user is an admin or a registered user
+    const checkAdminAccess = () => {
+      if (adminLoggedIn) {
+        authSection.classList.add("hidden");
+        adminSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
+        displaySignupRequests();
+      } else {
+        adminSection.classList.remove("hidden");
+      }
+    };
+
+    // Display signup requests in the admin dashboard
+    const displaySignupRequests = () => {
+      signupRequestsList.innerHTML = '';
+      users.forEach((user, index) => {
+        if (!user.isApproved) {
+          const listItem = document.createElement("li");
+          listItem.textContent = `Username: ${user.username}`;
+          listItem.innerHTML += ` <button onclick="approveSignup(${index})">Approve</button>`;
+          listItem.innerHTML += ` <button onclick="rejectSignup(${index})">Reject</button>`;
+          signupRequestsList.appendChild(listItem);
+        }
       });
     };
 
-    // Function to handle saving data
-    document.getElementById("saveData").addEventListener("click", () => {
-      const structureName = document.getElementById("structureName").value.trim();
-      const work = document.getElementById("work").value.trim();
-      const location = document.getElementById("location").value.trim();
+    // Approve a user signup
+    const approveSignup = (index) => {
+      users[index].isApproved = true;
+      localStorage.setItem("users", JSON.stringify(users));
+      displaySignupRequests();
+    };
 
-      if (!structureName || !work || !location) {
-        alert("Please fill in all fields!");
-        return;
-      }
+    // Reject a user signup
+    const rejectSignup = (index) => {
+      users.splice(index, 1);
+      localStorage.setItem("users", JSON.stringify(users));
+      displaySignupRequests();
+    };
 
-      const project = { 
-        StructureName: structureName, 
-        Work: work, 
-        Location: location, 
-        Manpower: [], 
-        Equipment: [], 
-        Materials: [] 
-      };
+    // Sign up a new user
+    signupBtn.addEventListener("click", () => {
+      const username = signupUsername.value.trim();
+      const password = signupPassword.value.trim();
+      const existingUser = users.find(user => user.username === username);
 
-      savedData.push(project);
-      localStorage.setItem("projectData", JSON.stringify(savedData));
-
-      displayData();
-
-      // Clear input fields
-      document.getElementById("structureName").value = "";
-      document.getElementById("work").value = "";
-      document.getElementById("location").value = "";
-    });
-
-    // Search functionality
-    document.getElementById("searchUser").addEventListener("click", () => {
-      const searchName = document.getElementById("searchName").value.trim().toLowerCase();
-      const result = savedData.filter(data => data.StructureName.toLowerCase().includes(searchName));
-
-      const searchResultDiv = document.getElementById("searchResult");
-      searchResultDiv.innerHTML = ""; // Clear previous results
-
-      if (result.length > 0) {
-        result.forEach((data) => {
-          const div = document.createElement("div");
-          div.textContent = `Found: ${data.StructureName} - Work: ${data.Work}`;
-          searchResultDiv.appendChild(div);
-        });
+      if (existingUser) {
+        signupError.textContent = "Username already exists!";
       } else {
-        searchResultDiv.textContent = "No matching records found.";
+        const newUser = {
+          username,
+          password,
+          isApproved: false,
+        };
+        users.push(newUser);
+        localStorage.setItem("users", JSON.stringify(users));
+        signupError.textContent = "Sign up successful. Awaiting approval from the admin.";
+        signupUsername.value = "";
+        signupPassword.value = "";
       }
     });
 
-    // Export data to Excel (consolidated)
-    document.getElementById("exportConsolidated").addEventListener("click", () => {
-      const ws = XLSX.utils.json_to_sheet(savedData.map(data => ({
-        StructureName: data.StructureName,
-        Work: data.Work,
-        Location: data.Location,
-        Manpower: JSON.stringify(data.Manpower),
-        Equipment: JSON.stringify(data.Equipment),
-        Materials: JSON.stringify(data.Materials)
-      })));
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Project Data");
-      XLSX.writeFile(wb, "consolidated_project_data.xlsx");
+    // Sign in an existing user
+    signinBtn.addEventListener("click", () => {
+      const username = signinUsername.value.trim();
+      const password = signinPassword.value.trim();
+      const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+
+      if (user) {
+        currentUser = user;
+        authSection.classList.add("hidden");
+        mainApp.classList.remove("hidden");
+      } else {
+        signinError.textContent = "Invalid credentials or account not approved by admin.";
+      }
     });
 
-    // Export filtered data to Excel (based on search)
-    document.getElementById("exportFiltered").addEventListener("click", () => {
-      const searchName = document.getElementById("searchName").value.trim().toLowerCase();
-      const filteredData = savedData.filter(data => data.StructureName.toLowerCase().includes(searchName));
-
-      const ws = XLSX.utils.json_to_sheet(filteredData.map(data => ({
-        StructureName: data.StructureName,
-        Work: data.Work,
-        Location: data.Location,
-        Manpower: JSON.stringify(data.Manpower),
-        Equipment: JSON.stringify(data.Equipment),
-        Materials: JSON.stringify(data.Materials)
-      })));
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Filtered Project Data");
-      XLSX.writeFile(wb, `filtered_project_data_${searchName}.xlsx`);
+    // Admin login
+    adminLoginBtn.addEventListener("click", () => {
+      if (adminUsername.value === "heyman" && adminPassword.value === "12345678") {
+        adminLoggedIn = true;
+        adminError.textContent = "";
+        checkAdminAccess();
+      } else {
+        adminError.textContent = "Invalid admin credentials!";
+      }
     });
 
-    // Export individual data
-    function exportData(index) {
-      const ws = XLSX.utils.json_to_sheet([savedData[index]]);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Project Data");
-      XLSX.writeFile(wb, `${savedData[index].StructureName}_project_data.xlsx`);
-    }
-
-    // Toggle visibility of sections
-    document.getElementById("addManpowerBtn").addEventListener("click", () => {
-      document.getElementById("manpowerSection").classList.toggle("hidden");
+    // Logout functionality
+    logoutBtn.addEventListener("click", () => {
+      authSection.classList.remove("hidden");
+      mainApp.classList.add("hidden");
+      adminLoggedIn = false;
+      currentUser = null;
     });
 
-    document.getElementById("addEquipmentBtn").addEventListener("click", () => {
-      document.getElementById("equipmentSection").classList.toggle("hidden");
-    });
+    // Initialize the app
+    checkAdminAccess();
 
-    document.getElementById("addMaterialBtn").addEventListener("click", () => {
-      document.getElementById("materialSection").classList.toggle("hidden");
-    });
-
-    // Save manpower data
-    document.getElementById("saveManpower").addEventListener("click", () => {
-      const badgeNumber = document.getElementById("manpowerBadge").value.trim();
-      const name = document.getElementById("manpowerName").value.trim();
-      const jobTitle = document.getElementById("manpowerJob").value.trim();
-      const normalHours = document.getElementById("manpowerHours").value.trim();
-      const overtime = document.getElementById("manpowerOvertime").value.trim();
-      const holiday = document.getElementById("manpowerHoliday").value.trim();
-
-      const manpower = { BadgeNumber: badgeNumber, Name: name, JobTitle: jobTitle, NormalHours: normalHours, Overtime: overtime, Holiday: holiday };
-
-      const lastIndex = savedData.length - 1;
-      savedData[lastIndex].Manpower.push(manpower);
-      localStorage.setItem("projectData", JSON.stringify(savedData));
-
-      document.getElementById("manpowerBadge").value = "";
-      document.getElementById("manpowerName").value = "";
-      document.getElementById("manpowerJob").value = "";
-      document.getElementById("manpowerHours").value = "";
-      document.getElementById("manpowerOvertime").value = "";
-      document.getElementById("manpowerHoliday").value = "";
-    });
-
-    // Save equipment data
-    document.getElementById("saveEquipment").addEventListener("click", () => {
-      const name = document.getElementById("equipmentName").value.trim();
-      const qty = document.getElementById("equipmentQty").value.trim();
-
-      const equipment = { Name: name, Quantity: qty };
-
-      const lastIndex = savedData.length - 1;
-      savedData[lastIndex].Equipment.push(equipment);
-      localStorage.setItem("projectData", JSON.stringify(savedData));
-
-      document.getElementById("equipmentName").value = "";
-      document.getElementById("equipmentQty").value = "";
-    });
-
-    // Save material data
-    document.getElementById("saveMaterial").addEventListener("click", () => {
-      const name = document.getElementById("materialName").value.trim();
-      const qty = document.getElementById("materialQty").value.trim();
-
-      const material = { Name: name, Quantity: qty };
-
-      const lastIndex = savedData.length - 1;
-      savedData[lastIndex].Materials.push(material);
-      localStorage.setItem("projectData", JSON.stringify(savedData));
-
-      document.getElementById("materialName").value = "";
-      document.getElementById("materialQty").value = "";
-    });
-
-    // Initialize data display
-    displayData();
   </script>
 </body>
 </html>
