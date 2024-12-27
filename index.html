@@ -114,8 +114,9 @@
             signinPassword.value = '';
             signinError.textContent = '';
 
-            adminDashboard.classList.add("hidden");
+            // Make sure all relevant sections are visible
             document.getElementById("signinSection").classList.remove("hidden");
+            adminDashboard.classList.add("hidden"); // Hide Admin Dashboard
         });
 
         // Sign-up a new user
