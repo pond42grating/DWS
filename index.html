@@ -235,26 +235,25 @@
 
     // Admin login
     adminLoginBtn.addEventListener("click", () => {
-      const username = adminUsername.value.trim();
+      const username = adminUsername
+            const username = adminUsername.value.trim();
       const password = adminPassword.value.trim();
 
-      // Admin credentials check
       if (username === "heyman" && password === "12345678") {
         adminLoggedIn = true;
-        checkAdminAccess();
+        adminSection.classList.add("hidden");
+        adminDashboard.classList.remove("hidden");
+        displaySignupRequests();
       } else {
-        adminError.textContent = "Invalid Admin credentials.";
+        adminError.textContent = "Invalid admin credentials!";
       }
     });
 
-    // Log out
+    // User logout
     logoutBtn.addEventListener("click", () => {
+      currentUser = null;
       authSection.classList.remove("hidden");
       mainApp.classList.add("hidden");
-      adminDashboard.classList.add("hidden");
-      signinUsername.value = "";
-      signinPassword.value = "";
-      currentUser = null;
     });
 
     // Save project data
@@ -268,30 +267,17 @@
         materials: materials.value.trim(),
       };
 
-      if (project.structureName && project.work && project.location) {
-        projectData.push(project);
-        localStorage.setItem("projectData", JSON.stringify(projectData));
-
-        // Clear the form fields
-        structureName.value = "";
-        work.value = "";
-        location.value = "";
-        manpower.value = "";
-        equipment.value = "";
-        materials.value = "";
-
-        displaySavedData();
-      } else {
-        alert("Please fill out all required fields.");
-      }
+      projectData.push(project);
+      localStorage.setItem("projectData", JSON.stringify(projectData));
+      displaySavedData();
+      resetProjectForm();
     });
 
-    // Display saved data in the table
-    function displaySavedData() {
-      savedDataTable.innerHTML = "";
-      projectData.forEach(project => {
-        const row = savedDataTable.insertRow
-                const row = savedDataTable.insertRow();
+    // Display saved project data in the table
+    const displaySavedData = () => {
+      savedDataTable.innerHTML = '';
+      projectData.forEach((project) => {
+        const row = savedDataTable.insertRow();
         row.insertCell(0).textContent = project.structureName;
         row.insertCell(1).textContent = project.work;
         row.insertCell(2).textContent = project.location;
@@ -299,9 +285,19 @@
         row.insertCell(4).textContent = project.equipment;
         row.insertCell(5).textContent = project.materials;
       });
-    }
+    };
 
-    // Export to Excel
+    // Reset the project form
+    const resetProjectForm = () => {
+      structureName.value = "";
+      work.value = "";
+      location.value = "";
+      manpower.value = "";
+      equipment.value = "";
+      materials.value = "";
+    };
+
+    // Export data to Excel
     exportBtn.addEventListener("click", () => {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(projectData);
@@ -310,11 +306,6 @@
       // Download the Excel file
       XLSX.writeFile(wb, "ProjectData.xlsx");
     });
-
-    // Initial check if admin or user is logged in
-    if (adminLoggedIn) {
-      checkAdminAccess();
-    }
   </script>
 </body>
 </html>
