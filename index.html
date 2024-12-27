@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration and Admin Control</title>
+    <title>User and Admin Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         .hidden { display: none; }
-        .auth-section, .error { margin-bottom: 15px; }
+        .input-section, .auth-section, .details-section { margin-bottom: 15px; }
         .back-btn { cursor: pointer; color: blue; font-size: 14px; }
         .error { color: red; }
     </style>
@@ -64,15 +65,68 @@
         <ul id="signupRequestsList"></ul>
     </div>
 
+    <!-- Main App (Visible After User Sign-In) -->
+    <div id="mainApp" class="hidden">
+        <h1>Welcome to the Project Data Management App</h1>
+        <button id="logoutBtn">Logout</button>
+
+        <div id="projectSection">
+            <h2>Enter Project Information</h2>
+
+            <!-- Project data entry form -->
+            <label for="structureName">Structure Name:</label>
+            <input type="text" id="structureName" placeholder="Enter Structure Name" required><br><br>
+
+            <label for="work">Work:</label>
+            <input type="text" id="work" placeholder="Enter Work" required><br><br>
+
+            <label for="location">Location:</label>
+            <input type="text" id="location" placeholder="Enter Location" required><br><br>
+
+            <label for="manpower">Manpower:</label>
+            <input type="text" id="manpower" placeholder="Enter Manpower" required><br><br>
+
+            <label for="equipment">Equipment:</label>
+            <input type="text" id="equipment" placeholder="Enter Equipment" required><br><br>
+
+            <label for="materials">Materials:</label>
+            <input type="text" id="materials" placeholder="Enter Materials" required><br><br>
+
+            <button id="saveDataBtn">Save Data</button>
+
+            <h3>Saved Data:</h3>
+            <table id="savedDataTable">
+                <thead>
+                    <tr>
+                        <th>Structure Name</th>
+                        <th>Work</th>
+                        <th>Location</th>
+                        <th>Manpower</th>
+                        <th>Equipment</th>
+                        <th>Materials</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+
+            <button id="exportBtn">Export to Excel</button>
+        </div>
+    </div>
+
     <script>
-        // Initialize storage for users
+        // Initialize storage for users and project data
         let users = JSON.parse(localStorage.getItem("users")) || [];
+        let projectData = JSON.parse(localStorage.getItem("projectData")) || [];
         let adminLoggedIn = false;
+        let currentUser = null;
 
         // DOM Elements
         const signupBtn = document.getElementById("signupBtn");
         const signinBtn = document.getElementById("signinBtn");
         const adminLoginBtn = document.getElementById("adminLoginBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const saveDataBtn = document.getElementById("saveDataBtn");
+        const exportBtn = document.getElementById("exportBtn");
 
         const signupUsername = document.getElementById("signupUsername");
         const signupPassword = document.getElementById("signupPassword");
@@ -80,6 +134,13 @@
         const signinPassword = document.getElementById("signinPassword");
         const adminUsername = document.getElementById("adminUsername");
         const adminPassword = document.getElementById("adminPassword");
+
+        const structureName = document.getElementById("structureName");
+        const work = document.getElementById("work");
+        const location = document.getElementById("location");
+        const manpower = document.getElementById("manpower");
+        const equipment = document.getElementById("equipment");
+        const materials = document.getElementById("materials");
 
         const signupError = document.getElementById("signupError");
         const signinError = document.getElementById("signinError");
@@ -89,6 +150,8 @@
         const signupSection = document.getElementById("signupSection");
         const adminSection = document.getElementById("adminSection");
         const adminDashboard = document.getElementById("adminDashboard");
+        const mainApp = document.getElementById("mainApp");
+        const savedDataTable = document.getElementById("savedDataTable").getElementsByTagName('tbody')[0];
 
         const signupRequestsList = document.getElementById("signupRequestsList");
 
@@ -134,8 +197,11 @@
                 const user = users.find(user => user.username === username && user.password === password && user.isApproved);
                 
                 if (user) {
-                    // Go to Main App (Later Section)
-                    alert("Login successful! Welcome to the project app.");
+                    currentUser = user;
+                    authSection.classList.add("hidden");
+                    adminSection.classList.add("hidden");
+                    mainApp.classList.remove("hidden");
+                    resetProjectForm();
                 } else {
                     signinError.textContent = "Invalid credentials or not approved by admin.";
                 }
@@ -168,7 +234,7 @@
                 li.textContent = `${user.username} (Pending Approval)`;
 
                 const approveBtn = document.createElement("button");
-                approveBtn.textContent = "Approve";
+                                approveBtn.textContent = "Approve";
                 approveBtn.onclick = () => approveUser(user);
 
                 const rejectBtn = document.createElement("button");
@@ -181,19 +247,109 @@
             });
         };
 
-        // Approve user
+        // Approve user and update the approval status
         const approveUser = (user) => {
             user.isApproved = true;
             localStorage.setItem("users", JSON.stringify(users));
-            displaySignupRequests();
+            displaySignupRequests();  // Refresh the list after approval
         };
 
-        // Reject user
+        // Reject user and remove them from the list
         const rejectUser = (user) => {
-            users = users.filter(u => u !== user);
-            localStorage.setItem("users", JSON.stringify(users));
-            displaySignupRequests();
+            const index = users.indexOf(user);
+            if (index !== -1) {
+                users.splice(index, 1);
+                localStorage.setItem("users", JSON.stringify(users));
+                displaySignupRequests();  // Refresh the list after rejection
+            }
         };
+
+        // Logout functionality
+        logoutBtn.addEventListener("click", () => {
+            currentUser = null;
+            mainApp.classList.add("hidden");
+            authSection.classList.remove("hidden");
+            savedDataTable.innerHTML = "";
+        });
+
+        // Save project data
+        saveDataBtn.addEventListener("click", () => {
+            const structureNameValue = structureName.value.trim();
+            const workValue = work.value.trim();
+            const locationValue = location.value.trim();
+            const manpowerValue = manpower.value.trim();
+            const equipmentValue = equipment.value.trim();
+            const materialsValue = materials.value.trim();
+
+            if (structureNameValue && workValue && locationValue && manpowerValue && equipmentValue && materialsValue) {
+                const project = {
+                    structureName: structureNameValue,
+                    work: workValue,
+                    location: locationValue,
+                    manpower: manpowerValue,
+                    equipment: equipmentValue,
+                    materials: materialsValue
+                };
+
+                projectData.push(project);
+                localStorage.setItem("projectData", JSON.stringify(projectData));
+
+                addToTable(project);
+                resetProjectForm();
+            } else {
+                alert("Please fill in all fields before saving.");
+            }
+        });
+
+        // Add project data to the table
+        const addToTable = (project) => {
+            const row = savedDataTable.insertRow();
+            row.insertCell(0).textContent = project.structureName;
+            row.insertCell(1).textContent = project.work;
+            row.insertCell(2).textContent = project.location;
+            row.insertCell(3).textContent = project.manpower;
+            row.insertCell(4).textContent = project.equipment;
+            row.insertCell(5).textContent = project.materials;
+        };
+
+        // Reset project data form after saving
+        const resetProjectForm = () => {
+            structureName.value = '';
+            work.value = '';
+            location.value = '';
+            manpower.value = '';
+            equipment.value = '';
+            materials.value = '';
+        };
+
+        // Export project data to Excel
+        exportBtn.addEventListener("click", () => {
+            const ws = XLSX.utils.json_to_sheet(projectData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Project Data");
+
+            // Save the Excel file
+            XLSX.writeFile(wb, "project_data.xlsx");
+        });
+
+        // Initialize the app based on the current state
+        const initApp = () => {
+            if (adminLoggedIn) {
+                adminSection.classList.add("hidden");
+                adminDashboard.classList.remove("hidden");
+                displaySignupRequests();
+            } else if (currentUser) {
+                mainApp.classList.remove("hidden");
+                authSection.classList.add("hidden");
+                projectData = JSON.parse(localStorage.getItem("projectData")) || [];
+                projectData.forEach(addToTable);
+            } else {
+                authSection.classList.remove("hidden");
+            }
+        };
+
+        initApp();
     </script>
 </body>
 </html>
+                
