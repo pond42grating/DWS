@@ -170,9 +170,11 @@
     // Export data to Excel (consolidated)
     document.getElementById("exportConsolidated").addEventListener("click", () => {
       const ws = XLSX.utils.json_to_sheet(savedData.map(data => ({
-        ...data, 
-        Manpower: JSON.stringify(data.Manpower), 
-        Equipment: JSON.stringify(data.Equipment), 
+        StructureName: data.StructureName,
+        Work: data.Work,
+        Location: data.Location,
+        Manpower: JSON.stringify(data.Manpower),
+        Equipment: JSON.stringify(data.Equipment),
         Materials: JSON.stringify(data.Materials)
       })));
       const wb = XLSX.utils.book_new();
@@ -186,9 +188,11 @@
       const filteredData = savedData.filter(data => data.StructureName.toLowerCase().includes(searchName));
 
       const ws = XLSX.utils.json_to_sheet(filteredData.map(data => ({
-        ...data, 
-        Manpower: JSON.stringify(data.Manpower), 
-        Equipment: JSON.stringify(data.Equipment), 
+        StructureName: data.StructureName,
+        Work: data.Work,
+        Location: data.Location,
+        Manpower: JSON.stringify(data.Manpower),
+        Equipment: JSON.stringify(data.Equipment),
         Materials: JSON.stringify(data.Materials)
       })));
       const wb = XLSX.utils.book_new();
