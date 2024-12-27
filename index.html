@@ -235,8 +235,7 @@
 
     // Admin login
     adminLoginBtn.addEventListener("click", () => {
-      const username = adminUsername
-            const username = adminUsername.value.trim();
+      const username = adminUsername.value.trim();
       const password = adminPassword.value.trim();
 
       if (username === "heyman" && password === "12345678") {
@@ -279,7 +278,7 @@
       projectData.forEach((project) => {
         const row = savedDataTable.insertRow();
         row.insertCell(0).textContent = project.structureName;
-        row.insertCell(1).textContent = project.work;
+                row.insertCell(1).textContent = project.work;
         row.insertCell(2).textContent = project.location;
         row.insertCell(3).textContent = project.manpower;
         row.insertCell(4).textContent = project.equipment;
@@ -306,6 +305,9 @@
       // Download the Excel file
       XLSX.writeFile(wb, "ProjectData.xlsx");
     });
+
+    // Initialize the app
+    checkAdminAccess();
   </script>
 </body>
 </html>
