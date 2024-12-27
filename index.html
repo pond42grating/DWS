@@ -131,11 +131,20 @@
             const password = signinPassword.value.trim();
 
             if (username && password) {
+                // Check if it's an admin login first
+                if (username === "heyman" && password === "12345678") {
+                    adminLoggedIn = true;
+                    adminSection.classList.add("hidden");
+                    adminDashboard.classList.remove("hidden");
+                    displaySignupRequests();
+                    return;
+                }
+
                 const user = users.find(user => user.username === username && user.password === password && user.isApproved);
                 
                 if (user) {
-                    // Go to Main App (Later Section)
                     alert("Login successful! Welcome to the project app.");
+                    // Proceed to project entry/dashboard
                 } else {
                     signinError.textContent = "Invalid credentials or not approved by admin.";
                 }
@@ -153,13 +162,13 @@
                 adminLoggedIn = true;
                 adminSection.classList.add("hidden");
                 adminDashboard.classList.remove("hidden");
-                displaySignupRequests(); // Display the pending sign-up requests for admin
+                displaySignupRequests();
             } else {
                 adminError.textContent = "Invalid admin credentials.";
             }
         });
 
-        // Admin approves or rejects users
+        // Display sign-up requests for admin to approve/reject
         const displaySignupRequests = () => {
             signupRequestsList.innerHTML = "";
             const pendingUsers = users.filter(user => !user.isApproved);
