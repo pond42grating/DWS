@@ -1,364 +1,199 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User and Admin Control</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <style>
-    .hidden {
-      display: none;
-    }
-    .input-section, .auth-section, .details-section {
-      margin-bottom: 15px;
-    }
-    .back-btn {
-      cursor: pointer;
-      color: blue;
-      font-size: 14px;
-    }
-    .error {
-      color: red;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration and Admin Control</title>
+    <style>
+        .hidden { display: none; }
+        .auth-section, .error { margin-bottom: 15px; }
+        .back-btn { cursor: pointer; color: blue; font-size: 14px; }
+        .error { color: red; }
+    </style>
 </head>
 <body>
 
-  <h1>User Registration and Admin Control</h1>
+    <h1>User Registration and Admin Control</h1>
 
-  <!-- Authentication Section (Sign-In and Sign-Up) -->
-  <div id="authSection">
-    <div class="auth-section">
-      <h2>Sign In</h2>
-      <label for="signinUsername">Username:</label>
-      <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
+    <!-- Authentication Section (Sign-In and Sign-Up) -->
+    <div id="authSection">
+        <div class="auth-section">
+            <h2>Sign In</h2>
+            <label for="signinUsername">Username:</label>
+            <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
 
-      <label for="signinPassword">Password:</label>
-      <input type="password" id="signinPassword" placeholder="Enter Password" required><br><br>
+            <label for="signinPassword">Password:</label>
+            <input type="password" id="signinPassword" placeholder="Enter Password" required><br><br>
 
-      <button id="signinBtn">Sign In</button>
-      <p class="error" id="signinError"></p>
-      <button id="goToSignupBtn">Sign Up</button> <!-- Button to go to Sign Up -->
+            <button id="signinBtn">Sign In</button>
+            <p class="error" id="signinError"></p>
+            <button id="goToSignupBtn">Sign Up</button> <!-- Button to go to Sign Up -->
+        </div>
+
+        <div id="signupSection" class="auth-section hidden">
+            <span class="back-btn" id="backToLoginBtn">← Back to Login</span> <!-- Back Button -->
+            <h2>Sign Up</h2>
+            <label for="signupUsername">Username:</label>
+            <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
+
+            <label for="signupPassword">Password:</label>
+            <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
+
+            <button id="signupBtn">Sign Up</button>
+            <p class="error" id="signupError"></p>
+        </div>
     </div>
 
-    <div id="signupSection" class="auth-section hidden">
-      <span class="back-btn" id="backToLoginBtn">← Back to Login</span> <!-- Back Button -->
-      <h2>Sign Up</h2>
-      <label for="signupUsername">Username:</label>
-      <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
+    <!-- Admin Login Section -->
+    <div id="adminSection" class="hidden">
+        <h2>Admin Login</h2>
+        <label for="adminUsername">Admin Username:</label>
+        <input type="text" id="adminUsername" placeholder="Enter Admin Username" required><br><br>
 
-      <label for="signupPassword">Password:</label>
-      <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
+        <label for="adminPassword">Admin Password:</label>
+        <input type="password" id="adminPassword" placeholder="Enter Admin Password" required><br><br>
 
-      <button id="signupBtn">Sign Up</button>
-      <p class="error" id="signupError"></p>
+        <button id="adminLoginBtn">Login as Admin</button>
+        <p class="error" id="adminError"></p>
     </div>
-  </div>
 
-  <!-- Admin Login Section -->
-  <div id="adminSection" class="hidden">
-    <h2>Admin Login</h2>
-    <label for="adminUsername">Admin Username:</label>
-    <input type="text" id="adminUsername" placeholder="Enter Admin Username" required><br><br>
-
-    <label for="adminPassword">Admin Password:</label>
-    <input type="password" id="adminPassword" placeholder="Enter Admin Password" required><br><br>
-
-    <button id="adminLoginBtn">Login as Admin</button>
-    <p class="error" id="adminError"></p>
-  </div>
-
-  <!-- Admin Dashboard (After Admin Login) -->
-  <div id="adminDashboard" class="hidden">
-    <h2>Admin Dashboard</h2>
-    <h3>Sign-Up Requests</h3>
-    <ul id="signupRequestsList"></ul>
-  </div>
-
-  <!-- Main App (Visible After User Sign-In) -->
-  <div id="mainApp" class="hidden">
-    <h1>Welcome to the Project Data Management App</h1>
-    <button id="logoutBtn">Logout</button>
-
-    <div id="projectSection">
-      <h2>Enter Project Information</h2>
-
-      <!-- Project data entry form -->
-      <label for="structureName">Structure Name:</label>
-      <input type="text" id="structureName" placeholder="Enter Structure Name" required><br><br>
-
-      <label for="work">Work:</label>
-      <input type="text" id="work" placeholder="Enter Work" required><br><br>
-
-      <label for="location">Location:</label>
-      <input type="text" id="location" placeholder="Enter Location" required><br><br>
-
-      <label for="manpower">Manpower:</label>
-      <input type="text" id="manpower" placeholder="Enter Manpower" required><br><br>
-
-      <label for="equipment">Equipment:</label>
-      <input type="text" id="equipment" placeholder="Enter Equipment" required><br><br>
-
-      <label for="materials">Materials:</label>
-      <input type="text" id="materials" placeholder="Enter Materials" required><br><br>
-
-      <button id="saveDataBtn">Save Data</button>
-
-      <h3>Saved Data:</h3>
-      <table id="savedDataTable">
-        <thead>
-          <tr>
-            <th>Structure Name</th>
-            <th>Work</th>
-            <th>Location</th>
-            <th>Manpower</th>
-            <th>Equipment</th>
-            <th>Materials</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <button id="exportBtn">Export to Excel</button>
+    <!-- Admin Dashboard (After Admin Login) -->
+    <div id="adminDashboard" class="hidden">
+        <h2>Admin Dashboard</h2>
+        <h3>Sign-Up Requests</h3>
+        <ul id="signupRequestsList"></ul>
     </div>
-  </div>
 
-  <script>
-    // Initialize storage for users and project data
-    let users = JSON.parse(localStorage.getItem("users")) || [];
-    let projectData = JSON.parse(localStorage.getItem("projectData")) || [];
-    let adminLoggedIn = false;
-    let currentUser = null;
+    <script>
+        // Initialize storage for users
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let adminLoggedIn = false;
 
-    // DOM Elements
-    const signupBtn = document.getElementById("signupBtn");
-    const signinBtn = document.getElementById("signinBtn");
-    const adminLoginBtn = document.getElementById("adminLoginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const saveDataBtn = document.getElementById("saveDataBtn");
-    const exportBtn = document.getElementById("exportBtn");
+        // DOM Elements
+        const signupBtn = document.getElementById("signupBtn");
+        const signinBtn = document.getElementById("signinBtn");
+        const adminLoginBtn = document.getElementById("adminLoginBtn");
 
-    const signupUsername = document.getElementById("signupUsername");
-    const signupPassword = document.getElementById("signupPassword");
-    const signinUsername = document.getElementById("signinUsername");
-    const signinPassword = document.getElementById("signinPassword");
-    const adminUsername = document.getElementById("adminUsername");
-    const adminPassword = document.getElementById("adminPassword");
+        const signupUsername = document.getElementById("signupUsername");
+        const signupPassword = document.getElementById("signupPassword");
+        const signinUsername = document.getElementById("signinUsername");
+        const signinPassword = document.getElementById("signinPassword");
+        const adminUsername = document.getElementById("adminUsername");
+        const adminPassword = document.getElementById("adminPassword");
 
-    const structureName = document.getElementById("structureName");
-    const work = document.getElementById("work");
-    const location = document.getElementById("location");
-    const manpower = document.getElementById("manpower");
-    const equipment = document.getElementById("equipment");
-    const materials = document.getElementById("materials");
+        const signupError = document.getElementById("signupError");
+        const signinError = document.getElementById("signinError");
+        const adminError = document.getElementById("adminError");
 
-    const signupError = document.getElementById("signupError");
-    const signinError = document.getElementById("signinError");
-    const adminError = document.getElementById("adminError");
+        const authSection = document.getElementById("authSection");
+        const signupSection = document.getElementById("signupSection");
+        const adminSection = document.getElementById("adminSection");
+        const adminDashboard = document.getElementById("adminDashboard");
 
-    const authSection = document.getElementById("authSection");
-    const signupSection = document.getElementById("signupSection");
-    const adminSection = document.getElementById("adminSection");
-    const adminDashboard = document.getElementById("adminDashboard");
-    const mainApp = document.getElementById("mainApp");
-    const savedDataTable = document.getElementById("savedDataTable").getElementsByTagName('tbody')[0];
+        const signupRequestsList = document.getElementById("signupRequestsList");
 
-    const signupRequestsList = document.getElementById("signupRequestsList");
+        // Show sign-up form
+        document.getElementById("goToSignupBtn").addEventListener("click", () => {
+            authSection.classList.add("hidden");
+            signupSection.classList.remove("hidden");
+        });
 
-    // Show sign-up form
-    document.getElementById("goToSignupBtn").addEventListener("click", () => {
-      authSection.classList.add("hidden");
-      signupSection.classList.remove("hidden");
-    });
+        // Go back to login screen from sign-up
+        document.getElementById("backToLoginBtn").addEventListener("click", () => {
+            signupSection.classList.add("hidden");
+            authSection.classList.remove("hidden");
+        });
 
-    // Go back to login screen from sign-up
-    document.getElementById("backToLoginBtn").addEventListener("click", () => {
-      signupSection.classList.add("hidden");
-      authSection.classList.remove("hidden");
-    });
+        // Sign-up a new user
+        signupBtn.addEventListener("click", () => {
+            const username = signupUsername.value.trim();
+            const password = signupPassword.value.trim();
 
-    // Sign-up a new user
-    signupBtn.addEventListener("click", () => {
-      const username = signupUsername.value.trim();
-      const password = signupPassword.value.trim();
+            if (username && password) {
+                const existingUser = users.find(user => user.username === username);
+                if (existingUser) {
+                    signupError.textContent = "Username already exists.";
+                } else {
+                    users.push({ username, password, isApproved: false });
+                    localStorage.setItem("users", JSON.stringify(users));
+                    signupError.textContent = "Sign up successful! Await admin approval.";
+                    signupUsername.value = '';
+                    signupPassword.value = '';
+                }
+            } else {
+                signupError.textContent = "Please fill in all fields.";
+            }
+        });
 
-      if (username && password) {
-        const existingUser = users.find(user => user.username === username);
-        if (existingUser) {
-          signupError.textContent = "Username already exists.";
-        } else {
-          users.push({ username, password, isApproved: false });
-          localStorage.setItem("users", JSON.stringify(users));
-          signupError.textContent = "Sign up successful! Await admin approval.";
-          signupUsername.value = '';
-          signupPassword.value = '';
-        }
-      } else {
-        signupError.textContent = "Please fill in all fields.";
-      }
-    });
+        // Sign-in
+        signinBtn.addEventListener("click", () => {
+            const username = signinUsername.value.trim();
+            const password = signinPassword.value.trim();
 
-    // Sign-in
-    signinBtn.addEventListener("click", () => {
-      const username = signinUsername.value.trim();
-      const password = signinPassword.value.trim();
+            if (username && password) {
+                const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+                
+                if (user) {
+                    // Go to Main App (Later Section)
+                    alert("Login successful! Welcome to the project app.");
+                } else {
+                    signinError.textContent = "Invalid credentials or not approved by admin.";
+                }
+            } else {
+                signinError.textContent = "Please fill in all fields.";
+            }
+        });
 
-      if (username && password) {
-        const user = users.find(user => user.username === username && user.password === password && user.isApproved);
-        
-        if (user) {
-          currentUser = user;
-          authSection.classList.add("hidden");
-          adminSection.classList.add("hidden");
-          mainApp.classList.remove("hidden");
-          resetProjectForm();
-        } else {
-          signinError.textContent = "Invalid credentials or not approved by admin.";
-        }
-      } else {
-        signinError.textContent = "Please fill in all fields.";
-      }
-    });
-
-    // Admin login
-    adminLoginBtn.addEventListener("click", () => {
-      const adminUsernameInput = adminUsername.value.trim();
-      const adminPasswordInput = adminPassword.value.trim();
+        // Admin login
+        adminLoginBtn.addEventListener("click", () => {
+            const adminUsernameInput = adminUsername.value.trim();
+            const adminPasswordInput = adminPassword.value.trim();
 
             if (adminUsernameInput === "heyman" && adminPasswordInput === "12345678") {
-        adminLoggedIn = true;
-        adminSection.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-        displaySignupRequests(); // Display the pending sign-up requests for admin
-      } else {
-        adminError.textContent = "Invalid admin credentials.";
-      }
-    });
+                adminLoggedIn = true;
+                adminSection.classList.add("hidden");
+                adminDashboard.classList.remove("hidden");
+                displaySignupRequests(); // Display the pending sign-up requests for admin
+            } else {
+                adminError.textContent = "Invalid admin credentials.";
+            }
+        });
 
-    // Admin approves or rejects users
-    const displaySignupRequests = () => {
-      signupRequestsList.innerHTML = "";
-      const pendingUsers = users.filter(user => !user.isApproved);
-      pendingUsers.forEach(user => {
-        const li = document.createElement("li");
-        li.textContent = `${user.username} (Pending Approval)`;
+        // Admin approves or rejects users
+        const displaySignupRequests = () => {
+            signupRequestsList.innerHTML = "";
+            const pendingUsers = users.filter(user => !user.isApproved);
+            pendingUsers.forEach(user => {
+                const li = document.createElement("li");
+                li.textContent = `${user.username} (Pending Approval)`;
 
-        const approveBtn = document.createElement("button");
-        approveBtn.textContent = "Approve";
-        approveBtn.onclick = () => approveUser(user);
+                const approveBtn = document.createElement("button");
+                approveBtn.textContent = "Approve";
+                approveBtn.onclick = () => approveUser(user);
 
-        const rejectBtn = document.createElement("button");
-        rejectBtn.textContent = "Reject";
-        rejectBtn.onclick = () => rejectUser(user);
+                const rejectBtn = document.createElement("button");
+                rejectBtn.textContent = "Reject";
+                rejectBtn.onclick = () => rejectUser(user);
 
-        li.appendChild(approveBtn);
-        li.appendChild(rejectBtn);
-        signupRequestsList.appendChild(li);
-      });
-    };
-
-    // Approve user and update the approval status
-    const approveUser = (user) => {
-      user.isApproved = true;
-      localStorage.setItem("users", JSON.stringify(users));
-      displaySignupRequests();  // Refresh the list after approval
-    };
-
-    // Reject user and remove them from the list
-    const rejectUser = (user) => {
-      const index = users.indexOf(user);
-      if (index !== -1) {
-        users.splice(index, 1);
-        localStorage.setItem("users", JSON.stringify(users));
-        displaySignupRequests();  // Refresh the list after rejection
-      }
-    };
-
-    // Logout functionality
-    logoutBtn.addEventListener("click", () => {
-      currentUser = null;
-      mainApp.classList.add("hidden");
-      authSection.classList.remove("hidden");
-      savedDataTable.innerHTML = "";
-    });
-
-    // Save project data
-    saveDataBtn.addEventListener("click", () => {
-      const structureNameValue = structureName.value.trim();
-      const workValue = work.value.trim();
-      const locationValue = location.value.trim();
-      const manpowerValue = manpower.value.trim();
-      const equipmentValue = equipment.value.trim();
-      const materialsValue = materials.value.trim();
-
-      if (structureNameValue && workValue && locationValue && manpowerValue && equipmentValue && materialsValue) {
-        const project = {
-          structureName: structureNameValue,
-          work: workValue,
-          location: locationValue,
-          manpower: manpowerValue,
-          equipment: equipmentValue,
-          materials: materialsValue
+                li.appendChild(approveBtn);
+                li.appendChild(rejectBtn);
+                signupRequestsList.appendChild(li);
+            });
         };
 
-        projectData.push(project);
-        localStorage.setItem("projectData", JSON.stringify(projectData));
+        // Approve user
+        const approveUser = (user) => {
+            user.isApproved = true;
+            localStorage.setItem("users", JSON.stringify(users));
+            displaySignupRequests();
+        };
 
-        addToTable(project);
-        resetProjectForm();
-      } else {
-        alert("Please fill in all fields before saving.");
-      }
-    });
-
-    // Add project data to the table
-    const addToTable = (project) => {
-      const row = savedDataTable.insertRow();
-      row.insertCell(0).textContent = project.structureName;
-      row.insertCell(1).textContent = project.work;
-      row.insertCell(2).textContent = project.location;
-      row.insertCell(3).textContent = project.manpower;
-      row.insertCell(4).textContent = project.equipment;
-      row.insertCell(5).textContent = project.materials;
-    };
-
-    // Reset project data form after saving
-    const resetProjectForm = () => {
-      structureName.value = '';
-      work.value = '';
-      location.value = '';
-      manpower.value = '';
-      equipment.value = '';
-      materials.value = '';
-    };
-
-    // Export project data to Excel
-    exportBtn.addEventListener("click", () => {
-      const ws = XLSX.utils.json_to_sheet(projectData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Project Data");
-
-      // Save the Excel file
-      XLSX.writeFile(wb, "project_data.xlsx");
-    });
-
-    // Initialize the app based on the current state
-    const initApp = () => {
-      if (adminLoggedIn) {
-        adminSection.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-        displaySignupRequests();
-      } else if (currentUser) {
-        mainApp.classList.remove("hidden");
-        authSection.classList.add("hidden");
-        projectData = JSON.parse(localStorage.getItem("projectData")) || [];
-        projectData.forEach(addToTable);
-      } else {
-        authSection.classList.remove("hidden");
-      }
-    };
-
-    initApp();
-  </script>
+        // Reject user
+        const rejectUser = (user) => {
+            users = users.filter(u => u !== user);
+            localStorage.setItem("users", JSON.stringify(users));
+            displaySignupRequests();
+        };
+    </script>
 </body>
 </html>
