@@ -15,6 +15,11 @@
     .error {
       color: red;
     }
+    .back-btn {
+      cursor: pointer;
+      color: blue;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -23,18 +28,6 @@
 
   <!-- Authentication Section (Sign-In and Sign-Up) -->
   <div id="authSection">
-    <div class="auth-section">
-      <h2>Sign Up</h2>
-      <label for="signupUsername">Username:</label>
-      <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
-
-      <label for="signupPassword">Password:</label>
-      <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
-
-      <button id="signupBtn">Sign Up</button>
-      <p class="error" id="signupError"></p>
-    </div>
-
     <div class="auth-section">
       <h2>Sign In</h2>
       <label for="signinUsername">Username:</label>
@@ -45,6 +38,20 @@
 
       <button id="signinBtn">Sign In</button>
       <p class="error" id="signinError"></p>
+      <button id="goToSignupBtn">Sign Up</button> <!-- Button to go to Sign Up -->
+    </div>
+
+    <div id="signupSection" class="auth-section hidden">
+      <span class="back-btn" id="backToLoginBtn">← Back to Login</span> <!-- Back Button -->
+      <h2>Sign Up</h2>
+      <label for="signupUsername">Username:</label>
+      <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
+
+      <label for="signupPassword">Password:</label>
+      <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
+
+      <button id="signupBtn">Sign Up</button>
+      <p class="error" id="signupError"></p>
     </div>
   </div>
 
@@ -148,12 +155,25 @@
     const adminError = document.getElementById("adminError");
 
     const authSection = document.getElementById("authSection");
+    const signupSection = document.getElementById("signupSection");
     const adminSection = document.getElementById("adminSection");
     const adminDashboard = document.getElementById("adminDashboard");
     const mainApp = document.getElementById("mainApp");
     const savedDataTable = document.getElementById("savedDataTable").getElementsByTagName('tbody')[0];
 
     const signupRequestsList = document.getElementById("signupRequestsList");
+
+    // Show sign-up form
+    document.getElementById("goToSignupBtn").addEventListener("click", () => {
+      authSection.classList.add("hidden");
+      signupSection.classList.remove("hidden");
+    });
+
+    // Go back to login screen from sign-up
+    document.getElementById("backToLoginBtn").addEventListener("click", () => {
+      signupSection.classList.add("hidden");
+      authSection.classList.remove("hidden");
+    });
 
     // Check if the user is an admin or a registered user
     const checkAdminAccess = () => {
@@ -198,92 +218,105 @@
     // Sign up a new user
     signupBtn.addEventListener("click", () => {
       const username = signupUsername.value.trim();
-      const password = signupPassword.value.trim();
-      const existingUser = users.find(user => user.username === username);
+            const password = signupPassword.value.trim();
 
-      if (existingUser) {
-        signupError.textContent = "Username already exists!";
+      if (username && password) {
+        // Check if the username already exists
+        const existingUser = users.find(user => user.username === username);
+        if (existingUser) {
+          signupError.textContent = "Username already exists.";
+        } else {
+          // Add the new user to the users array
+          users.push({ username, password, isApproved: false });
+          localStorage.setItem("users", JSON.stringify(users));
+          signupError.textContent = "Sign up successful! Await admin approval.";
+          signupUsername.value = '';
+          signupPassword.value = '';
+        }
       } else {
-        const newUser = {
-          username,
-          password,
-          isApproved: false,
-        };
-        users.push(newUser);
-        localStorage.setItem("users", JSON.stringify(users));
-        signupError.textContent = "Sign up successful. Awaiting approval from the admin.";
-        signupUsername.value = "";
-        signupPassword.value = "";
+        signupError.textContent = "Please fill in all fields.";
       }
     });
 
-    // Sign in an existing user
+    // Sign in a user
     signinBtn.addEventListener("click", () => {
       const username = signinUsername.value.trim();
       const password = signinPassword.value.trim();
-      const user = users.find(user => user.username === username && user.password === password && user.isApproved);
 
-      if (user) {
-        currentUser = user;
-        authSection.classList.add("hidden");
-        mainApp.classList.remove("hidden");
-        displaySavedData();
+      if (username && password) {
+        const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+        
+        if (user) {
+          currentUser = user;
+          authSection.classList.add("hidden");
+          adminSection.classList.add("hidden");
+          mainApp.classList.remove("hidden");
+          resetProjectForm();
+        } else {
+          signinError.textContent = "Invalid credentials or not approved by admin.";
+        }
       } else {
-        signinError.textContent = "Invalid credentials or account not approved by admin.";
+        signinError.textContent = "Please fill in all fields.";
       }
     });
 
     // Admin login
     adminLoginBtn.addEventListener("click", () => {
-      const username = adminUsername.value.trim();
-      const password = adminPassword.value.trim();
+      const adminUsernameInput = adminUsername.value.trim();
+      const adminPasswordInput = adminPassword.value.trim();
 
-      if (username === "heyman" && password === "12345678") {
+      if (adminUsernameInput === "heyman" && adminPasswordInput === "12345678") {
         adminLoggedIn = true;
-        adminSection.classList.add("hidden");
-        adminDashboard.classList.remove("hidden");
-        displaySignupRequests();
+        checkAdminAccess();
       } else {
-        adminError.textContent = "Invalid admin credentials!";
+        adminError.textContent = "Invalid admin credentials.";
       }
     });
 
-    // User logout
+    // Logout user
     logoutBtn.addEventListener("click", () => {
       currentUser = null;
-      authSection.classList.remove("hidden");
       mainApp.classList.add("hidden");
+      authSection.classList.remove("hidden");
     });
 
     // Save project data
     saveDataBtn.addEventListener("click", () => {
-      const project = {
-        structureName: structureName.value.trim(),
-        work: work.value.trim(),
-        location: location.value.trim(),
-        manpower: manpower.value.trim(),
-        equipment: equipment.value.trim(),
-        materials: materials.value.trim(),
-      };
+      const structure = structureName.value.trim();
+      const workDetails = work.value.trim();
+      const loc = location.value.trim();
+      const manpowerDetails = manpower.value.trim();
+      const equipmentDetails = equipment.value.trim();
+      const materialsDetails = materials.value.trim();
 
-      projectData.push(project);
-      localStorage.setItem("projectData", JSON.stringify(projectData));
-      displaySavedData();
-      resetProjectForm();
+      if (structure && workDetails && loc && manpowerDetails && equipmentDetails && materialsDetails) {
+        const project = {
+          structureName: structure,
+          work: workDetails,
+          location: loc,
+          manpower: manpowerDetails,
+          equipment: equipmentDetails,
+          materials: materialsDetails,
+        };
+
+        projectData.push(project);
+        localStorage.setItem("projectData", JSON.stringify(projectData));
+        addToTable(project);
+        resetProjectForm();
+      } else {
+        alert("Please fill in all fields.");
+      }
     });
 
-    // Display saved project data in the table
-    const displaySavedData = () => {
-      savedDataTable.innerHTML = '';
-      projectData.forEach((project) => {
-        const row = savedDataTable.insertRow();
-        row.insertCell(0).textContent = project.structureName;
-                row.insertCell(1).textContent = project.work;
-        row.insertCell(2).textContent = project.location;
-        row.insertCell(3).textContent = project.manpower;
-        row.insertCell(4).textContent = project.equipment;
-        row.insertCell(5).textContent = project.materials;
-      });
+    // Add project data to the table
+    const addToTable = (project) => {
+      const row = savedDataTable.insertRow();
+      row.insertCell(0).textContent = project.structureName;
+      row.insertCell(1).textContent = project.work;
+      row.insertCell(2).textContent = project.location;
+      row.insertCell(3).textContent = project.manpower;
+      row.insertCell(4).textContent = project.equipment;
+      row.insertCell(5).textContent = project.materials;
     };
 
     // Reset the project form
@@ -305,9 +338,6 @@
       // Download the Excel file
       XLSX.writeFile(wb, "ProjectData.xlsx");
     });
-
-    // Initialize the app
-    checkAdminAccess();
   </script>
 </body>
 </html>
