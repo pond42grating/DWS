@@ -6,19 +6,19 @@
   <title>User and Admin Control</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
-    .input-section, .auth-section, .details-section {
-      margin-bottom: 15px;
-    }
     .hidden {
       display: none;
     }
-    .error {
-      color: red;
+    .input-section, .auth-section, .details-section {
+      margin-bottom: 15px;
     }
     .back-btn {
       cursor: pointer;
       color: blue;
       font-size: 14px;
+    }
+    .error {
+      color: red;
     }
   </style>
 </head>
@@ -94,13 +94,13 @@
       <input type="text" id="location" placeholder="Enter Location" required><br><br>
 
       <label for="manpower">Manpower:</label>
-      <button id="addManpowerBtn">Add Manpower</button><br><br>
+      <input type="text" id="manpower" placeholder="Enter Manpower" required><br><br>
 
       <label for="equipment">Equipment:</label>
-      <button id="addEquipmentBtn">Add Equipment</button><br><br>
+      <input type="text" id="equipment" placeholder="Enter Equipment" required><br><br>
 
       <label for="materials">Materials:</label>
-      <button id="addMaterialsBtn">Add Materials</button><br><br>
+      <input type="text" id="materials" placeholder="Enter Materials" required><br><br>
 
       <button id="saveDataBtn">Save Data</button>
 
@@ -215,18 +215,16 @@
       displaySignupRequests();
     };
 
-    // Sign up a new user
+    // Sign-up a new user
     signupBtn.addEventListener("click", () => {
       const username = signupUsername.value.trim();
-            const password = signupPassword.value.trim();
+      const password = signupPassword.value.trim();
 
       if (username && password) {
-        // Check if the username already exists
         const existingUser = users.find(user => user.username === username);
         if (existingUser) {
           signupError.textContent = "Username already exists.";
         } else {
-          // Add the new user to the users array
           users.push({ username, password, isApproved: false });
           localStorage.setItem("users", JSON.stringify(users));
           signupError.textContent = "Sign up successful! Await admin approval.";
@@ -238,7 +236,7 @@
       }
     });
 
-    // Sign in a user
+    // Sign-in
     signinBtn.addEventListener("click", () => {
       const username = signinUsername.value.trim();
       const password = signinPassword.value.trim();
@@ -319,25 +317,41 @@
       row.insertCell(5).textContent = project.materials;
     };
 
-    // Reset the project form
+    // Reset the project data form after submission
     const resetProjectForm = () => {
-      structureName.value = "";
-      work.value = "";
-      location.value = "";
-      manpower.value = "";
-      equipment.value = "";
-      materials.value = "";
+      structureName.value = '';
+      work.value = '';
+      location.value = '';
+      manpower.value = '';
+      equipment.value = '';
+      materials.value = '';
     };
 
-    // Export data to Excel
+    // Export project data to Excel
     exportBtn.addEventListener("click", () => {
-      const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(projectData);
+      const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Project Data");
 
-      // Download the Excel file
-      XLSX.writeFile(wb, "ProjectData.xlsx");
+      // Save the Excel file
+      XLSX.writeFile(wb, "project_data.xlsx");
     });
+
+    // Initially, display data if available in local storage
+    projectData.forEach(addToTable);
+
+    // Initialize the app to show the appropriate sections
+    const initApp = () => {
+      if (adminLoggedIn) {
+        checkAdminAccess();
+      } else {
+        authSection.classList.remove("hidden");
+      }
+    };
+
+    // Start the app
+    initApp();
   </script>
+
 </body>
 </html>
