@@ -3,301 +3,439 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Management</title>
+    <title>Create DWS</title>
+    <!-- Include jsPDF and xlsx libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <style>
+        /* General styling */
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
+            background-color: #f1f1f1;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-        }
-        .container {
-            width: 80%;
-            margin: 50px auto;
-        }
-        .nav-buttons {
             display: flex;
-            justify-content: space-between;
-            margin-bottom: 30px;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
         }
-        .nav-buttons button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+
+        .container {
+            background-color: #ffffff;
+            width: 90%;
+            max-width: 900px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
-        .section {
-            display: none;
+
+        h2, h3 {
+            text-align: center;
+            color: #333;
         }
-        .form-input {
+
+        /* Input and Textarea styling */
+        .form-input, textarea {
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
+            padding: 12px;
+            margin: 8px 0;
             font-size: 16px;
-            border: 1px solid #ccc;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        table, th, td {
             border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
         }
-        th, td {
-            padding: 8px 12px;
-            text-align: left;
+
+        .form-input:focus, textarea:focus {
+            border-color: #007bff;
+            outline: none;
         }
+
+        /* Buttons Styling */
         button {
-            padding: 8px 12px;
-            cursor: pointer;
+            padding: 10px 16px;
             background-color: #007bff;
             color: white;
             border: none;
-            margin-right: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: background-color 0.3s;
         }
-        .back-btn {
-            background-color: #f44336; /* Red color */
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Preview list styling */
+        .preview-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .preview-item {
+            background-color: #e9ecef;
+            margin: 5px 0;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Section styling */
+        .form-section {
+            margin-bottom: 25px;
+        }
+
+        .export-buttons {
+            display: flex;
+            justify-content: center;
             margin-top: 20px;
         }
-        .manpower-section, .equipment-section, .consumables-section {
-            margin-bottom: 20px;
+
+        .export-buttons button {
+            width: 200px;
+            margin: 5px;
         }
+
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        /* Add a back button */
+        .back-button {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 0;
+        }
+
+        .back-button:hover {
+            background-color: #218838;
+        }
+
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <!-- Navigation Section -->
-        <div class="nav-buttons" id="mainPage">
-            <button onclick="switchSection('createDWSSection')">Create DWS</button>
-            <button onclick="switchSection('manageDWSSection')">Manage DWS</button>
-            <button onclick="switchSection('searchDWSSection')">Search DWS</button>
-            <button onclick="switchSection('exportDWSSection')">Export DWS</button>
+<div class="container">
+    <h2>Create DWS</h2>
+
+    <!-- Back Button -->
+    <button class="back-button" onclick="goBack()">Back to Main</button>
+
+    <!-- Create DWS Form -->
+    <div id="createDWSForm">
+        <!-- DWS No. -->
+        <div class="form-section">
+            <input type="text" id="dwsNo" class="form-input" placeholder="Enter DWS No." required>
         </div>
 
-        <!-- Create DWS Section -->
-        <div id="createDWSSection" class="section">
-            <h2>Create DWS</h2>
-            <form id="createDWSForm">
-                <input type="text" id="dwsNo" class="form-input" placeholder="DWS No." disabled>
-                <input type="date" id="date" class="form-input" placeholder="Date">
-                <input type="text" id="structureName" class="form-input" placeholder="Structure Name">
-                <input type="text" id="siNo" class="form-input" placeholder="SI No.">
-                <input type="text" id="workDescription" class="form-input" placeholder="Work Description">
-                <input type="text" id="location" class="form-input" placeholder="Location">
-                
-                <!-- Manpower Section -->
-                <h3>Manpower</h3>
-                <div id="manpowerSection" class="manpower-section">
-                    <input type="text" placeholder="Badge No." id="badgeNo">
-                    <input type="text" placeholder="Name" id="manpowerName">
-                    <input type="number" placeholder="Normal Hours" id="normalHours">
-                    <input type="number" placeholder="OT Hours" id="otHours">
-                    <input type="number" placeholder="Holiday Hours" id="holidayHours">
-                    <button type="button" onclick="addManpower()">Add Manpower</button>
-                </div>
-                
-                <!-- Equipment Section -->
-                <h3>Equipment</h3>
-                <div id="equipmentSection" class="equipment-section">
-                    <input type="text" placeholder="Equipment Name" id="equipmentName">
-                    <input type="number" placeholder="Working Hours" id="equipmentHours">
-                    <button type="button" onclick="addEquipment()">Add Equipment</button>
-                </div>
-                
-                <!-- Consumables Section -->
-                <h3>Consumables/Materials</h3>
-                <div id="consumablesSection" class="consumables-section">
-                    <input type="text" placeholder="Consumable/Material Name" id="consumablesName">
-                    <input type="number" placeholder="Quantity" id="consumablesQuantity">
-                    <button type="button" onclick="addConsumables()">Add Consumable</button>
-                </div>
-
-                <button type="button" onclick="saveDWS()">Save DWS</button>
-                <button type="button" class="back-btn" onclick="goBack()">Back</button>
-            </form>
+        <!-- Date -->
+        <div class="form-section">
+            <input type="date" id="date" class="form-input" required>
         </div>
 
-        <!-- Manage DWS Section -->
-        <div id="manageDWSSection" class="section">
-            <h2>Manage DWS</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>DWS No.</th>
-                        <th>Date</th>
-                        <th>Structure Name</th>
-                        <th>SI No.</th>
-                        <th>Work Description</th>
-                        <th>Location</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="dwsTableBody">
-                    <!-- Dynamic content will be added here -->
-                </tbody>
-            </table>
-            <button class="back-btn" onclick="goBack()">Back</button>
+        <!-- Structure Name -->
+        <div class="form-section">
+            <input type="text" id="structureName" class="form-input" placeholder="Enter Structure Name" required>
         </div>
 
-        <!-- Search DWS Section -->
-        <div id="searchDWSSection" class="section">
-            <h2>Search DWS</h2>
-            <input type="number" id="searchDWSNo" class="form-input" placeholder="Enter DWS No.">
-            <button type="button" id="searchDWSBtn">Search</button>
-            <div id="searchResult"></div>
-            <button class="back-btn" onclick="goBack()">Back</button>
+        <!-- SI No. -->
+        <div class="form-section">
+            <input type="text" id="siNo" class="form-input" placeholder="Enter SI No." required>
         </div>
 
-        <!-- Export DWS Section -->
-        <div id="exportDWSSection" class="section">
-            <h2>Export DWS</h2>
-            <button id="exportToExcelBtn">Export to Excel</button>
-            <button id="exportToPDFBtn">Export to PDF</button>
-            <button class="back-btn" onclick="goBack()">Back</button>
+        <!-- Work Description -->
+        <div class="form-section">
+            <textarea id="workDescription" class="form-input" placeholder="Enter Work Description" rows="4" required></textarea>
         </div>
+
+        <!-- Location -->
+        <div class="form-section">
+            <input type="text" id="location" class="form-input" placeholder="Enter Location" required>
+        </div>
+
+        <!-- Manpower Section -->
+        <div class="form-section">
+            <h3>Manpower</h3>
+            <input type="text" id="manpowerBadgeNo" class="form-input" placeholder="Badge No." required>
+            <input type="text" id="manpowerName" class="form-input" placeholder="Name" required>
+            <input type="text" id="manpowerRole" class="form-input" placeholder="Role (e.g., Welder)" required>
+            <button type="button" onclick="addManpower()">Add Manpower</button>
+            <ul id="manpowerPreview" class="preview-list"></ul>
+        </div>
+
+        <!-- Equipment Section -->
+        <div class="form-section">
+            <h3>Equipment</h3>
+            <input type="text" id="equipmentName" class="form-input" placeholder="Equipment Name" required>
+            <input type="number" id="equipmentHours" class="form-input" placeholder="Working Hours" required>
+            <button type="button" onclick="addEquipment()">Add Equipment</button>
+            <ul id="equipmentPreview" class="preview-list"></ul>
+        </div>
+
+        <!-- Consumables Section -->
+        <div class="form-section">
+            <h3>Consumables/Materials</h3>
+            <input type="text" id="consumableName" class="form-input" placeholder="Consumable/Material Name" required>
+            <input type="number" id="consumableQuantity" class="form-input" placeholder="Quantity" required>
+            <button type="button" onclick="addConsumable()">Add Consumable</button>
+            <ul id="consumablePreview" class="preview-list"></ul>
+        </div>
+
+        <!-- Save DWS Button -->
+        <button type="button" onclick="saveDWS()">Save DWS</button>
     </div>
 
-    <script>
-        let dwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
-        let nextDwsNo = dwsData.length ? Math.max(...dwsData.map(dws => dws.dwsNo)) + 1 : 1;
+    <!-- Export Buttons -->
+    <div class="export-buttons">
+        <button type="button" onclick="exportToPDF()">Export as PDF</button>
+        <button type="button" onclick="exportToExcel()">Export as Excel</button>
+    </div>
 
-        // Switch to different sections
-        function switchSection(sectionId) {
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
+    <!-- Display Saved DWS -->
+    <h3>Saved DWS</h3>
+    <table id="dwsTable">
+        <thead>
+            <tr>
+                <th>DWS No.</th>
+                <th>Date</th>
+                <th>Structure Name</th>
+                <th>SI No.</th>
+                <th>Work Description</th>
+                <th>Location</th>
+            </tr>
+        </thead>
+        <tbody id="dwsList">
+            <!-- DWS data will be displayed here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    // Store the DWS data
+    let dwsList = JSON.parse(localStorage.getItem('dwsList')) || [];
+
+    // Store the manpower, equipment, and consumable lists for the current DWS
+    let manpowerList = [];
+    let equipmentList = [];
+    let consumableList = [];
+
+    // Function to display the saved DWS data
+    function displayDWS() {
+        const dwsTable = document.getElementById('dwsList');
+        dwsTable.innerHTML = '';
+
+        dwsList.forEach(dws => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${dws.dwsNo}</td>
+                <td>${dws.date}</td>
+                <td>${dws.structureName}</td>
+                <td>${dws.siNo}</td>
+                <td>${dws.workDescription}</td>
+                <td>${dws.location}</td>
+            `;
+            dwsTable.appendChild(row);
+        });
+    }
+
+    // Function to add manpower to the preview list
+    function addManpower() {
+        const badgeNo = document.getElementById('manpowerBadgeNo').value;
+        const name = document.getElementById('manpowerName').value;
+        const role = document.getElementById('manpowerRole').value;
+
+        if (badgeNo && name && role) {
+            const manpower = `${badgeNo} - ${name} - ${role}`;
+            manpowerList.push(manpower);
+            updatePreview('manpower', manpowerList);
+        } else {
+            alert('Please fill in all manpower fields');
+        }
+
+        // Clear inputs
+        document.getElementById('manpowerBadgeNo').value = '';
+        document.getElementById('manpowerName').value = '';
+        document.getElementById('manpowerRole').value = '';
+    }
+
+    // Function to add equipment to the preview list
+    function addEquipment() {
+        const equipmentName = document.getElementById('equipmentName').value;
+        const workingHours = document.getElementById('equipmentHours').value;
+
+        if (equipmentName && workingHours) {
+            const equipment = `${equipmentName} - ${workingHours} hours`;
+            equipmentList.push(equipment);
+            updatePreview('equipment', equipmentList);
+        } else {
+            alert('Please fill in all equipment fields');
+        }
+
+        // Clear inputs
+        document.getElementById('equipmentName').value = '';
+        document.getElementById('equipmentHours').value = '';
+    }
+
+    // Function to add consumables to the preview list
+    function addConsumable() {
+        const consumableName = document.getElementById('consumableName').value;
+        const quantity = document.getElementById('consumableQuantity').value;
+
+        if (consumableName && quantity) {
+            const consumable = `${consumableName} - ${quantity}`;
+            consumableList.push(consumable);
+            updatePreview('consumable', consumableList);
+        } else {
+            alert('Please fill in all consumable fields');
+        }
+
+        // Clear inputs
+        document.getElementById('consumableName').value = '';
+        document.getElementById('consumableQuantity').value = '';
+    }
+
+    // Function to update preview list
+    function updatePreview(type, list) {
+        let previewElement = document.getElementById(`${type}Preview`);
+        previewElement.innerHTML = '';
+
+        list.forEach((item, index) => {
+            const listItem = document.createElement('li');
+            listItem.className = 'preview-item';
+            listItem.textContent = `${index + 1}. ${item}`;
+            previewElement.appendChild(listItem);
+        });
+    }
+
+    // Function to save DWS data
+    function saveDWS() {
+        const dwsNo = document.getElementById('dwsNo').value;
+        const date = document.getElementById('date').value;
+        const structureName = document.getElementById('structureName').value;
+        const siNo = document.getElementById('siNo').value;
+        const workDescription = document.getElementById('workDescription').value;
+        const location = document.getElementById('location').value;
+
+        if (dwsNo && date && structureName && siNo && workDescription && location) {
+            // Save DWS data along with manpower, equipment, and consumables
+            dwsList.push({
+                dwsNo, 
+                date, 
+                structureName, 
+                siNo, 
+                workDescription, 
+                location, 
+                manpower: manpowerList, 
+                equipment: equipmentList, 
+                consumables: consumableList
             });
-            document.getElementById(sectionId).style.display = 'block';
-            document.getElementById('mainPage').style.display = 'none';
+
+            // Save to local storage
+            localStorage.setItem('dwsList', JSON.stringify(dwsList));
+
+            // Clear input fields and lists
+            document.getElementById('dwsNo').value = '';
+            document.getElementById('date').value = '';
+            document.getElementById('structureName').value = '';
+            document.getElementById('siNo').value = '';
+            document.getElementById('workDescription').value = '';
+            document.getElementById('location').value = '';
+
+            manpowerList = [];
+            equipmentList = [];
+            consumableList = [];
+
+            // Refresh the DWS table display
+            displayDWS();
+        } else {
+            alert("Please fill in all fields.");
         }
+    }
 
-        // Go back to main page
-        function goBack() {
-            document.getElementById('mainPage').style.display = 'block';
-            document.querySelectorAll('.section').forEach(section => {
-                section.style.display = 'none';
-            });
-        }
+    // Function to export data as PDF
+    function exportToPDF() {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-        // Add manpower data
-        function addManpower() {
-            const badgeNo = document.getElementById('badgeNo').value;
-            const name = document.getElementById('manpowerName').value;
-            const normalHours = document.getElementById('normalHours').value;
-            const otHours = document.getElementById('otHours').value;
-            const holidayHours = document.getElementById('holidayHours').value;
+        doc.text("DWS Report", 20, 20);
+        doc.text("DWS No.: " + document.getElementById('dwsNo').value, 20, 30);
+               doc.text("Date: " + document.getElementById('date').value, 20, 40);
+        doc.text("Structure Name: " + document.getElementById('structureName').value, 20, 50);
+        doc.text("SI No.: " + document.getElementById('siNo').value, 20, 60);
+        doc.text("Work Description: " + document.getElementById('workDescription').value, 20, 70);
+        doc.text("Location: " + document.getElementById('location').value, 20, 80);
 
-            if (badgeNo && name && normalHours && otHours && holidayHours) {
-                let manpowerList = JSON.parse(localStorage.getItem('manpowerList')) || [];
-                manpowerList.push({ badgeNo, name, normalHours, otHours, holidayHours });
-                localStorage.setItem('manpowerList', JSON.stringify(manpowerList));
-                alert("Manpower Added Successfully");
-                document.getElementById('badgeNo').value = '';
-                document.getElementById('manpowerName').value = '';
-                document.getElementById('normalHours').value = '';
-                document.getElementById('otHours').value = '';
-                document.getElementById('holidayHours').value = '';
-            } else {
-                alert("Please fill all fields in Manpower section.");
-            }
-        }
+        doc.text("Manpower:", 20, 100);
+        manpowerList.forEach((manpower, index) => {
+            doc.text(`${index + 1}. ${manpower}`, 20, 110 + (index * 10));
+        });
 
-        // Add equipment data
-        function addEquipment() {
-            const equipmentName = document.getElementById('equipmentName').value;
-            const equipmentHours = document.getElementById('equipmentHours').value;
+        doc.text("Equipment:", 20, 130 + (manpowerList.length * 10));
+        equipmentList.forEach((equipment, index) => {
+            doc.text(`${index + 1}. ${equipment}`, 20, 140 + (manpowerList.length * 10) + (index * 10));
+        });
 
-            if (equipmentName && equipmentHours) {
-                let equipmentList = JSON.parse(localStorage.getItem('equipmentList')) || [];
-                equipmentList.push({ equipmentName, equipmentHours });
-                localStorage.setItem('equipmentList', JSON.stringify(equipmentList));
-                alert("Equipment Added Successfully");
-                document.getElementById('equipmentName').value = '';
-                document.getElementById('equipmentHours').value = '';
-            } else {
-                alert("Please fill all fields in Equipment section.");
-            }
-        }
+        doc.text("Consumables:", 20, 160 + (manpowerList.length * 10) + (equipmentList.length * 10));
+        consumableList.forEach((consumable, index) => {
+            doc.text(`${index + 1}. ${consumable}`, 20, 170 + (manpowerList.length * 10) + (equipmentList.length * 10) + (index * 10));
+        });
 
-        // Add consumables data
-        function addConsumables() {
-            const consumablesName = document.getElementById('consumablesName').value;
-            const consumablesQuantity = document.getElementById('consumablesQuantity').value;
+        doc.save('dws_report.pdf');
+    }
 
-            if (consumablesName && consumablesQuantity) {
-                let consumablesList = JSON.parse(localStorage.getItem('consumablesList')) || [];
-                consumablesList.push({ consumablesName, consumablesQuantity });
-                localStorage.setItem('consumablesList', JSON.stringify(consumablesList));
-                alert("Consumable Added Successfully");
-                document.getElementById('consumablesName').value = '';
-                document.getElementById('consumablesQuantity').value = '';
-            } else {
-                alert("Please fill all fields in Consumables section.");
-            }
-        }
+    // Function to export data as Excel
+    function exportToExcel() {
+        let data = [];
+        const dwsData = {
+            "DWS No.": document.getElementById('dwsNo').value,
+            "Date": document.getElementById('date').value,
+            "Structure Name": document.getElementById('structureName').value,
+            "SI No.": document.getElementById('siNo').value,
+            "Work Description": document.getElementById('workDescription').value,
+            "Location": document.getElementById('location').value,
+            "Manpower": manpowerList.join(", "),
+            "Equipment": equipmentList.join(", "),
+            "Consumables": consumableList.join(", ")
+        };
 
-        // Save DWS data
-        function saveDWS() {
-            const dws = {
-                dwsNo: nextDwsNo,
-                date: document.getElementById('date').value,
-                structureName: document.getElementById('structureName').value,
-                siNo: document.getElementById('siNo').value,
-                workDescription: document.getElementById('workDescription').value,
-                location: document.getElementById('location').value,
-                manpower: JSON.parse(localStorage.getItem('manpowerList')) || [],
-                equipment: JSON.parse(localStorage.getItem('equipmentList')) || [],
-                consumables: JSON.parse(localStorage.getItem('consumablesList')) || []
-            };
+        data.push(dwsData);
 
-            dwsData.push(dws);
-            localStorage.setItem('dwsData', JSON.stringify(dwsData));
-            nextDwsNo++;
+        // Convert data to worksheet
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'DWS Report');
+        XLSX.writeFile(wb, 'dws_report.xlsx');
+    }
 
-            // Clear local storage for lists
-            localStorage.removeItem('manpowerList');
-            localStorage.removeItem('equipmentList');
-            localStorage.removeItem('consumablesList');
+    // Function to handle back navigation
+    function goBack() {
+        window.location.reload();
+    }
 
-            // Clear form and switch to Manage DWS section
-            document.getElementById('createDWSForm').reset();
-            switchSection('manageDWSSection');
-            loadDWSData();
-        }
+    // Display saved DWS data on page load
+    displayDWS();
+</script>
 
-        // Load saved DWS data into table
-        function loadDWSData() {
-            const tbody = document.getElementById('dwsTableBody');
-            tbody.innerHTML = '';
-            dwsData.forEach(dws => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${dws.dwsNo}</td>
-                    <td>${dws.date}</td>
-                    <td>${dws.structureName}</td>
-                    <td>${dws.siNo}</td>
-                    <td>${dws.workDescription}</td>
-                    <td>${dws.location}</td>
-                    <td>
-                        <button onclick="editDWS(${dws.dwsNo})">Edit</button>
-                        <button onclick="deleteDWS(${dws.dwsNo})">Delete</button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Delete a DWS entry
-        function deleteDWS(dwsNo) {
-            if (confirm('Are you sure you want to delete this DWS?')) {
-                dwsData = dwsData.filter(dws => dws.dwsNo !== dwsNo);
-                localStorage.setItem('dwsData', JSON.stringify(dwsData));
-                loadDWSData();
-            }
-        }
-
-        // Initial setup to load data
-        loadDWSData();
-    </script>
 </body>
 </html>
