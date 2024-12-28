@@ -7,13 +7,15 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f7;
             margin: 0;
             padding: 0;
+            background-color: #f7f9fc;
         }
 
         h1 {
             text-align: center;
+            color: #2c3e50;
+            margin-top: 20px;
         }
 
         .auth-section, .dashboard-section {
@@ -21,35 +23,35 @@
             margin: 20px auto;
             background: #ffffff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .hidden {
-            display: none;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         label {
-            font-weight: bold;
             display: block;
             margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
         }
 
         input {
-            width: calc(100% - 20px);
-            padding: 8px 10px;
+            width: 100%;
+            padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ccc;
-            border-radius: 4px;
+            border-radius: 5px;
         }
 
         button {
+            width: 100%;
             background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 10px;
             border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
+            margin-bottom: 10px;
         }
 
         button:hover {
@@ -57,28 +59,38 @@
         }
 
         .back-btn {
-            cursor: pointer;
             color: #3498db;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
             display: inline-block;
-            margin-bottom: 10px;
         }
 
         .error {
             color: red;
-            font-size: 12px;
+            font-size: 14px;
+            margin-bottom: 10px;
         }
 
         ul {
-            padding-left: 20px;
+            list-style: none;
+            padding: 0;
         }
 
         ul li {
             margin-bottom: 10px;
         }
+
+        ul li button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
-    <h1>User Registration and Admin Control</h1>
+    <h1>User Management System</h1>
 
     <!-- Sign-In Section -->
     <div id="signinSection" class="auth-section">
@@ -103,6 +115,8 @@
         <input type="password" id="signupPassword" placeholder="Enter Password">
         <label for="signupConfirmPassword">Confirm Password:</label>
         <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
+        <label for="signupSecretCode">Secret Code:</label>
+        <input type="text" id="signupSecretCode" placeholder="Enter a Secret Code">
         <button id="signupBtn">Sign Up</button>
         <p class="error" id="signupError"></p>
     </div>
@@ -110,7 +124,7 @@
     <!-- Forgot Password Section -->
     <div id="forgotPasswordSection" class="auth-section hidden">
         <span class="back-btn" id="backToSigninFromForgot">← Back to Sign In</span>
-        <h2>Reset Password</h2>
+        <h2>Forgot Password</h2>
         <label for="resetUsername">Username:</label>
         <input type="text" id="resetUsername" placeholder="Enter Username">
         <label for="resetSecretCode">Secret Code:</label>
@@ -132,55 +146,213 @@
     </div>
 
     <script>
-        // Hardcoded admin credentials
+        // Admin credentials
         const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
 
-        // Storage for users
+        // Users storage
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
-        // DOM Elements
-        const signinSection = document.getElementById('signinSection');
-        const signupSection = document.getElementById('signupSection');
-        const forgotPasswordSection = document.getElementById('forgotPasswordSection');
-        const adminDashboard = document.getElementById('adminDashboard');
-
-        const signinBtn = document.getElementById('signinBtn');
-        const signupBtn = document.getElementById('signupBtn');
-        const resetPasswordBtn = document.getElementById('resetPasswordBtn');
-        const logoutAdminBtn = document.getElementById('logoutAdminBtn');
-
-        const signinError = document.getElementById('signinError');
-        const signupError = document.getElementById('signupError');
-        const resetError = document.getElementById('resetError');
-
+        // Clear input fields
         const clearInputs = () => {
-            document.querySelectorAll('input').forEach(input => input.value = '');
-            signinError.textContent = '';
-            signupError.textContent = '';
-            resetError.textContent = '';
+            document.querySelectorAll('input').forEach(input => (input.value = ''));
+            document.querySelectorAll('.error').forEach(error => (error.textContent = ''));
         };
 
-        // Sign-In Logic
-        signinBtn.addEventListener('click', () => {
-            const username = document.getElementById('signinUsername').value.trim();
-            const password = document.getElementById('signinPassword').value.trim();
+        // Functionality for navigation, sign-in, sign-up, reset password, admin login
+        // Add your JavaScript functionality here...
+        <script>
+    // Admin credentials
+    const ADMIN_CREDENTIALS = { username: "admin", password: "admin123" };
 
-            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
-                signinSection.classList.add('hidden');
-                adminDashboard.classList.remove('hidden');
-                clearInputs();
-            } else {
-                const user = users.find(u => u.username === username && u.password === password && u.isApproved);
-                if (user) {
-                    alert('Login successful!');
-                    clearInputs();
-                } else {
-                    signinError.textContent = 'Invalid credentials or not approved by admin.';
-                }
-            }
+    // Users storage (localStorage persistence)
+    let users = JSON.parse(localStorage.getItem("users")) || [];
+
+    // DOM Elements
+    const signinSection = document.getElementById("signinSection");
+    const signupSection = document.getElementById("signupSection");
+    const forgotPasswordSection = document.getElementById("forgotPasswordSection");
+    const adminDashboard = document.getElementById("adminDashboard");
+
+    const signinUsername = document.getElementById("signinUsername");
+    const signinPassword = document.getElementById("signinPassword");
+    const signinError = document.getElementById("signinError");
+
+    const signupUsername = document.getElementById("signupUsername");
+    const signupPassword = document.getElementById("signupPassword");
+    const signupConfirmPassword = document.getElementById("signupConfirmPassword");
+    const signupSecretCode = document.getElementById("signupSecretCode");
+    const signupError = document.getElementById("signupError");
+
+    const resetUsername = document.getElementById("resetUsername");
+    const resetSecretCode = document.getElementById("resetSecretCode");
+    const resetNewPassword = document.getElementById("resetNewPassword");
+    const resetConfirmPassword = document.getElementById("resetConfirmPassword");
+    const resetError = document.getElementById("resetError");
+
+    const pendingApprovalsList = document.getElementById("pendingApprovalsList");
+
+    // Clear all input fields and error messages
+    const clearInputs = () => {
+        document.querySelectorAll("input").forEach(input => input.value = "");
+        document.querySelectorAll(".error").forEach(error => error.textContent = "");
+    };
+
+    // Navigation
+    document.getElementById("goToSignupBtn").addEventListener("click", () => {
+        signinSection.classList.add("hidden");
+        signupSection.classList.remove("hidden");
+        clearInputs();
+    });
+
+    document.getElementById("backToSigninFromSignup").addEventListener("click", () => {
+        signupSection.classList.add("hidden");
+        signinSection.classList.remove("hidden");
+        clearInputs();
+    });
+
+    document.getElementById("goToForgotPassword").addEventListener("click", () => {
+        signinSection.classList.add("hidden");
+        forgotPasswordSection.classList.remove("hidden");
+        clearInputs();
+    });
+
+    document.getElementById("backToSigninFromForgot").addEventListener("click", () => {
+        forgotPasswordSection.classList.add("hidden");
+        signinSection.classList.remove("hidden");
+        clearInputs();
+    });
+
+    document.getElementById("logoutAdminBtn").addEventListener("click", () => {
+        adminDashboard.classList.add("hidden");
+        signinSection.classList.remove("hidden");
+        clearInputs();
+    });
+
+    // Sign-Up
+    document.getElementById("signupBtn").addEventListener("click", () => {
+        const username = signupUsername.value.trim();
+        const password = signupPassword.value.trim();
+        const confirmPassword = signupConfirmPassword.value.trim();
+        const secretCode = signupSecretCode.value.trim();
+
+        if (!username || !password || !confirmPassword || !secretCode) {
+            signupError.textContent = "Please fill in all fields.";
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            signupError.textContent = "Passwords do not match.";
+            return;
+        }
+
+        if (users.some(user => user.username === username)) {
+            signupError.textContent = "Username already exists.";
+            return;
+        }
+
+        users.push({ username, password, secretCode, isApproved: false });
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("Sign up successful! Await admin approval.");
+        clearInputs();
+        signupSection.classList.add("hidden");
+        signinSection.classList.remove("hidden");
+    });
+
+    // Sign-In
+    document.getElementById("signinBtn").addEventListener("click", () => {
+        const username = signinUsername.value.trim();
+        const password = signinPassword.value.trim();
+
+        if (!username || !password) {
+            signinError.textContent = "Please fill in all fields.";
+            return;
+        }
+
+        // Admin Login
+        if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+            signinSection.classList.add("hidden");
+            adminDashboard.classList.remove("hidden");
+            displayPendingApprovals();
+            clearInputs();
+            return;
+        }
+
+        // User Login
+        const user = users.find(u => u.username === username && u.password === password);
+        if (!user) {
+            signinError.textContent = "Invalid credentials.";
+            return;
+        }
+
+        if (!user.isApproved) {
+            signinError.textContent = "Account not approved by admin.";
+            return;
+        }
+
+        alert("Login successful! Welcome.");
+        clearInputs();
+    });
+
+    // Forgot Password
+    document.getElementById("resetPasswordBtn").addEventListener("click", () => {
+        const username = resetUsername.value.trim();
+        const secretCode = resetSecretCode.value.trim();
+        const newPassword = resetNewPassword.value.trim();
+        const confirmPassword = resetConfirmPassword.value.trim();
+
+        if (!username || !secretCode || !newPassword || !confirmPassword) {
+            resetError.textContent = "Please fill in all fields.";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            resetError.textContent = "Passwords do not match.";
+            return;
+        }
+
+        const user = users.find(u => u.username === username && u.secretCode === secretCode);
+        if (!user) {
+            resetError.textContent = "Invalid username or secret code.";
+            return;
+        }
+
+        user.password = newPassword;
+        localStorage.setItem("users", JSON.stringify(users));
+        alert("Password reset successful!");
+        clearInputs();
+        forgotPasswordSection.classList.add("hidden");
+        signinSection.classList.remove("hidden");
+    });
+
+    // Admin Dashboard
+    const displayPendingApprovals = () => {
+        pendingApprovalsList.innerHTML = "";
+        const pendingUsers = users.filter(user => !user.isApproved);
+        pendingUsers.forEach(user => {
+            const li = document.createElement("li");
+            li.textContent = `${user.username}`;
+            const approveBtn = document.createElement("button");
+            approveBtn.textContent = "Approve";
+            approveBtn.addEventListener("click", () => {
+                user.isApproved = true;
+                localStorage.setItem("users", JSON.stringify(users));
+                displayPendingApprovals();
+            });
+
+            const rejectBtn = document.createElement("button");
+            rejectBtn.textContent = "Reject";
+            rejectBtn.addEventListener("click", () => {
+                users = users.filter(u => u.username !== user.username);
+                localStorage.setItem("users", JSON.stringify(users));
+                displayPendingApprovals();
+            });
+
+            li.appendChild(approveBtn);
+            li.appendChild(rejectBtn);
+            pendingApprovalsList.appendChild(li);
         });
-
-        // Add other functionality as explained above
+    };
+</script>
     </script>
 </body>
 </html>
