@@ -5,24 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Registration and Admin Control</title>
     <style>
+        body {
+            background-color: #f0f4f8;
+            font-family: Arial, sans-serif;
+        }
         .hidden { display: none; }
         .auth-section, .error { margin-bottom: 15px; }
         .back-btn { cursor: pointer; color: blue; font-size: 14px; }
         .error { color: red; }
-        body {
-            background-color: #f4f4f4;
-            font-family: Arial, sans-serif;
-            padding: 20px;
-        }
         button {
             background-color: lightblue;
-            border: none;
             padding: 10px 20px;
+            border: none;
             cursor: pointer;
             border-radius: 5px;
         }
         button:hover {
-            background-color: deepskyblue;
+            background-color: #4cbbf0;
         }
     </style>
 </head>
@@ -44,6 +43,7 @@
             <button id="signinBtn">Sign In</button>
             <p class="error" id="signinError"></p>
             <button id="goToSignupBtn">Sign Up</button> <!-- Button to go to Sign Up -->
+            <button id="goToForgetPasswordBtn">Forget Password</button> <!-- Button to go to Forget Password -->
         </div>
 
         <!-- Sign-Up Section -->
@@ -83,14 +83,14 @@
     <!-- Admin Dashboard (After Admin Login) -->
     <div id="adminDashboard" class="hidden">
         <span class="back-btn" id="backToSignInBtn">← Back to Sign In</span> <!-- Back Button to Sign In -->
-        <button id="adminLogoutBtn">Log Out</button> <!-- Log Out Button -->
         <h2>Admin Dashboard</h2>
         <h3>Sign-Up Requests</h3>
         <ul id="signupRequestsList"></ul>
+        <button id="adminLogoutBtn">Log Out</button> <!-- Log Out Button -->
     </div>
 
     <script>
-        // Initialize storage for users and secret code
+        // Initialize storage for users
         let users = JSON.parse(localStorage.getItem("users")) || [];
         let adminLoggedIn = false;
 
@@ -98,12 +98,12 @@
         const signupBtn = document.getElementById("signupBtn");
         const signinBtn = document.getElementById("signinBtn");
         const adminLoginBtn = document.getElementById("adminLoginBtn");
+        const adminLogoutBtn = document.getElementById("adminLogoutBtn");
 
         const signupUsername = document.getElementById("signupUsername");
         const signupPassword = document.getElementById("signupPassword");
         const confirmPassword = document.getElementById("confirmPassword");
         const secretCode = document.getElementById("secretCode");
-
         const signinUsername = document.getElementById("signinUsername");
         const signinPassword = document.getElementById("signinPassword");
         const adminUsername = document.getElementById("adminUsername");
@@ -122,14 +122,14 @@
 
         // Show sign-up form
         document.getElementById("goToSignupBtn").addEventListener("click", () => {
-            document.getElementById("signinSection").classList.add("hidden");
+            authSection.classList.add("hidden");
             signupSection.classList.remove("hidden");
         });
 
         // Go back to login screen from sign-up
         document.getElementById("backToLoginBtn").addEventListener("click", () => {
             signupSection.classList.add("hidden");
-            document.getElementById("signinSection").classList.remove("hidden");
+            authSection.classList.remove("hidden");
 
             // Clear Sign Up fields when coming back to Login
             signupUsername.value = '';
@@ -140,23 +140,34 @@
 
         // Go back to Sign-In screen from admin dashboard
         document.getElementById("backToSignInBtn").addEventListener("click", () => {
-            authSection.classList.remove("hidden"); // Show the sign-in section
-            adminDashboard.classList.add("hidden"); // Hide the admin dashboard
+            adminDashboard.classList.add("hidden");
+            authSection.classList.remove("hidden");
 
             // Clear Admin Login fields when coming back to Sign In
             adminUsername.value = '';
             adminPassword.value = '';
         });
 
+        // Log out from admin dashboard
+        adminLogoutBtn.addEventListener("click", () => {
+            adminLoggedIn = false;
+            adminDashboard.classList.add("hidden");
+            authSection.classList.remove("hidden");
+
+            // Clear Sign-In credentials when logging out
+            signinUsername.value = '';
+            signinPassword.value = '';
+        });
+
         // Sign-up a new user
         signupBtn.addEventListener("click", () => {
             const username = signupUsername.value.trim();
             const password = signupPassword.value.trim();
-            const confirmPasswordValue = confirmPassword.value.trim();
+            const confirmPass = confirmPassword.value.trim();
             const code = secretCode.value.trim();
 
-            if (username && password && confirmPasswordValue && code) {
-                if (password !== confirmPasswordValue) {
+            if (username && password && confirmPass && code) {
+                if (password !== confirmPass) {
                     signupError.textContent = "Passwords do not match.";
                     return;
                 }
@@ -184,12 +195,11 @@
             const password = signinPassword.value.trim();
 
             if (username && password) {
-                // Check if it's an admin login first
                 if (username === "admin" && password === "admin123") {
                     adminLoggedIn = true;
-                    authSection.classList.add("hidden"); // Hide the login section
-                    adminSection.classList.add("hidden"); // Hide the admin section
-                    adminDashboard.classList.remove("hidden"); // Show the admin dashboard
+                    authSection.classList.add("hidden");
+                    adminSection.classList.add("hidden");
+                    adminDashboard.classList.remove("hidden");
                     displaySignupRequests();
                     return;
                 }
@@ -214,21 +224,12 @@
 
             if (adminUsernameInput === "admin" && adminPasswordInput === "admin123") {
                 adminLoggedIn = true;
-                adminSection.classList.add("hidden"); // Hide admin login
-                adminDashboard.classList.remove("hidden"); // Show admin dashboard
+                adminSection.classList.add("hidden");
+                adminDashboard.classList.remove("hidden");
                 displaySignupRequests();
             } else {
                 adminError.textContent = "Invalid admin credentials.";
             }
-        });
-
-        // Admin Logout
-        document.getElementById("adminLogoutBtn").addEventListener("click", () => {
-            // Reset admin credentials and hide admin dashboard
-            adminUsername.value = '';
-            adminPassword.value = '';
-            adminDashboard.classList.add("hidden");
-            authSection.classList.remove("hidden"); // Show the sign-in section
         });
 
         // Display sign-up requests for admin to approve/reject
