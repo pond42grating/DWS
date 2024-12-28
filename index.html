@@ -68,6 +68,19 @@
             cursor: pointer;
             padding: 0;
         }
+
+        .pending-users-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pending-user {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
     </style>
 </head>
 <body>
@@ -110,13 +123,15 @@
         <!-- Admin Dashboard Section -->
         <div id="adminDashboard" class="hidden">
             <h1>Admin Dashboard</h1>
-            <h3>Welcome, Admin!</h3>
+            <h3>Pending User Approvals</h3>
+            <ul id="pendingUsersList" class="pending-users-list"></ul>
             <button onclick="logout()">Log Out</button>
         </div>
     </div>
 
     <script>
         const users = JSON.parse(localStorage.getItem("users")) || [];
+        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
 
         function switchSection(sectionId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
@@ -127,6 +142,35 @@
         function clearInputs() {
             document.querySelectorAll('input').forEach(input => input.value = '');
             document.querySelectorAll('.error').forEach(error => error.textContent = '');
+        }
+
+        function updatePendingUsersList() {
+            const list = document.getElementById("pendingUsersList");
+            list.innerHTML = '';
+            pendingUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("pending-user");
+                listItem.innerHTML = `${user.username} 
+                    <button onclick="approveUser(${index})">Approve</button>
+                    <button onclick="rejectUser(${index})">Reject</button>`;
+                list.appendChild(listItem);
+            });
+        }
+
+        function approveUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User approved!");
+            updatePendingUsersList();
+        }
+
+        function rejectUser(index) {
+            pendingUsers.splice(index, 1);
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User rejected!");
+            updatePendingUsersList();
         }
 
         document.getElementById("signinBtn").addEventListener("click", () => {
@@ -140,12 +184,18 @@
 
             if (username === "admin" && password === "admin123") {
                 switchSection("adminDashboard");
+                updatePendingUsersList();
                 return;
             }
 
             const user = users.find(u => u.username === username && u.password === password);
             if (!user) {
                 document.getElementById("signinError").textContent = "Invalid credentials.";
+                return;
+            }
+
+            if (!user.approved) {
+                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
                 return;
             }
 
@@ -174,10 +224,10 @@
                 return;
             }
 
-            users.push({ username, password, secretCode });
-            localStorage.setItem("users", JSON.stringify(users));
+            pendingUsers.push({ username, password, secretCode, approved: false });
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
 
-            alert("Sign-up successful!");
+            alert("Sign-up successful! Awaiting admin approval.");
             switchSection("loginSection");
         });
 
