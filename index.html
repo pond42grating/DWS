@@ -502,6 +502,67 @@
             alert("Password reset successful!");
             switchSection("loginSection");
         });
+        
+        // Show sections when respective buttons are clicked
+    document.getElementById("createDWSBtn").addEventListener("click", function() {
+        switchSection("createDWSSection");
+    });
+
+    document.getElementById("manageDWSBtn").addEventListener("click", function() {
+        switchSection("manageDWSSection");
+        loadUserDWS();  // This function will load the list of user's DWS if any
+    });
+
+    document.getElementById("searchDWSBtn").addEventListener("click", function() {
+        switchSection("searchDWSSection");
+    });
+
+    // Switch sections helper function
+    function switchSection(sectionId) {
+        // Hide all sections
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        // Show the selected section
+        document.getElementById(sectionId).classList.remove('hidden');
+    }
+
+    // Function to load the user's DWS list into the "Manage DWS" section
+    function loadUserDWS() {
+        const user = users.find(u => u.username === "currentUser"); // Replace with actual logged-in username logic
+        if (!user || !user.dws) {
+            document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
+            return;
+        }
+
+        const list = document.getElementById("userDWSList");
+        list.innerHTML = ""; // Clear existing list
+        user.dws.forEach(dws => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+            list.appendChild(listItem);
+        });
+    }
+
+    // Search DWS function (called when the Search button is clicked)
+    function searchDWS() {
+        const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
+        const dws = findDWSByNumber(dwsNumber);
+
+        if (dws) {
+            document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+        } else {
+            document.getElementById("dwsSearchResult").textContent = "DWS not found.";
+        }
+    }
+
+    function findDWSByNumber(dwsNumber) {
+        for (const user of users) {
+            if (user.dws) {
+                const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
+                if (dws) return dws;
+            }
+        }
+        return null;  // If DWS not found
+    }
     </script>
 </body>
 </html>
