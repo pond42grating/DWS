@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DWS Management System</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -161,6 +163,8 @@
                 <!-- DWS data will be displayed here -->
             </tbody>
         </table>
+        <button class="button" onclick="exportToExcel()">Export to Excel</button>
+        <button class="button" onclick="exportToPDF()">Export to PDF</button>
         <button class="back-button" onclick="goBack()">Back</button>
     </div>
 
@@ -261,7 +265,7 @@
 
             const equipment = [];
             document.querySelectorAll('#equipmentPreview div').forEach(div => {
-                const details = div.textContent.split(' - ');
+                                const details = div.textContent.split(' - ');
                 equipment.push({
                     name: details[0],
                     hours: details[1]?.split(' hrs')[0] || ''
@@ -277,67 +281,129 @@
                 });
             });
 
-            const newDws = {
-                dwsNumber: dwsNumber,
-                date: date,
-                structure: structure,
-                siNo: siNo,
-                workDescription: workDescription,
-                location: location,
-                manpower: manpower,
-                equipment: equipment,
-                consumables: consumables
+            const dwsData = {
+                dwsNumber: dwsNumber++,
+                date,
+                structure,
+                siNo,
+                workDescription,
+                location,
+                manpower,
+                equipment,
+                consumables
             };
 
-            const savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
-            savedData.push(newDws);
-            localStorage.setItem('dwsData', JSON.stringify(savedData));
+            // Save DWS data to localStorage
+            let allDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            allDwsData.push(dwsData);
+            localStorage.setItem('dwsData', JSON.stringify(allDwsData));
 
             alert('DWS saved successfully!');
-            dwsNumber++; // Increment DWS number after saving
+            goBack();
         }
 
-        // Load saved DWS data and display in Manage DWS page
+        // Load DWS data from localStorage and display it in the Manage DWS table
         function loadDwsData() {
-            const savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
-            const tableBody = document.getElementById('dwsTable').getElementsByTagName('tbody')[0];
+            const allDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            const tableBody = document.querySelector('#dwsTable tbody');
+            tableBody.innerHTML = ''; // Clear the table first
 
-            savedData.forEach(dws => {
-                let row = tableBody.insertRow();
-                row.insertCell(0).textContent = dws.dwsNumber;
-                row.insertCell(1).textContent = dws.date;
-                row.insertCell(2).textContent = dws.structure;
-                row.insertCell(3).textContent = dws.siNo;
-                row.insertCell(4).textContent = dws.workDescription;
-                row.insertCell(5).textContent = dws.location;
-
-                let manpower = dws.manpower.map(item => `${item.badge} - ${item.name}`).join(', ');
-                row.insertCell(6).textContent = manpower;
-
-                let equipment = dws.equipment.map(item => `${item.name} (${item.hours} hrs)`).join(', ');
-                row.insertCell(7).textContent = equipment;
-
-                let consumables = dws.consumables.map(item => `${item.name} (${item.quantity})`).join(', ');
-                row.insertCell(8).textContent = consumables;
+            allDwsData.forEach(dws => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dws.dwsNumber}</td>
+                    <td>${dws.date}</td>
+                    <td>${dws.structure}</td>
+                    <td>${dws.siNo}</td>
+                    <td>${dws.workDescription}</td>
+                    <td>${dws.location}</td>
+                    <td>${dws.manpower.map(m => m.name).join(', ')}</td>
+                    <td>${dws.equipment.map(e => e.name).join(', ')}</td>
+                    <td>${dws.consumables.map(c => c.name).join(', ')}</td>
+                `;
+                tableBody.appendChild(row);
             });
         }
 
-        // Search DWS data
+        // Search functionality
         function searchDws() {
-            const searchValue = document.getElementById('searchInput').value.toLowerCase();
-            const rows = document.getElementById('dwsTable').getElementsByTagName('tbody')[0].rows;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const allDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            const filteredDws = allDwsData.filter(dws => 
+                dws.dwsNumber.toString().includes(searchInput) || 
+                dws.structure.toLowerCase().includes(searchInput)
+            );
+            displayFilteredDws(filteredDws);
+        }
 
-            for (let row of rows) {
-                let dwsNo = row.cells[0].textContent.toLowerCase();
-                let structure = row.cells[2].textContent.toLowerCase();
+        // Display filtered DWS data
+        function displayFilteredDws(filteredDws) {
+            const tableBody = document.querySelector('#dwsTable tbody');
+            tableBody.innerHTML = '';
 
-                if (dwsNo.includes(searchValue) || structure.includes(searchValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            }
+            filteredDws.forEach(dws => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dws.dwsNumber}</td>
+                    <td>${dws.date}</td>
+                    <td>${dws.structure}</td>
+                    <td>${dws.siNo}</td>
+                    <td>${dws.workDescription}</td>
+                    <td>${dws.location}</td>
+                    <td>${dws.manpower.map(m => m.name).join(', ')}</td>
+                    <td>${dws.equipment.map(e => e.name).join(', ')}</td>
+                    <td>${dws.consumables.map(c => c.name).join(', ')}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Export to Excel
+        function exportToExcel() {
+            const allDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            const ws = XLSX.utils.json_to_sheet(allDwsData.map(dws => ({
+                DWS_Number: dws.dwsNumber,
+                Date: dws.date,
+                Structure: dws.structure,
+                SI_No: dws.siNo,
+                Work_Description: dws.workDescription,
+                Location: dws.location,
+                Manpower: dws.manpower.map(m => `${m.name}`).join(', '),
+                Equipment: dws.equipment.map(e => `${e.name}`).join(', '),
+                Consumables: dws.consumables.map(c => `${c.name}`).join(', ')
+            })));
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'DWS Data');
+            XLSX.writeFile(wb, 'DWS_Data.xlsx');
+        }
+
+        // Export to PDF
+        function exportToPDF() {
+            const allDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(12);
+
+            allDwsData.forEach((dws, index) => {
+                const content = `
+                    DWS No.: ${dws.dwsNumber}\n
+                    Date: ${dws.date}\n
+                    Structure Name: ${dws.structure}\n
+                    SI No.: ${dws.siNo}\n
+                    Work Description: ${dws.workDescription}\n
+                    Location: ${dws.location}\n
+                    Manpower: ${dws.manpower.map(m => m.name).join(', ')}\n
+                    Equipment: ${dws.equipment.map(e => e.name).join(', ')}\n
+                    Consumables: ${dws.consumables.map(c => c.name).join(', ')}\n
+                    -------------------------------------------
+                `;
+                doc.text(content, 10, 10 + (index * 100)); // position the content on the PDF
+                if (index < allDwsData.length - 1) doc.addPage();
+            });
+
+            doc.save('DWS_Data.pdf');
         }
     </script>
+
 </body>
 </html>
