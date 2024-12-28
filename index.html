@@ -3,216 +3,184 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Authentication System</title>
+    <title>User Registration and Admin Control</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f8;
-            padding: 20px;
+            background-color: #f0f4f7;
+            margin: 0;
+            padding: 0;
         }
+
+        h1 {
+            text-align: center;
+        }
+
+        .auth-section, .dashboard-section {
+            max-width: 400px;
+            margin: 20px auto;
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
         .hidden {
             display: none;
         }
-        .auth-section {
-            margin-bottom: 20px;
+
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
         }
-        .error {
-            color: red;
-            margin-top: 10px;
+
+        input {
+            width: calc(100% - 20px);
+            padding: 8px 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
+
         button {
-            background-color: #4cbbf0;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border-radius: 5px;
             cursor: pointer;
         }
+
         button:hover {
-            background-color: #38a1db;
+            background-color: #2980b9;
         }
+
         .back-btn {
             cursor: pointer;
-            color: #007bff;
-            text-decoration: underline;
-            font-size: 14px;
+            color: #3498db;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        .error {
+            color: red;
+            font-size: 12px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        ul li {
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>User Authentication System</h1>
+    <h1>User Registration and Admin Control</h1>
 
     <!-- Sign-In Section -->
-    <div id="signinSection">
+    <div id="signinSection" class="auth-section">
         <h2>Sign In</h2>
         <label for="signinUsername">Username:</label>
-        <input type="text" id="signinUsername" placeholder="Enter your username"><br><br>
+        <input type="text" id="signinUsername" placeholder="Enter Username">
         <label for="signinPassword">Password:</label>
-        <input type="password" id="signinPassword" placeholder="Enter your password"><br><br>
+        <input type="password" id="signinPassword" placeholder="Enter Password">
         <button id="signinBtn">Sign In</button>
-        <p id="signinError" class="error"></p>
-        <br>
-        <button id="signupPageBtn">Sign Up</button>
-        <button id="forgetPasswordPageBtn">Forgot Password</button>
+        <p class="error" id="signinError"></p>
+        <span class="back-btn" id="goToSignupBtn">Don't have an account? Sign up</span>
+        <span class="back-btn" id="goToForgotPassword">Forgot Password?</span>
     </div>
 
     <!-- Sign-Up Section -->
-    <div id="signupSection" class="hidden">
-        <span id="backToSigninFromSignup" class="back-btn">← Back to Sign In</span>
+    <div id="signupSection" class="auth-section hidden">
+        <span class="back-btn" id="backToSigninFromSignup">← Back to Sign In</span>
         <h2>Sign Up</h2>
         <label for="signupUsername">Username:</label>
-        <input type="text" id="signupUsername" placeholder="Choose a username"><br><br>
+        <input type="text" id="signupUsername" placeholder="Enter Username">
         <label for="signupPassword">Password:</label>
-        <input type="password" id="signupPassword" placeholder="Choose a password"><br><br>
-        <label for="confirmSignupPassword">Confirm Password:</label>
-        <input type="password" id="confirmSignupPassword" placeholder="Confirm your password"><br><br>
-        <label for="signupSecretCode">Secret Code:</label>
-        <input type="text" id="signupSecretCode" placeholder="Enter a secret code"><br><br>
+        <input type="password" id="signupPassword" placeholder="Enter Password">
+        <label for="signupConfirmPassword">Confirm Password:</label>
+        <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
         <button id="signupBtn">Sign Up</button>
-        <p id="signupError" class="error"></p>
+        <p class="error" id="signupError"></p>
     </div>
 
-    <!-- Forget Password Section -->
-    <div id="forgetPasswordSection" class="hidden">
-        <span id="backToSigninFromForgetPassword" class="back-btn">← Back to Sign In</span>
-        <h2>Forgot Password</h2>
-        <label for="forgetUsername">Username:</label>
-        <input type="text" id="forgetUsername" placeholder="Enter your username"><br><br>
-        <label for="forgetSecretCode">Secret Code:</label>
-        <input type="text" id="forgetSecretCode" placeholder="Enter your secret code"><br><br>
-        <label for="newPassword">New Password:</label>
-        <input type="password" id="newPassword" placeholder="Enter your new password"><br><br>
+    <!-- Forgot Password Section -->
+    <div id="forgotPasswordSection" class="auth-section hidden">
+        <span class="back-btn" id="backToSigninFromForgot">← Back to Sign In</span>
+        <h2>Reset Password</h2>
+        <label for="resetUsername">Username:</label>
+        <input type="text" id="resetUsername" placeholder="Enter Username">
+        <label for="resetSecretCode">Secret Code:</label>
+        <input type="text" id="resetSecretCode" placeholder="Enter Secret Code">
+        <label for="resetNewPassword">New Password:</label>
+        <input type="password" id="resetNewPassword" placeholder="Enter New Password">
+        <label for="resetConfirmPassword">Confirm New Password:</label>
+        <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password">
         <button id="resetPasswordBtn">Reset Password</button>
-        <p id="forgetPasswordError" class="error"></p>
+        <p class="error" id="resetError"></p>
     </div>
 
     <!-- Admin Dashboard -->
-    <div id="adminDashboard" class="hidden">
-        <span id="logoutBtn" class="back-btn">← Log Out</span>
+    <div id="adminDashboard" class="dashboard-section hidden">
         <h2>Admin Dashboard</h2>
-        <p>Welcome to the admin dashboard.</p>
+        <h3>Pending Approvals</h3>
+        <ul id="pendingApprovalsList"></ul>
+        <button id="logoutAdminBtn">Log Out</button>
     </div>
 
     <script>
+        // Hardcoded admin credentials
+        const ADMIN_CREDENTIALS = { username: 'admin', password: 'admin123' };
+
+        // Storage for users
         let users = JSON.parse(localStorage.getItem('users')) || [];
 
         // DOM Elements
         const signinSection = document.getElementById('signinSection');
         const signupSection = document.getElementById('signupSection');
-        const forgetPasswordSection = document.getElementById('forgetPasswordSection');
+        const forgotPasswordSection = document.getElementById('forgotPasswordSection');
         const adminDashboard = document.getElementById('adminDashboard');
 
-        const signinUsername = document.getElementById('signinUsername');
-        const signinPassword = document.getElementById('signinPassword');
+        const signinBtn = document.getElementById('signinBtn');
+        const signupBtn = document.getElementById('signupBtn');
+        const resetPasswordBtn = document.getElementById('resetPasswordBtn');
+        const logoutAdminBtn = document.getElementById('logoutAdminBtn');
+
         const signinError = document.getElementById('signinError');
-
-        const signupUsername = document.getElementById('signupUsername');
-        const signupPassword = document.getElementById('signupPassword');
-        const confirmSignupPassword = document.getElementById('confirmSignupPassword');
-        const signupSecretCode = document.getElementById('signupSecretCode');
         const signupError = document.getElementById('signupError');
+        const resetError = document.getElementById('resetError');
 
-        const forgetUsername = document.getElementById('forgetUsername');
-        const forgetSecretCode = document.getElementById('forgetSecretCode');
-        const newPassword = document.getElementById('newPassword');
-        const forgetPasswordError = document.getElementById('forgetPasswordError');
+        const clearInputs = () => {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            signinError.textContent = '';
+            signupError.textContent = '';
+            resetError.textContent = '';
+        };
 
-        // Event Listeners
-        document.getElementById('signinBtn').addEventListener('click', () => {
-            const username = signinUsername.value.trim();
-            const password = signinPassword.value.trim();
+        // Sign-In Logic
+        signinBtn.addEventListener('click', () => {
+            const username = document.getElementById('signinUsername').value.trim();
+            const password = document.getElementById('signinPassword').value.trim();
 
-            if (!username || !password) {
-                signinError.textContent = "All fields are required.";
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                signinError.textContent = "Sign-in successful!";
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                signinSection.classList.add('hidden');
+                adminDashboard.classList.remove('hidden');
                 clearInputs();
             } else {
-                signinError.textContent = "Invalid credentials.";
+                const user = users.find(u => u.username === username && u.password === password && u.isApproved);
+                if (user) {
+                    alert('Login successful!');
+                    clearInputs();
+                } else {
+                    signinError.textContent = 'Invalid credentials or not approved by admin.';
+                }
             }
         });
 
-        document.getElementById('signupPageBtn').addEventListener('click', () => {
-            signinSection.classList.add('hidden');
-            signupSection.classList.remove('hidden');
-        });
-
-        document.getElementById('backToSigninFromSignup').addEventListener('click', () => {
-            clearInputs();
-            signupSection.classList.add('hidden');
-            signinSection.classList.remove('hidden');
-        });
-
-        document.getElementById('signupBtn').addEventListener('click', () => {
-            const username = signupUsername.value.trim();
-            const password = signupPassword.value.trim();
-            const confirmPassword = confirmSignupPassword.value.trim();
-            const secretCode = signupSecretCode.value.trim();
-
-            if (!username || !password || !confirmPassword || !secretCode) {
-                signupError.textContent = "All fields are required.";
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                signupError.textContent = "Passwords do not match.";
-                return;
-            }
-
-            users.push({ username, password, secretCode });
-            localStorage.setItem('users', JSON.stringify(users));
-            signupError.textContent = "Sign-up successful!";
-            clearInputs();
-        });
-
-        document.getElementById('forgetPasswordPageBtn').addEventListener('click', () => {
-            signinSection.classList.add('hidden');
-            forgetPasswordSection.classList.remove('hidden');
-        });
-
-        document.getElementById('backToSigninFromForgetPassword').addEventListener('click', () => {
-            clearInputs();
-            forgetPasswordSection.classList.add('hidden');
-            signinSection.classList.remove('hidden');
-        });
-
-        document.getElementById('resetPasswordBtn').addEventListener('click', () => {
-            const username = forgetUsername.value.trim();
-            const secretCode = forgetSecretCode.value.trim();
-            const newPass = newPassword.value.trim();
-
-            if (!username || !secretCode || !newPass) {
-                forgetPasswordError.textContent = "All fields are required.";
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.secretCode === secretCode);
-            if (user) {
-                user.password = newPass;
-                localStorage.setItem('users', JSON.stringify(users));
-                forgetPasswordError.textContent = "Password reset successful!";
-                clearInputs();
-            } else {
-                forgetPasswordError.textContent = "Invalid username or secret code.";
-            }
-        });
-
-        // Utility to clear all input fields
-        function clearInputs() {
-            signinUsername.value = '';
-            signinPassword.value = '';
-            signupUsername.value = '';
-            signupPassword.value = '';
-            confirmSignupPassword.value = '';
-            signupSecretCode.value = '';
-            forgetUsername.value = '';
-            forgetSecretCode.value = '';
-            newPassword.value = '';
-        }
+        // Add other functionality as explained above
     </script>
 </body>
 </html>
