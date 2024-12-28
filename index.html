@@ -161,32 +161,35 @@
         </div>
 
         <!-- User Dashboard Section -->
-        <div id="userDashboard" class="hidden">
-            <h1>User Dashboard</h1>
-            <button onclick="logout()">Log Out</button>
-            <h3>Welcome to the User Dashboard</h3>
-            <button id="createDWSBtn">Create DWS</button>
-            <button id="manageDWSBtn">Manage DWS</button>
-            <button id="searchDWSBtn">Search DWS</button>
-            
-            <div id="createDWSSection" class="hidden">
-                <h3>Create DWS</h3>
-                <button onclick="createDWS()">Create DWS</button>
-                <p id="dwsMessage"></p>
-            </div>
-            
-            <div id="manageDWSSection" class="hidden">
-                <h3>Manage Your DWS</h3>
-                <ul id="userDWSList"></ul>
-            </div>
+        <!-- User Dashboard Section -->
+<div id="userDashboard" class="hidden">
+    <h1>User Dashboard</h1>
+    <button onclick="logout()">Log Out</button>
+    <h3>Welcome to the User Dashboard</h3>
+    <button id="createDWSBtn">Create DWS</button>
+    <button id="manageDWSBtn">Manage DWS</button>
+    <button id="searchDWSBtn">Search DWS</button>
+    
+    <div id="createDWSSection" class="hidden">
+        <h3>Create DWS</h3>
+        <button onclick="createDWS()">Create DWS</button>
+        <p id="dwsMessage"></p>
+        <button onclick="switchSection('userDashboard')">Back to Dashboard</button> <!-- Back button -->
+    </div>
+    
+    <div id="manageDWSSection" class="hidden">
+        <h3>Manage Your DWS</h3>
+        <ul id="userDWSList"></ul>
+        <button onclick="switchSection('userDashboard')">Back to Dashboard</button> <!-- Back button -->
+    </div>
 
-            <div id="searchDWSSection" class="hidden">
-                <h3>Search DWS by Number</h3>
-                <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
-                <button onclick="searchDWS()">Search</button>
-                <p id="dwsSearchResult"></p>
-            </div>
-        </div>
+    <div id="searchDWSSection" class="hidden">
+        <h3>Search DWS by Number</h3>
+        <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
+        <button onclick="searchDWS()">Search</button>
+        <p id="dwsSearchResult"></p>
+        <button onclick="switchSection('userDashboard')">Back to Dashboard</button> <!-- Back button -->
+    </div>
     </div>
 
     <script>
