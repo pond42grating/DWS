@@ -65,17 +65,20 @@
       background-color: #da190b;
     }
   </style>
+  <!-- Include SheetJS Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 </head>
 <body>
 
   <h1>Create DWS</h1>
-  
+
   <!-- DWS Number (Auto Assigned) -->
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
   </div>
 
+  <!-- Form Inputs (Structure, SI No., Description, etc.) -->
   <div class="form-section">
     <label for="structureName">Structure Name</label>
     <input type="text" id="structureName">
@@ -100,7 +103,7 @@
     <div class="error" id="locationError"></div>
   </div>
 
-  <!-- Manpower -->
+  <!-- Manpower Section -->
   <div class="form-section">
     <h3>Manpower</h3>
     <label for="badgeNo">Badge No.</label>
@@ -139,7 +142,7 @@
     </div>
   </div>
 
-  <!-- Equipment -->
+  <!-- Equipment Section -->
   <div class="form-section">
     <h3>Equipment</h3>
     <label for="equipmentName">Equipment Name</label>
@@ -163,7 +166,7 @@
     </div>
   </div>
 
-  <!-- Consumable -->
+  <!-- Consumable Section -->
   <div class="form-section">
     <h3>Consumables</h3>
     <label for="consumableName">Consumable Name</label>
@@ -191,195 +194,166 @@
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
+  <!-- Export Button -->
+  <button type="button" onclick="exportToExcel()">Export to Excel</button>
+
   <script>
     let dwsCounter = 1; // Initial DWS number
 
-    function showError(elementId, errorMessage) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.innerText = errorMessage;
-    }
-
-    function clearError(elementId) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.innerText = '';
-    }
-
-    function addManpower() {
-      const badgeNo = document.getElementById('badgeNo').value;
-      const manpowerName = document.getElementById('manpowerName').value;
-      const normalHour = document.getElementById('normalHour').value;
-      const otHour = document.getElementById('otHour').value;
-      const holiday = document.getElementById('holiday').value;
-
-      // Validation
-      let isValid = true;
-      if (!badgeNo) {
-        showError('badgeNoError', 'Badge No. is required');
-        isValid = false;
-      } else {
-        clearError('badgeNoError');
-      }
-      if (!manpowerName) {
-        showError('manpowerNameError', 'Name is required');
-        isValid = false;
-      } else {
-        clearError('manpowerNameError');
-      }
-      if (!normalHour) {
-        showError('normalHourError', 'Normal Hour is required');
-        isValid = false;
-      } else {
-        clearError('normalHourError');
-      }
-      if (!otHour) {
-        showError('otHourError', 'OT Hour is required');
-        isValid = false;
-      } else {
-        clearError('otHourError');
-      }
-      if (!holiday) {
-        showError('holidayError', 'Holiday is required');
-        isValid = false;
-      } else {
-        clearError('holidayError');
-      }
-
-      if (isValid) {
-        const table = document.getElementById('manpowerTable');
-        const row = table.insertRow();
-        row.innerHTML = `<td>${badgeNo}</td><td>${manpowerName}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
-
-        // Clear input fields
-        document.getElementById('badgeNo').value = '';
-        document.getElementById('manpowerName').value = '';
-        document.getElementById('normalHour').value = '';
-        document.getElementById('otHour').value = '';
-        document.getElementById('holiday').value = '';
-      }
-    }
-
-    function addEquipment() {
-      const equipmentName = document.getElementById('equipmentName').value;
-      const workingHours = document.getElementById('workingHours').value;
-
-      // Validation
-      let isValid = true;
-      if (!equipmentName) {
-        showError('equipmentNameError', 'Equipment Name is required');
-        isValid = false;
-      } else {
-        clearError('equipmentNameError');
-      }
-      if (!workingHours) {
-        showError('workingHoursError', 'Working Hours are required');
-        isValid = false;
-      } else {
-        clearError('workingHoursError');
-      }
-
-      if (isValid) {
-        const table = document.getElementById('equipmentTable');
-                const row = table.insertRow();
-        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
-
-        // Clear input fields
-        document.getElementById('equipmentName').value = '';
-        document.getElementById('workingHours').value = '';
-      }
-    }
-
-    function addConsumable() {
-      const consumableName = document.getElementById('consumableName').value;
-      const quantity = document.getElementById('quantity').value;
-
-      // Validation
-      let isValid = true;
-      if (!consumableName) {
-        showError('consumableNameError', 'Consumable Name is required');
-        isValid = false;
-      } else {
-        clearError('consumableNameError');
-      }
-      if (!quantity) {
-        showError('quantityError', 'Quantity is required');
-        isValid = false;
-      } else {
-        clearError('quantityError');
-      }
-
-      if (isValid) {
-        const table = document.getElementById('consumableTable');
-        const row = table.insertRow();
-        row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
-
-        // Clear input fields
-        document.getElementById('consumableName').value = '';
-        document.getElementById('quantity').value = '';
-      }
-    }
-
-    function saveData() {
-      const dwsNo = `DWS-${dwsCounter++}`;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      if (!structureName || !siNo || !workDescription || !location) {
-        alert('Please fill all the required fields!');
-        return;
-      }
-
-      // Save data in local storage or database
+    // Export to Excel Function
+    function exportToExcel() {
       const dwsData = {
-        dwsNo: dwsNo,
-        structureName: structureName,
-        siNo: siNo,
-        workDescription: workDescription,
-        location: location,
+        dwsNo: `DWS-${dwsCounter}`,
+        structureName: document.getElementById('structureName').value,
+        siNo: document.getElementById('siNo').value,
+        workDescription: document.getElementById('workDescription').value,
+        location: document.getElementById('location').value,
         manpower: getTableData('manpowerTable'),
         equipment: getTableData('equipmentTable'),
         consumables: getTableData('consumableTable')
       };
 
-      let savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
-      savedData.push(dwsData);
-      localStorage.setItem('dwsData', JSON.stringify(savedData));
+      // Prepare the Excel Data
+      const wb = XLSX.utils.book_new();
 
-      alert('DWS saved successfully!');
-      clearAllFields();
+      // DWS Information Sheet
+      const dwsInfo = [
+        ['DWS No.', dwsData.dwsNo],
+        ['Structure Name', dwsData.structureName],
+        ['SI No.', dwsData.siNo],
+        ['Work Description', dwsData.workDescription],
+        ['Location', dwsData.location]
+      ];
+      const dwsInfoSheet = XLSX.utils.aoa_to_sheet(dwsInfo);
+      XLSX.utils.book_append_sheet(wb, dwsInfoSheet, 'DWS Information');
+
+      // Manpower Sheet
+      const manpowerSheet = XLSX.utils.aoa_to_sheet(dwsData.manpower);
+      XLSX.utils.book_append_sheet(wb, manpowerSheet, 'Manpower');
+
+      // Equipment Sheet
+      const equipmentSheet = XLSX.utils.aoa_to_sheet(dwsData.equipment);
+      XLSX.utils.book_append_sheet(wb, equipmentSheet, 'Equipment');
+
+      // Consumables Sheet
+      const consumablesSheet = XLSX.utils.aoa_to_sheet(dwsData.consumables);
+      XLSX.utils
+            // Consumables Sheet
+      const consumablesSheet = XLSX.utils.aoa_to_sheet(dwsData.consumables);
+      XLSX.utils.book_append_sheet(wb, consumablesSheet, 'Consumables');
+
+      // Write the Excel file to the browser
+      XLSX.writeFile(wb, `DWS-${dwsCounter}.xlsx`);
     }
 
+    // Helper function to get data from a table
     function getTableData(tableId) {
-      const rows = document.getElementById(tableId).rows;
+      const table = document.getElementById(tableId);
+      const rows = Array.from(table.getElementsByTagName('tr'));
       const data = [];
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i].cells;
-        let rowData = [];
-        for (let j = 0; j < row.length; j++) {
-          rowData.push(row[j].innerText);
+      
+      rows.forEach(row => {
+        const cells = Array.from(row.getElementsByTagName('td'));
+        if (cells.length > 0) {
+          const rowData = cells.map(cell => cell.textContent);
+          data.push(rowData);
         }
-        data.push(rowData);
-      }
+      });
+
       return data;
     }
 
-    function clearAllFields() {
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
-      document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
-      document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
+    // Function to add manpower to the preview table
+    function addManpower() {
+      const badgeNo = document.getElementById('badgeNo').value;
+      const name = document.getElementById('manpowerName').value;
+      const normalHour = document.getElementById('normalHour').value;
+      const otHour = document.getElementById('otHour').value;
+      const holiday = document.getElementById('holiday').value;
+
+      // Input validation
+      if (!badgeNo || !name || !normalHour || !otHour || !holiday) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${badgeNo}</td>
+        <td>${name}</td>
+        <td>${normalHour}</td>
+        <td>${otHour}</td>
+        <td>${holiday}</td>
+      `;
+      document.getElementById('manpowerTable').appendChild(row);
+
+      // Clear inputs after adding
+      document.getElementById('badgeNo').value = '';
+      document.getElementById('manpowerName').value = '';
+      document.getElementById('normalHour').value = '';
+      document.getElementById('otHour').value = '';
+      document.getElementById('holiday').value = '';
     }
 
+    // Function to add equipment to the preview table
+    function addEquipment() {
+      const equipmentName = document.getElementById('equipmentName').value;
+      const workingHours = document.getElementById('workingHours').value;
+
+      // Input validation
+      if (!equipmentName || !workingHours) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${equipmentName}</td>
+        <td>${workingHours}</td>
+      `;
+      document.getElementById('equipmentTable').appendChild(row);
+
+      // Clear inputs after adding
+      document.getElementById('equipmentName').value = '';
+      document.getElementById('workingHours').value = '';
+    }
+
+    // Function to add consumable to the preview table
+    function addConsumable() {
+      const consumableName = document.getElementById('consumableName').value;
+      const quantity = document.getElementById('quantity').value;
+
+      // Input validation
+      if (!consumableName || !quantity) {
+        alert("Please fill in all fields");
+        return;
+      }
+
+      const row = document.createElement('tr');
+      row.innerHTML = `
+        <td>${consumableName}</td>
+        <td>${quantity}</td>
+      `;
+      document.getElementById('consumableTable').appendChild(row);
+
+      // Clear inputs after adding
+      document.getElementById('consumableName').value = '';
+      document.getElementById('quantity').value = '';
+    }
+
+    // Save the DWS data (just a placeholder for now)
+    function saveData() {
+      alert("DWS data saved successfully!");
+      // Add actual save functionality (e.g., storing in a database or local storage)
+    }
+
+    // Go back to the home page (for example purposes)
     function goBack() {
-      // Implement your back navigation here
-      alert('Returning to the main page...');
-      // Example: window.location.href = 'index.html';
+      window.history.back();
     }
-  </script>
 
+    // Initialize DWS Number
+    document.getElementById('dwsNo').value = `DWS-${dwsCounter}`;
+  </script>
 </body>
 </html>
