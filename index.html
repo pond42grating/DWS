@@ -4,144 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All-in-One Authentication System</title>
-    
     <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
-        margin: 0;
-        padding: 0;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
 
-    .container {
-        background-color: #fff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-        width: 100%;
-        max-width: 400px;
-    }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+        }
 
-    h1, h3 {
-        text-align: center;
-    }
+        h1, h3 {
+            text-align: center;
+        }
 
-    input {
-        width: 100%;
-        padding: 10px;
-        margin: 10px 0;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-    }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
 
-    button {
-        width: 100%;
-        padding: 10px;
-        background-color: #007bff;
-        color: #fff;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
 
-    button:hover {
-        background-color: #0056b3;
-    }
+        button:hover {
+            background-color: #0056b3;
+        }
 
-    .hidden {
-        display: none;
-    }
+        .hidden {
+            display: none;
+        }
 
-    .error {
-        color: red;
-        font-size: 0.9em;
-    }
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
 
-    .link-button {
-        background: none;
-        color: blue;
-        border: none;
-        text-decoration: underline;
-        cursor: pointer;
-        padding: 0;
-    }
+        .link-button {
+            background: none;
+            color: blue;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
 
-    .pending-users-list {
-        list-style-type: none;
-        padding: 0;
-    }
+        .pending-users-list, .user-list, .audit-log {
+            list-style-type: none;
+            padding: 0;
+        }
 
-    .pending-user {
-        padding: 10px;
-        border: 1px solid #ccc;
-        margin-bottom: 5px;
-        display: flex;
-        justify-content: space-between;
-    }
+        .pending-user, .user-item, .audit-entry {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
 
-    .pending-user button {
-        padding: 5px 10px;
-        font-size: 0.9em;
-        background-color: #007bff;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        margin: 0 5px;
-        transition: background-color 0.3s ease;
-    }
+        .role-select {
+            width: 150px;
+        }
 
-    .pending-user button:hover {
-        background-color: #0056b3;
-    }
+        .bulk-actions {
+            margin: 20px 0;
+        }
 
-    .pending-user button.reject {
-        background-color: #dc3545;
-    }
-
-    .pending-user button.reject:hover {
-        background-color: #c82333;
-    }
-
-    .pending-user button.approve {
-        background-color: #28a745;
-    }
-
-    .pending-user button.approve:hover {
-        background-color: #218838;
-    }
-
-    .remove-btn, .logout-btn {
-        padding: 5px 10px;
-        font-size: 0.9em;
-        background-color: #dc3545;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-        margin: 5px 0;
-        width: auto;
-    }
-
-    .remove-btn:hover, .logout-btn:hover {
-        background-color: #c82333;
-    }
-
-    .remove-btn {
-        background-color: #dc3545;
-    }
-
-    .logout-btn {
-        background-color: #007bff;
-    }
-</style>
-    
+        .bulk-actions button {
+            width: auto;
+            background-color: #28a745;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -181,15 +134,30 @@
         </div>
 
         <!-- Admin Dashboard Section -->
-<div id="adminDashboard" class="hidden">
-    <h1>Admin Dashboard</h1>
-    <h3>Pending User Approvals</h3>
-    <ul id="pendingUsersList" class="pending-users-list"></ul>
-    <h3>Total Users: <span id="totalUsersCount">0</span></h3> <!-- Added user count -->
-    <h3>Registered Users</h3>
-    <ul id="userList" class="pending-users-list"></ul> <!-- Added list of users -->
-    <button class="logout-btn" onclick="logout()">Log Out</button>
-</div>
+        <div id="adminDashboard" class="hidden">
+            <h1>Admin Dashboard</h1>
+
+            <!-- Search Users -->
+            <input type="text" id="searchUser" placeholder="Search User by Username" oninput="searchUsers()">
+
+            <!-- User Role Management -->
+            <div class="bulk-actions">
+                <button onclick="bulkApprove()">Bulk Approve</button>
+                <button onclick="bulkReject()">Bulk Reject</button>
+            </div>
+
+            <h3>Pending User Approvals</h3>
+            <ul id="pendingUsersList" class="pending-users-list"></ul>
+            <h3>Total Users: <span id="totalUsersCount">0</span></h3>
+
+            <h3>Registered Users</h3>
+            <ul id="userList" class="user-list"></ul>
+
+            <h3>Audit Logs</h3>
+            <ul id="auditLog" class="audit-log"></ul>
+
+            <button onclick="logout()">Log Out</button>
+        </div>
 
         <!-- User Dashboard Section -->
         <div id="userDashboard" class="hidden">
@@ -203,6 +171,7 @@
     <script>
         const users = JSON.parse(localStorage.getItem("users")) || [];
         const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+        const auditLogs = JSON.parse(localStorage.getItem("auditLogs")) || [];
 
         function switchSection(sectionId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
@@ -228,114 +197,154 @@
             });
         }
 
+        function updateUserList() {
+            const list = document.getElementById("userList");
+            const totalUsersCount = document.getElementById("totalUsersCount");
+            list.innerHTML = ''; // Clear existing user list
+            users.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("user-item");
+                listItem.innerHTML = `${user.username} 
+                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
+                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
+                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                    </select>
+                    <button onclick="removeUser(${index})">Remove</button>`;
+                list.appendChild(listItem);
+            });
+            totalUsersCount.textContent = users.length;
+        }
+
+        function updateAuditLog(action, username) {
+            const log = { action, username, timestamp: new Date().toISOString() };
+            auditLogs.push(log);
+            localStorage.setItem("auditLogs", JSON.stringify(auditLogs));
+            renderAuditLog();
+        }
+
+        function renderAuditLog() {
+            const list = document.getElementById("auditLog");
+            list.innerHTML = '';
+            auditLogs.forEach(log => {
+                const logItem = document.createElement("li");
+                logItem.classList.add("audit-entry");
+                logItem.innerHTML = `${log.timestamp}: ${log.username} - ${log.action}`;
+                list.appendChild(logItem);
+            });
+        }
+
         function approveUser(index) {
             const user = pendingUsers.splice(index, 1)[0];
-            user.approved = true;  // Mark user as approved
+            user.approved = true;
             users.push(user);
             localStorage.setItem("users", JSON.stringify(users));
             localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
             alert("User approved!");
             updatePendingUsersList();
+            updateUserList();
+            updateAuditLog('Approved', user.username);
         }
 
         function rejectUser(index) {
-            pendingUsers.splice(index, 1);
+            const user = pendingUsers.splice(index, 1)[0];
             localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
             alert("User rejected!");
             updatePendingUsersList();
+            updateAuditLog('Rejected', user.username);
         }
-        
-        // Update the admin dashboard to show the list of registered users and user count
-function updateUserList() {
-    const list = document.getElementById("userList");
-    const totalUsersCount = document.getElementById("totalUsersCount");
-    list.innerHTML = ''; // Clear existing user list
-    users.forEach((user, index) => {
-        const listItem = document.createElement("li");
-        listItem.classList.add("pending-user");
-        listItem.innerHTML = `${user.username} 
-            <button class="remove-btn" onclick="removeUser(${index})">Remove</button>`;
-        list.appendChild(listItem);
-    });
-    totalUsersCount.textContent = users.length; // Update total users count
-}
 
-// Remove a user from the list
-function removeUser(index) {
-    const user = users.splice(index, 1)[0]; // Remove from the users list
-    localStorage.setItem("users", JSON.stringify(users)); // Update the local storage
-    alert(`${user.username} has been removed from the system.`);
-    updateUserList(); // Re-render the updated user list
-}
+        function removeUser(index) {
+            const user = users.splice(index, 1)[0];
+            localStorage.setItem("users", JSON.stringify(users));
+            alert(`${user.username} has been removed from the system.`);
+            updateUserList();
+            updateAuditLog('Removed', user.username);
+        }
 
-// Log out function
-function logout() {
-    switchSection("loginSection");
-}
+        function changeUserRole(index, role) {
+            users[index].role = role;
+            localStorage.setItem("users", JSON.stringify(users));
+            updateAuditLog('Role changed', users[index].username);
+        }
 
-function updatePendingUsersList() {
-    const list = document.getElementById("pendingUsersList");
-    list.innerHTML = '';
-    pendingUsers.forEach((user, index) => {
-        const listItem = document.createElement("li");
-        listItem.classList.add("pending-user");
-        listItem.innerHTML = `${user.username} 
-            <button class="approve" onclick="approveUser(${index})">Approve</button>
-            <button class="reject" onclick="rejectUser(${index})">Reject</button>`;
-        list.appendChild(listItem);
-    });
-}
+        function bulkApprove() {
+            pendingUsers.forEach((user, index) => {
+                user.approved = true;
+                users.push(user);
+                updateAuditLog('Bulk approved', user.username);
+            });
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify([]));
+            alert("Bulk approval successful.");
+            updatePendingUsersList();
+            updateUserList();
+        }
 
-// Approve a user
-function approveUser(index) {
-    const user = pendingUsers.splice(index, 1)[0];
-    user.approved = true;  // Mark user as approved
-    users.push(user);
-    localStorage.setItem("users", JSON.stringify(users));
-    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-    alert("User approved!");
-    updatePendingUsersList();
-    updateUserList(); // Update the user list after approval
-}
+        function bulkReject() {
+            pendingUsers.forEach((user, index) => {
+                updateAuditLog('Bulk rejected', user.username);
+            });
+            localStorage.setItem("pendingUsers", JSON.stringify([]));
+            alert("Bulk rejection successful.");
+            updatePendingUsersList();
+        }
 
-// Reject a user
-function rejectUser(index) {
-    pendingUsers.splice(index, 1);
-    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-    alert("User rejected!");
-    updatePendingUsersList();
-}
+        function searchUsers() {
+            const searchTerm = document.getElementById("searchUser").value.trim().toLowerCase();
+            const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchTerm));
+            renderFilteredUsers(filteredUsers);
+        }
 
-document.getElementById("signinBtn").addEventListener("click", () => {
-    const username = document.getElementById("signinUsername").value.trim();
-    const password = document.getElementById("signinPassword").value.trim();
+        function renderFilteredUsers(filteredUsers) {
+            const list = document.getElementById("userList");
+            list.innerHTML = ''; // Clear existing list
+            filteredUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("user-item");
+                listItem.innerHTML = `${user.username} 
+                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
+                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
+                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                    </select>
+                    <button onclick="removeUser(${index})">Remove</button>`;
+                list.appendChild(listItem);
+            });
+        }
 
-    if (!username || !password) {
-        document.getElementById("signinError").textContent = "Please fill in all fields.";
-        return;
-    }
+        function logout() {
+            switchSection("loginSection");
+        }
 
-    if (username === "admin" && password === "admin123") {
-        switchSection("adminDashboard");
-        updatePendingUsersList();
-        updateUserList(); // Also load the approved users
-        return;
-    }
+        document.getElementById("signinBtn").addEventListener("click", () => {
+            const username = document.getElementById("signinUsername").value.trim();
+            const password = document.getElementById("signinPassword").value.trim();
 
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-        document.getElementById("signinError").textContent = "Invalid credentials.";
-        return;
-    }
+            if (!username || !password) {
+                document.getElementById("signinError").textContent = "Please fill in all fields.";
+                return;
+            }
 
-    if (!user.approved) {
-        document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-        return;
-    }
+            if (username === "admin" && password === "admin123") {
+                switchSection("adminDashboard");
+                updatePendingUsersList();
+                updateUserList();
+                renderAuditLog();
+                return;
+            }
 
-    // Redirect to user dashboard
-    switchSection("userDashboard");
-});
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById("signinError").textContent = "Invalid credentials.";
+                return;
+            }
+
+            if (!user.approved) {
+                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+                return;
+            }
+
+            switchSection("userDashboard");
+        });
 
         document.getElementById("signupBtn").addEventListener("click", () => {
             const username = document.getElementById("signupUsername").value.trim();
@@ -358,7 +367,7 @@ document.getElementById("signinBtn").addEventListener("click", () => {
                 return;
             }
 
-            pendingUsers.push({ username, password, secretCode, approved: false });
+            pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
             localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
 
             alert("Sign-up successful! Awaiting admin approval.");
@@ -393,10 +402,6 @@ document.getElementById("signinBtn").addEventListener("click", () => {
             alert("Password reset successful!");
             switchSection("loginSection");
         });
-
-        function logout() {
-            switchSection("loginSection");
-        }
     </script>
 </body>
 </html>
