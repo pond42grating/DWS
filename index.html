@@ -282,7 +282,224 @@
 
         // Update lists, audit log, and other functionalities...
         // (remaining JavaScript functions for user management, approval, etc.)
+        function updatePendingUsersList() {
+            const list = document.getElementById("pendingUsersList");
+            list.innerHTML = '';
+            pendingUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("pending-user");
+                listItem.innerHTML = `${user.username} 
+                    <button onclick="approveUser(${index})">Approve</button>
+                    <button onclick="rejectUser(${index})">Reject</button>`;
+                list.appendChild(listItem);
+            });
+        }
 
+        function updateUserList() {
+            const list = document.getElementById("userList");
+            const totalUsersCount = document.getElementById("totalUsersCount");
+            list.innerHTML = ''; // Clear existing user list
+            users.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("user-item");
+                listItem.innerHTML = `${user.username} 
+                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
+                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
+                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                    </select>
+                    <button onclick="removeUser(${index})">Remove</button>`;
+                list.appendChild(listItem);
+            });
+            totalUsersCount.textContent = users.length;
+        }
+
+        function updateAuditLog(action, username) {
+            const log = { action, username, timestamp: new Date().toISOString() };
+            auditLogs.push(log);
+            localStorage.setItem("auditLogs", JSON.stringify(auditLogs));
+            renderAuditLog();
+        }
+
+        function renderAuditLog() {
+            const list = document.getElementById("auditLog");
+            list.innerHTML = '';
+            auditLogs.forEach(log => {
+                const logItem = document.createElement("li");
+                logItem.classList.add("audit-entry");
+                logItem.innerHTML = `${log.timestamp}: ${log.username} - ${log.action}`;
+                list.appendChild(logItem);
+            });
+        }
+
+        function approveUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            user.approved = true;
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User approved!");
+            updatePendingUsersList();
+            updateUserList();
+            updateAuditLog('Approved', user.username);
+        }
+
+        function rejectUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User rejected!");
+            updatePendingUsersList();
+            updateAuditLog('Rejected', user.username);
+        }
+
+        function removeUser(index) {
+            const user = users.splice(index, 1)[0];
+            localStorage.setItem("users", JSON.stringify(users));
+            alert(`${user.username} has been removed from the system.`);
+            updateUserList();
+            updateAuditLog('Removed', user.username);
+        }
+
+        function changeUserRole(index, role) {
+            users[index].role = role;
+            localStorage.setItem("users", JSON.stringify(users));
+            updateAuditLog('Role changed', users[index].username);
+        }
+
+        function bulkApprove() {
+            pendingUsers.forEach((user, index) => {
+                user.approved = true;
+                users.push(user);
+                updateAuditLog('Bulk approved', user.username);
+            });
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify([]));
+            alert("Bulk approval successful.");
+            updatePendingUsersList();
+            updateUserList();
+        }
+
+        function bulkReject() {
+            pendingUsers.forEach((user, index) => {
+                updateAuditLog('Bulk rejected', user.username);
+            });
+            localStorage.setItem("pendingUsers", JSON.stringify([]));
+            alert("Bulk rejection successful.");
+            updatePendingUsersList();
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById("searchUser").value.trim().toLowerCase();
+            const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchTerm));
+            renderFilteredUsers(filteredUsers);
+        }
+
+        function renderFilteredUsers(filteredUsers) {
+            const list = document.getElementById("userList");
+            list.innerHTML = ''; // Clear existing list
+            filteredUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("user-item");
+                listItem.innerHTML = `${user.username} 
+                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
+                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
+                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                    </select>
+                    <button onclick="removeUser(${index})">Remove</button>`;
+                list.appendChild(listItem);
+            });
+        }
+
+        function logout() {
+            switchSection("loginSection");
+        }
+
+        document.getElementById("signinBtn").addEventListener("click", () => {
+            const username = document.getElementById("signinUsername").value.trim();
+            const password = document.getElementById("signinPassword").value.trim();
+
+            if (!username || !password) {
+                document.getElementById("signinError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (username === "admin" && password === "admin123") {
+                switchSection("adminDashboard");
+                updatePendingUsersList();
+                updateUserList();
+                renderAuditLog();
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById("signinError").textContent = "Invalid credentials.";
+                return;
+            }
+
+            if (!user.approved) {
+                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+                return;
+            }
+
+            switchSection("userDashboard");
+        });
+
+        document.getElementById("signupBtn").addEventListener("click", () => {
+            const username = document.getElementById("signupUsername").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
+            const secretCode = document.getElementById("signupSecretCode").value.trim();
+
+            if (!username || !password || !confirmPassword || !secretCode) {
+                document.getElementById("signupError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById("signupError").textContent = "Passwords do not match.";
+                return;
+            }
+
+            if (users.some(user => user.username === username)) {
+                document.getElementById("signupError").textContent = "Username already exists.";
+                return;
+            }
+
+            pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+
+            alert("Sign-up successful! Awaiting admin approval.");
+            switchSection("loginSection");
+        });
+
+        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
+            const username = document.getElementById("resetUsername").value.trim();
+            const secretCode = document.getElementById("resetSecretCode").value.trim();
+            const newPassword = document.getElementById("resetNewPassword").value.trim();
+            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+
+            if (!username || !secretCode || !newPassword || !confirmPassword) {
+                document.getElementById("resetError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById("resetError").textContent = "Passwords do not match.";
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.secretCode === secretCode);
+            if (!user) {
+                document.getElementById("resetError").textContent = "Invalid username or secret code.";
+                return;
+            }
+
+            user.password = newPassword;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Password reset successful!");
+            switchSection("loginSection");
+        });
     </script>
 </body>
 </html>
