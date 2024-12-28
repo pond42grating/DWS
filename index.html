@@ -69,6 +69,13 @@
 <body>
 
   <h1>Create DWS</h1>
+  
+  <!-- DWS Number (Auto Assigned) -->
+  <div class="form-section">
+    <label for="dwsNo">DWS No.</label>
+    <input type="text" id="dwsNo" readonly>
+  </div>
+
   <div class="form-section">
     <label for="structureName">Structure Name</label>
     <input type="text" id="structureName">
@@ -185,6 +192,8 @@
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
+    let dwsCounter = 1; // Initial DWS number
+
     function showError(elementId, errorMessage) {
       const errorElement = document.getElementById(elementId);
       errorElement.innerText = errorMessage;
@@ -270,7 +279,7 @@
 
       if (isValid) {
         const table = document.getElementById('equipmentTable');
-        const row = table.insertRow();
+                const row = table.insertRow();
         row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
@@ -310,15 +319,65 @@
     }
 
     function saveData() {
-      // Implement the save functionality
-      alert('Data Saved Successfully');
-      // Here you can save data to localStorage or backend as needed
+      const dwsNo = `DWS-${dwsCounter++}`;
+      const structureName = document.getElementById('structureName').value;
+      const siNo = document.getElementById('siNo').value;
+      const workDescription = document.getElementById('workDescription').value;
+      const location = document.getElementById('location').value;
+
+      if (!structureName || !siNo || !workDescription || !location) {
+        alert('Please fill all the required fields!');
+        return;
+      }
+
+      // Save data in local storage or database
+      const dwsData = {
+        dwsNo: dwsNo,
+        structureName: structureName,
+        siNo: siNo,
+        workDescription: workDescription,
+        location: location,
+        manpower: getTableData('manpowerTable'),
+        equipment: getTableData('equipmentTable'),
+        consumables: getTableData('consumableTable')
+      };
+
+      let savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
+      savedData.push(dwsData);
+      localStorage.setItem('dwsData', JSON.stringify(savedData));
+
+      alert('DWS saved successfully!');
+      clearAllFields();
+    }
+
+    function getTableData(tableId) {
+      const rows = document.getElementById(tableId).rows;
+      const data = [];
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i].cells;
+        let rowData = [];
+        for (let j = 0; j < row.length; j++) {
+          rowData.push(row[j].innerText);
+        }
+        data.push(rowData);
+      }
+      return data;
+    }
+
+    function clearAllFields() {
+      document.getElementById('structureName').value = '';
+      document.getElementById('siNo').value = '';
+      document.getElementById('workDescription').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
+      document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
+      document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
     }
 
     function goBack() {
-      alert('Going back to home!');
-      // You can redirect to the home page or reset the form as needed
-      window.location.reload(); // This will reload the page and reset the form
+      // Implement your back navigation here
+      alert('Returning to the main page...');
+      // Example: window.location.href = 'index.html';
     }
   </script>
 
