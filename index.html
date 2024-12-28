@@ -6,6 +6,95 @@
     <title>All-in-One Authentication System</title>
     <style>
         /* Existing Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1, h3 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        .link-button {
+            background: none;
+            color: blue;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .pending-users-list, .user-list, .audit-log {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pending-user, .user-item, .audit-entry {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .role-select {
+            width: 150px;
+        }
+
+        .bulk-actions {
+            margin: 20px 0;
+        }
+
+        .bulk-actions button {
+            width: auto;
+            background-color: #28a745;
+        }
     </style>
 </head>
 <body>
