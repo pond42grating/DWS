@@ -3,267 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-in-One Authentication System</title>
+    <title>User Registration and Admin Control</title>
     <style>
+        .hidden { display: none; }
+        .auth-section, .error { margin-bottom: 15px; }
+        .back-btn { cursor: pointer; color: blue; font-size: 14px; }
+        .error { color: red; }
+        /* Styling for the page */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: #fff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
         }
-
-        h1, h3 {
+        h1 {
             text-align: center;
+            color: #333;
         }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
+        .btn {
+            background-color: lightblue;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
             border-radius: 5px;
         }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
-
-        .link-button {
-            background: none;
-            color: blue;
-            border: none;
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .pending-users-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .pending-user {
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
+        .btn:hover {
+            background-color: #3e8e41;
+            color: white;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection">
-            <h1>Login</h1>
-            <input type="text" id="signinUsername" placeholder="Enter Username">
-            <input type="password" id="signinPassword" placeholder="Enter Password">
-            <button id="signinBtn">Sign In</button>
-            <p id="signinError" class="error"></p>
-            <button class="link-button" onclick="switchSection('signupSection')">Sign Up</button>
-            <button class="link-button" onclick="switchSection('forgotPasswordSection')">Forgot Password</button>
+
+    <h1>User Registration and Admin Control</h1>
+
+    <!-- Authentication Section -->
+    <div id="authSection">
+        <!-- Sign-In Section -->
+        <div class="auth-section" id="signinSection">
+            <h2>Sign In</h2>
+            <label for="signinUsername">Username:</label>
+            <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
+
+            <label for="signinPassword">Password:</label>
+            <input type="password" id="signinPassword" placeholder="Enter Password" required><br><br>
+
+            <button id="signinBtn" class="btn">Sign In</button>
+            <p class="error" id="signinError"></p>
+            <button id="goToSignupBtn" class="btn">Sign Up</button> 
         </div>
 
         <!-- Sign-Up Section -->
-        <div id="signupSection" class="hidden">
-            <h1>Sign Up</h1>
-            <input type="text" id="signupUsername" placeholder="Enter Username">
-            <input type="password" id="signupPassword" placeholder="Enter Password">
-            <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
-            <input type="text" id="signupSecretCode" placeholder="Enter Secret Code">
-            <button id="signupBtn">Sign Up</button>
-            <p id="signupError" class="error"></p>
-            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
-        </div>
+        <div id="signupSection" class="auth-section hidden">
+            <span class="back-btn" id="backToLoginBtn">← Back to Login</span>
+            <h2>Sign Up</h2>
+            <label for="signupUsername">Username:</label>
+            <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
 
-        <!-- Forgot Password Section -->
-        <div id="forgotPasswordSection" class="hidden">
-            <h1>Forgot Password</h1>
-            <input type="text" id="resetUsername" placeholder="Enter Username">
-            <input type="text" id="resetSecretCode" placeholder="Enter Secret Code">
-            <input type="password" id="resetNewPassword" placeholder="Enter New Password">
-            <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password">
-            <button id="resetPasswordBtn">Reset Password</button>
-            <p id="resetError" class="error"></p>
-            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
-        </div>
+            <label for="signupPassword">Password:</label>
+            <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
 
-        <!-- Admin Dashboard Section -->
-        <div id="adminDashboard" class="hidden">
-            <h1>Admin Dashboard</h1>
-            <h3>Pending User Approvals</h3>
-            <ul id="pendingUsersList" class="pending-users-list"></ul>
-            <button onclick="logout()">Log Out</button>
+            <label for="confirmPassword">Confirm Password:</label>
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required><br><br>
+
+            <label for="secretCode">Secret Code:</label>
+            <input type="text" id="secretCode" placeholder="Enter Secret Code" required><br><br>
+
+            <button id="signupBtn" class="btn">Sign Up</button>
+            <p class="error" id="signupError"></p>
         </div>
     </div>
 
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="hidden">
+        <h2>Admin Dashboard</h2>
+        <button id="logoutAdminBtn" class="btn">Logout</button>
+        <h3>Admin Content Goes Here</h3>
+        <p>Manage users and perform admin actions.</p>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="userDashboard" class="hidden">
+        <h2>User Dashboard</h2>
+        <button id="logoutUserBtn" class="btn">Logout</button>
+        <h3>User Content Goes Here</h3>
+        <p>Welcome to your user dashboard.</p>
+    </div>
+
     <script>
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+        let users = JSON.parse(localStorage.getItem("users")) || [];
+        let adminLoggedIn = false;
+        let currentUser = null;
 
-        function switchSection(sectionId) {
-            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-            clearInputs();
-        }
+        const signinBtn = document.getElementById("signinBtn");
+        const signupBtn = document.getElementById("signupBtn");
+        const signupSection = document.getElementById("signupSection");
+        const signinSection = document.getElementById("signinSection");
+        const adminDashboard = document.getElementById("adminDashboard");
+        const userDashboard = document.getElementById("userDashboard");
 
-        function clearInputs() {
-            document.querySelectorAll('input').forEach(input => input.value = '');
-            document.querySelectorAll('.error').forEach(error => error.textContent = '');
-        }
+        const signupUsername = document.getElementById("signupUsername");
+        const signupPassword = document.getElementById("signupPassword");
+        const confirmPassword = document.getElementById("confirmPassword");
+        const secretCode = document.getElementById("secretCode");
+        const signinUsername = document.getElementById("signinUsername");
+        const signinPassword = document.getElementById("signinPassword");
 
-        function updatePendingUsersList() {
-            const list = document.getElementById("pendingUsersList");
-            list.innerHTML = '';
-            pendingUsers.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("pending-user");
-                listItem.innerHTML = `${user.username} 
-                    <button onclick="approveUser(${index})">Approve</button>
-                    <button onclick="rejectUser(${index})">Reject</button>`;
-                list.appendChild(listItem);
-            });
-        }
+        const signupError = document.getElementById("signupError");
+        const signinError = document.getElementById("signinError");
 
-        function approveUser(index) {
-            const user = pendingUsers.splice(index, 1)[0];
-            user.approved = true;  // Mark user as approved
-            users.push(user);
-            localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User approved!");
-            updatePendingUsersList();
-        }
+        const backToLoginBtn = document.getElementById("backToLoginBtn");
+        const goToSignupBtn = document.getElementById("goToSignupBtn");
 
-        function rejectUser(index) {
-            pendingUsers.splice(index, 1);
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User rejected!");
-            updatePendingUsersList();
-        }
+        const logoutAdminBtn = document.getElementById("logoutAdminBtn");
+        const logoutUserBtn = document.getElementById("logoutUserBtn");
 
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            const username = document.getElementById("signinUsername").value.trim();
-            const password = document.getElementById("signinPassword").value.trim();
-
-            if (!username || !password) {
-                document.getElementById("signinError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updatePendingUsersList();
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById("signinError").textContent = "Invalid credentials.";
-                return;
-            }
-
-            if (!user.approved) {
-                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                return;
-            }
-
-            alert("Login successful!");
-            clearInputs();
+        // Switch to Signup page
+        goToSignupBtn.addEventListener("click", () => {
+            signinSection.classList.add("hidden");
+            signupSection.classList.remove("hidden");
         });
 
-        document.getElementById("signupBtn").addEventListener("click", () => {
-            const username = document.getElementById("signupUsername").value.trim();
-            const password = document.getElementById("signupPassword").value.trim();
-            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
-            const secretCode = document.getElementById("signupSecretCode").value.trim();
-
-            if (!username || !password || !confirmPassword || !secretCode) {
-                document.getElementById("signupError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                document.getElementById("signupError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            if (users.some(user => user.username === username)) {
-                document.getElementById("signupError").textContent = "Username already exists.";
-                return;
-            }
-
-            pendingUsers.push({ username, password, secretCode, approved: false });
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-
-            alert("Sign-up successful! Awaiting admin approval.");
-            switchSection("loginSection");
+        // Back to Login page from Signup
+        backToLoginBtn.addEventListener("click", () => {
+            signupSection.classList.add("hidden");
+            signinSection.classList.remove("hidden");
         });
 
-        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
-            const username = document.getElementById("resetUsername").value.trim();
-            const secretCode = document.getElementById("resetSecretCode").value.trim();
-            const newPassword = document.getElementById("resetNewPassword").value.trim();
-            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+        // Sign up new user
+        signupBtn.addEventListener("click", () => {
+            const username = signupUsername.value.trim();
+            const password = signupPassword.value.trim();
+            const confirmPass = confirmPassword.value.trim();
+            const secret = secretCode.value.trim();
 
-            if (!username || !secretCode || !newPassword || !confirmPassword) {
-                document.getElementById("resetError").textContent = "Please fill in all fields.";
-                return;
+            if (username && password && confirmPass && secret) {
+                if (password === confirmPass) {
+                    const existingUser = users.find(user => user.username === username);
+                    if (existingUser) {
+                        signupError.textContent = "Username already exists.";
+                    } else {
+                        users.push({ username, password, secretCode: secret, isApproved: false });
+                        localStorage.setItem("users", JSON.stringify(users));
+                        signupError.textContent = "Sign up successful! Await admin approval.";
+                    }
+                } else {
+                    signupError.textContent = "Passwords do not match.";
+                }
+            } else {
+                signupError.textContent = "Please fill in all fields.";
             }
-
-            if (newPassword !== confirmPassword) {
-                document.getElementById("resetError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.secretCode === secretCode);
-            if (!user) {
-                document.getElementById("resetError").textContent = "Invalid username or secret code.";
-                return;
-            }
-
-            user.password = newPassword;
-            localStorage.setItem("users", JSON.stringify(users));
-
-            alert("Password reset successful!");
-            switchSection("loginSection");
         });
 
-        function logout() {
-            switchSection("loginSection");
-        }
+        // Sign-in user
+        signinBtn.addEventListener("click", () => {
+            const username = signinUsername.value.trim();
+            const password = signinPassword.value.trim();
+
+            if (username && password) {
+                // Check if it's an admin login
+                if (username === "admin" && password === "admin123") {
+                    adminLoggedIn = true;
+                    currentUser = null;
+                    adminDashboard.classList.remove("hidden");
+                    signinSection.classList.add("hidden");
+                } else {
+                    // Check for regular user login
+                    const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+                    if (user) {
+                        currentUser = user;
+                        userDashboard.classList.remove("hidden");
+                        signinSection.classList.add("hidden");
+                    } else {
+                        signinError.textContent = "Invalid credentials or account not approved.";
+                    }
+                }
+            } else {
+                signinError.textContent = "Please fill in all fields.";
+            }
+        });
+
+        // Logout as Admin
+        logoutAdminBtn.addEventListener("click", () => {
+            adminDashboard.classList.add("hidden");
+            signinSection.classList.remove("hidden");
+        });
+
+        // Logout as User
+        logoutUserBtn.addEventListener("click", () => {
+            userDashboard.classList.add("hidden");
+            signinSection.classList.remove("hidden");
+        });
     </script>
 </body>
 </html>
