@@ -3,337 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Management System</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsPDF/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <title>Create DWS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            overflow: auto;
+        }
+
+        header {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-align: center;
         }
 
         .container {
-            width: 80%;
-            max-width: 1200px;
-            background-color: white;
+            max-width: 1000px;
+            margin: 20px auto;
+            background: white;
             padding: 20px;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            color: #333;
-        }
-
-        .form-group {
-            margin-bottom: 15px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         label {
-            font-weight: bold;
             display: block;
-            margin-bottom: 5px;
+            margin: 10px 0 5px;
+            font-weight: bold;
         }
 
-        input[type="text"], input[type="date"], input[type="number"] {
+        input, select, button {
             width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
         button {
-            background-color: #4CAF50;
+            background-color: #007bff;
             color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
             cursor: pointer;
-            transition: background-color 0.3s;
         }
 
         button:hover {
-            background-color: #45a049;
+            background-color: #0056b3;
         }
 
-        .list-preview {
-            margin-top: 15px;
-            padding: 10px;
-            background-color: #f1f1f1;
-            border-radius: 4px;
-        }
-
-        .list-preview ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .list-preview ul li {
-            margin-bottom: 8px;
-        }
-
-        .form-container {
-            margin-bottom: 30px;
-        }
-
-        /* Section for Manpower, Equipment, Consumables */
-        .list-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-        }
-
-        .list-container > div {
-            flex: 1;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .back-btn {
+        table {
+            width: 100%;
+            border-collapse: collapse;
             margin-top: 20px;
-            display: block;
-            text-align: center;
-            font-size: 16px;
-            color: #007BFF;
-            cursor: pointer;
         }
 
-        .back-btn:hover {
-            text-decoration: underline;
+        table th, table td {
+            border: 1px solid #ddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        table th {
+            background-color: #007bff;
+            color: white;
         }
     </style>
 </head>
 <body>
+    <header>
+        <h1>Create DWS</h1>
+    </header>
 
-<div class="container">
-    <h1>DWS Management System</h1>
+    <div class="container">
+        <h2>DWS Details</h2>
 
-    <div class="form-container">
-        <!-- Form for entering DWS data -->
-        <div class="form-group">
-            <label for="dwsNo">DWS No.</label>
-            <input type="text" id="dwsNo" placeholder="Enter DWS No." required>
-        </div>
-        <div class="form-group">
-            <label for="date">Date</label>
-            <input type="date" id="date" required>
-        </div>
-        <div class="form-group">
-            <label for="structureName">Structure Name</label>
-            <input type="text" id="structureName" placeholder="Enter Structure Name" required>
-        </div>
-        <div class="form-group">
-            <label for="siNo">SI No.</label>
-            <input type="text" id="siNo" placeholder="Enter SI No." required>
-        </div>
-        <div class="form-group">
-            <label for="workDescription">Work Description</label>
-            <input type="text" id="workDescription" placeholder="Enter Work Description" required>
-        </div>
-        <div class="form-group">
-            <label for="location">Location</label>
-            <input type="text" id="location" placeholder="Enter Location" required>
-        </div>
+        <label for="dwsNumber">DWS Number:</label>
+        <input type="text" id="dwsNumber" placeholder="Enter DWS Number">
 
-        <div class="list-container">
-            <div class="manpower-list">
-                <label for="manpower">Manpower</label>
-                <input type="text" id="manpowerName" placeholder="Enter Manpower Name">
-                <input type="text" id="manpowerBadgeNo" placeholder="Enter Badge No.">
-                <input type="number" id="manpowerNormalHours" placeholder="Enter Normal Hours">
-                <input type="number" id="manpowerOTHours" placeholder="Enter OT Hours">
-                <button onclick="addManpower()">Add Manpower</button>
-                <div class="list-preview" id="manpowerListPreview"></div>
-            </div>
+        <label for="date">Date:</label>
+        <input type="date" id="date">
 
-            <div class="equipment-list">
-                <label for="equipment">Equipment</label>
-                <input type="text" id="equipmentName" placeholder="Enter Equipment Name">
-                <input type="number" id="equipmentWorkingHours" placeholder="Enter Working Hours">
-                <button onclick="addEquipment()">Add Equipment</button>
-                <div class="list-preview" id="equipmentListPreview"></div>
-            </div>
+        <label for="structureName">Structure Name:</label>
+        <input type="text" id="structureName" placeholder="Enter Structure Name">
 
-            <div class="consumables-list">
-                <label for="consumables">Consumables</label>
-                <input type="text" id="consumableName" placeholder="Enter Consumable Name">
-                <input type="number" id="consumableQuantity" placeholder="Enter Quantity">
-                <button onclick="addConsumable()">Add Consumable</button>
-                <div class="list-preview" id="consumableListPreview"></div>
-            </div>
-        </div>
+        <h3>Manpower</h3>
+        <label for="badgeNo">Badge Number:</label>
+        <input type="text" id="badgeNo" placeholder="Enter Badge Number">
 
-        <button onclick="saveDWS()">Save DWS</button>
-        <button onclick="exportToPDF()">Export to PDF</button>
+        <label for="manpowerName">Name:</label>
+        <input type="text" id="manpowerName" placeholder="Enter Name">
+
+        <label for="normalHours">Normal Hours:</label>
+        <input type="number" id="normalHours" placeholder="Enter Normal Hours">
+
+        <label for="otHours">OT Hours:</label>
+        <input type="number" id="otHours" placeholder="Enter OT Hours">
+
+        <button onclick="addManpower()">Add Manpower</button>
+
+        <h3>Equipment</h3>
+        <label for="equipmentName">Equipment Name:</label>
+        <input type="text" id="equipmentName" placeholder="Enter Equipment Name">
+
+        <label for="equipmentHours">Working Hours:</label>
+        <input type="number" id="equipmentHours" placeholder="Enter Working Hours">
+
+        <button onclick="addEquipment()">Add Equipment</button>
+
+        <h3>Consumables</h3>
+        <label for="consumableName">Consumable Name:</label>
+        <input type="text" id="consumableName" placeholder="Enter Consumable Name">
+
+        <label for="consumableQty">Quantity:</label>
+        <input type="text" id="consumableQty" placeholder="Enter Quantity">
+
+        <button onclick="addConsumable()">Add Consumable</button>
+
+        <h3>Preview</h3>
+        <table id="previewTable">
+            <thead>
+                <tr>
+                    <th>DWS Number</th>
+                    <th>Date</th>
+                    <th>Structure Name</th>
+                    <th>Badge No</th>
+                    <th>Manpower Name</th>
+                    <th>Normal Hours</th>
+                    <th>OT Hours</th>
+                    <th>Equipment Name</th>
+                    <th>Equipment Hours</th>
+                    <th>Consumable Name</th>
+                    <th>Quantity</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
         <button onclick="exportToExcel()">Export to Excel</button>
     </div>
 
-    <!-- Back to Main Page Button -->
-    <div class="back-btn" onclick="goBack()">Back to Main Page</div>
-</div>
+    <script>
+        const data = [];
 
-<script>
-    let manpowerList = [];
-    let equipmentList = [];
-    let consumableList = [];
+        function addManpower() {
+            const badgeNo = document.getElementById('badgeNo').value;
+            const name = document.getElementById('manpowerName').value;
+            const normalHours = document.getElementById('normalHours').value;
+            const otHours = document.getElementById('otHours').value;
 
-    // Function to add manpower details to list
-    function addManpower() {
-        const name = document.getElementById('manpowerName').value;
-        const badgeNo = document.getElementById('manpowerBadgeNo').value;
-        const normalHours = document.getElementById('manpowerNormalHours').value;
-        const otHours = document.getElementById('manpowerOTHours').value;
+            data.push({
+                dwsNumber: document.getElementById('dwsNumber').value,
+                date: document.getElementById('date').value,
+                structureName: document.getElementById('structureName').value,
+                badgeNo,
+                name,
+                normalHours,
+                otHours,
+                equipmentName: '',
+                equipmentHours: '',
+                consumableName: '',
+                consumableQty: ''
+            });
 
-        if (name && badgeNo && normalHours && otHours) {
-            manpowerList.push(`${badgeNo} - ${name} - Normal: ${normalHours}hrs, OT: ${otHours}hrs`);
-            updateManpowerPreview();
+            updatePreview();
         }
-    }
 
-    // Function to add equipment details to list
-    function addEquipment() {
-        const equipmentName = document.getElementById('equipmentName').value;
-        const workingHours = document.getElementById('equipmentWorkingHours').value;
+        function addEquipment() {
+            const equipmentName = document.getElementById('equipmentName').value;
+            const equipmentHours = document.getElementById('equipmentHours').value;
 
-        if (equipmentName && workingHours) {
-            equipmentList.push(`${equipmentName} - Working Hours: ${workingHours}`);
-            updateEquipmentPreview();
+            data.push({
+                dwsNumber: document.getElementById('dwsNumber').value,
+                date: document.getElementById('date').value,
+                structureName: document.getElementById('structureName').value,
+                badgeNo: '',
+                name: '',
+                normalHours: '',
+                otHours: '',
+                equipmentName,
+                equipmentHours,
+                consumableName: '',
+                consumableQty: ''
+            });
+
+            updatePreview();
         }
-    }
 
-    // Function to add consumable details to list
-    function addConsumable() {
-        const consumableName = document.getElementById('consumableName').value;
-        const quantity = document.getElementById('consumableQuantity').value;
+        function addConsumable() {
+            const consumableName = document.getElementById('consumableName').value;
+            const consumableQty = document.getElementById('consumableQty').value;
 
-        if (consumableName && quantity) {
-            consumableList.push(`${consumableName} - Quantity: ${quantity}`);
-            updateConsumablePreview();
+            data.push({
+                dwsNumber: document.getElementById('dwsNumber').value,
+                date: document.getElementById('date').value,
+                structureName: document.getElementById('structureName').value,
+                badgeNo: '',
+                name: '',
+                normalHours: '',
+                otHours: '',
+                equipmentName: '',
+                equipmentHours: '',
+                consumableName,
+                consumableQty
+            });
+
+            updatePreview();
         }
-    }
 
-    // Update the preview lists for manpower
-    function updateManpowerPreview() {
-        const previewDiv = document.getElementById('manpowerListPreview');
-        previewDiv.innerHTML = '';
-        manpowerList.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            previewDiv.appendChild(li);
-        });
-    }
+        function updatePreview() {
+            const tableBody = document.querySelector('#previewTable tbody');
+            tableBody.innerHTML = '';
 
-    // Update the preview lists for equipment
-    function updateEquipmentPreview() {
-        const previewDiv = document.getElementById('equipmentListPreview');
-        previewDiv.innerHTML = '';
-        equipmentList.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            previewDiv.appendChild(li);
-        });
-    }
+            data.forEach((row) => {
+                const tr = document.createElement('tr');
 
-    // Update the preview lists for consumables
-    function updateConsumablePreview() {
-        const previewDiv = document.getElementById('consumableListPreview');
-        previewDiv.innerHTML = '';
-        consumableList.forEach(item => {
-            const li = document.createElement('li');
-            li.textContent = item;
-            previewDiv.appendChild(li);
-        });
-    }
+                Object.values(row).forEach((cell) => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '';
+                    tr.appendChild(td);
+                });
 
-    // Function to save DWS
-    function saveDWS() {
-        const dwsData = {
-            "DWS No.": document.getElementById('dwsNo').value,
-            "Date": document.getElementById('date').value,
-            "Structure Name": document.getElementById('structureName').value,
-            "SI No.": document.getElementById('siNo').value,
-            "Work Description": document.getElementById('workDescription').value,
-            "Location": document.getElementById('location').value,
-            "Manpower": manpowerList.join(", "),
-            "Equipment": equipmentList.join(", "),
-            "Consumables": consumableList.join(", ")
-        };
+                tableBody.appendChild(tr);
+            });
+        }
 
-        localStorage.setItem("dwsData", JSON.stringify(dwsData));
-        alert("DWS Saved Successfully!");
-    }
+        function exportToExcel() {
+            let csvContent = "data:text/csv;charset=utf-8,";
 
-    // Export to PDF
-    function exportToPDF() {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
+            const headers = [
+                'DWS Number',
+                'Date',
+                'Structure Name',
+                'Badge No',
+                'Manpower Name',
+                'Normal Hours',
+                'OT Hours',
+                'Equipment Name',
+                'Equipment Hours',
+                'Consumable Name',
+                'Quantity'
+            ];
 
-        doc.text("DWS No.: " + document.getElementById('dwsNo').value, 20, 30);
-        doc.text("Date: " + document.getElementById('date').value, 20, 40);
-        doc.text("Structure Name: " + document.getElementById('structureName').value, 20, 50);
-        doc.text("SI No.: " + document.getElementById('siNo').value, 20, 60);
-        doc.text("Work Description: " + document.getElementById('workDescription').value, 20, 70);
-        doc.text("Location: " + document.getElementById('location').value, 20, 80);
+            csvContent += headers.join(',') + "\n";
 
-        doc.text("Manpower:", 20, 100);
-        manpowerList.forEach((manpower, index) => {
-            doc.text(`${index + 1}. ${manpower}`, 20, 110 + (index * 10));
-        });
+            data.forEach((row) => {
+                csvContent += Object.values(row).join(',') + "\n";
+            });
 
-        doc.text("Equipment:", 20, 130 + (manpowerList.length * 10));
-        equipmentList.forEach((equipment, index) => {
-            doc.text(`${index + 1}. ${equipment}`, 20, 140 + (manpowerList.length * 10) + (index * 10));
-        });
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement('a');
+            link.setAttribute('href', encodedUri);
+            link.setAttribute('download', 'dws_data.csv');
+            document.body.appendChild(link);
 
-        doc.text("Consumables:", 20, 160 + (manpowerList.length * 10) + (equipmentList.length * 10));
-        consumableList.forEach((consumable, index) => {
-            doc.text(`${index + 1}. ${consumable}`, 20, 170 + (manpowerList.length * 10) + (equipmentList.length * 10) + (index * 10));
-        });
-
-        doc.save('dws_report.pdf');
-    }
-
-    // Export to Excel
-    function exportToExcel() {
-        let data = [];
-        const dwsData = {
-            "DWS No.": document.getElementById('dwsNo').value,
-            "Date": document.getElementById('date').value,
-            "Structure Name": document.getElementById('structureName').value,
-            "SI No.": document.getElementById('siNo').value,
-            "Work Description": document.getElementById('workDescription').value,
-            "Location": document.getElementById('location').value,
-            "Manpower": manpowerList.join(", "),
-            "Equipment": equipmentList.join(", "),
-            "Consumables": consumableList.join(", ")
-        };
-
-        data.push(dwsData);
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'DWS Report');
-        XLSX.writeFile(wb, 'dws_report.xlsx');
-    }
-
-    // Go back to the main page
-    function goBack() {
-        window.location.reload();
-    }
-
-    // Display saved DWS data
-    displayDWS();
-</script>
-
+            link.click();
+        }
+    </script>
 </body>
 </html>
