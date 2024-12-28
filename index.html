@@ -174,17 +174,35 @@
             }
         });
 
+        // Sign-in
         document.getElementById("signinBtn").addEventListener("click", () => {
             const username = signinUsername.value.trim();
             const password = signinPassword.value.trim();
-            const user = users.find(u => u.username === username && u.password === password && u.isApproved);
-            if (user) {
-                alert("Login successful!");
+
+            if (username && password) {
+                // Check if it's an admin login first
+                if (username === "heyman" && password === "12345678") {
+                    alert("Admin login successful!");
+                    // Proceed to Admin Dashboard
+                    // Here, you can navigate to the admin dashboard or show the appropriate sections
+                    return;
+                }
+
+                // Check for normal users
+                const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+                
+                if (user) {
+                    alert("Login successful! Welcome to the project app.");
+                    // Proceed to project entry/dashboard
+                } else {
+                    signinError.textContent = "Invalid credentials or not approved by admin.";
+                }
             } else {
-                signinError.textContent = "Invalid credentials or not approved.";
+                signinError.textContent = "Please fill in all fields.";
             }
         });
 
+        // Reset Password
         document.getElementById("resetPasswordBtn").addEventListener("click", () => {
             const username = forgotUsername.value.trim();
             const user = users.find(u => u.username === username);
