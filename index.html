@@ -140,14 +140,56 @@
         <input type="text" id="location" placeholder="Enter location">
       </div>
 
+      <!-- Manpower Section -->
+      <h3>Manpower</h3>
+      <div class="form-group">
+        <label for="manpower-badge-no">Badge No.</label>
+        <input type="text" id="manpower-badge-no" placeholder="Enter Badge No.">
+      </div>
+      <div class="form-group">
+        <label for="manpower-name">Name</label>
+        <input type="text" id="manpower-name" placeholder="Enter Name">
+      </div>
+      <div class="form-group">
+        <label for="manpower-normal-hours">Normal Hours</label>
+        <input type="number" id="manpower-normal-hours" placeholder="Enter Normal Hours">
+      </div>
+      <div class="form-group">
+        <label for="manpower-ot-hours">OT Hours</label>
+        <input type="number" id="manpower-ot-hours" placeholder="Enter OT Hours">
+      </div>
+      <div class="form-group">
+        <label for="manpower-holiday">Holiday</label>
+        <input type="text" id="manpower-holiday" placeholder="Enter Holiday (Yes/No)">
+      </div>
       <div class="form-group">
         <button id="add-manpower">Add Manpower</button>
       </div>
 
+      <!-- Equipment Section -->
+      <h3>Equipment</h3>
+      <div class="form-group">
+        <label for="equipment-name">Equipment Name</label>
+        <input type="text" id="equipment-name" placeholder="Enter Equipment Name">
+      </div>
+      <div class="form-group">
+        <label for="equipment-working-hours">Working Hours</label>
+        <input type="number" id="equipment-working-hours" placeholder="Enter Working Hours">
+      </div>
       <div class="form-group">
         <button id="add-equipment">Add Equipment</button>
       </div>
 
+      <!-- Consumables Section -->
+      <h3>Consumables</h3>
+      <div class="form-group">
+        <label for="consumable-name">Consumable Name</label>
+        <input type="text" id="consumable-name" placeholder="Enter Consumable Name">
+      </div>
+      <div class="form-group">
+        <label for="consumable-quantity">Quantity</label>
+        <input type="number" id="consumable-quantity" placeholder="Enter Quantity">
+      </div>
       <div class="form-group">
         <button id="add-consumable">Add Consumable</button>
       </div>
@@ -217,11 +259,11 @@
 
     // Add Manpower Function
     document.getElementById('add-manpower').addEventListener('click', function() {
-      let badgeNo = prompt("Enter Badge No.");
-      let name = prompt("Enter Name");
-      let normalHour = prompt("Enter Normal Hours");
-      let otHour = prompt("Enter OT Hours");
-      let holiday = prompt("Enter Holiday (Yes/No)");
+      let badgeNo = document.getElementById('manpower-badge-no').value;
+      let name = document.getElementById('manpower-name').value;
+      let normalHour = document.getElementById('manpower-normal-hours').value;
+      let otHour = document.getElementById('manpower-ot-hours').value;
+      let holiday = document.getElementById('manpower-holiday').value;
 
       let manpower = { badgeNo, name, normalHour, otHour, holiday };
       manpowerList.push(manpower);
@@ -230,8 +272,8 @@
 
     // Add Equipment Function
     document.getElementById('add-equipment').addEventListener('click', function() {
-      let equipmentName = prompt("Enter Equipment Name");
-      let workingHours = prompt("Enter Working Hours");
+      let equipmentName = document.getElementById('equipment-name').value;
+      let workingHours = document.getElementById('equipment-working-hours').value;
 
       let equipment = { equipmentName, workingHours };
       equipmentList.push(equipment);
@@ -240,8 +282,8 @@
 
     // Add Consumable Function
     document.getElementById('add-consumable').addEventListener('click', function() {
-      let materialName = prompt("Enter Consumable Name");
-      let quantity = prompt("Enter Quantity (Nos/ML)");
+      let materialName = document.getElementById('consumable-name').value;
+      let quantity = document.getElementById('consumable-quantity').value;
 
       let consumable = { materialName, quantity };
       consumableList.push(consumable);
@@ -266,8 +308,9 @@
 
     // Back Button Function
     document.getElementById('back-button').addEventListener('click', function() {
-      // Code to navigate back to home or previous page
-      alert('Going back to home page.');
+            alert('Going back to home!');
+      // You can redirect to the home page or reset the form as needed
+      window.location.reload(); // This will reload the page and reset the form
     });
   </script>
 
