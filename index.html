@@ -3,60 +3,65 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DWS Management</title>
+  <title>Create DWS</title>
   <style>
     body {
       font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
-      box-sizing: border-box;
+      background-color: #f9f9f9;
     }
     .container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 20px auto;
       padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background: #ffffff;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     }
-    h2, h3 {
+    h2 {
       text-align: center;
+      color: #333;
     }
-    form {
+    .form-section {
       margin-bottom: 20px;
     }
-    .form-group {
-      margin-bottom: 15px;
-    }
     label {
+      font-weight: bold;
+      margin-bottom: 5px;
       display: block;
-      margin-bottom: 5px;
     }
-    input, select, button {
+    input, button {
       width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
+      padding: 10px;
+      margin: 5px 0;
       border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .preview-list {
-      border-top: 1px solid #ccc;
-      padding-top: 10px;
-    }
-    .preview-item {
-      margin-bottom: 5px;
-    }
-    .action-buttons {
-      display: flex;
-      justify-content: space-between;
+      border-radius: 4px;
     }
     button {
+      background-color: #007bff;
+      color: white;
       cursor: pointer;
+      border: none;
     }
-    .success-message {
-      color: green;
-      text-align: center;
+    button:hover {
+      background-color: #0056b3;
+    }
+    .preview {
       margin-top: 10px;
+      padding: 10px;
+      background: #f1f1f1;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .preview ul {
+      padding: 0;
+      list-style: none;
+    }
+    .preview li {
+      margin-bottom: 5px;
+      font-size: 14px;
     }
   </style>
 </head>
@@ -65,70 +70,62 @@
     <h2>Create DWS</h2>
     <form id="dwsForm">
       <!-- DWS Number -->
-      <div class="form-group">
+      <div class="form-section">
         <label for="dwsNumber">DWS Number</label>
         <input type="text" id="dwsNumber" readonly>
       </div>
-      
+
       <!-- Structure Name -->
-      <div class="form-group">
+      <div class="form-section">
         <label for="structureName">Structure Name</label>
-        <input type="text" id="structureName" required>
+        <input type="text" id="structureName">
       </div>
 
-      <!-- Manpower -->
-      <h3>Manpower</h3>
-      <div class="form-group">
+      <!-- Manpower Section -->
+      <div class="form-section">
+        <h3>Manpower</h3>
         <label for="badgeNumber">Badge Number</label>
         <input type="text" id="badgeNumber">
-      </div>
-      <div class="form-group">
         <label for="manpowerName">Name</label>
         <input type="text" id="manpowerName">
-      </div>
-      <div class="form-group">
         <label for="normalHours">Normal Hours</label>
         <input type="number" id="normalHours">
-      </div>
-      <div class="form-group">
         <label for="otHours">OT Hours</label>
         <input type="number" id="otHours">
+        <button type="button" id="addManpower">Add Manpower</button>
+        <div class="preview" id="manpowerPreview"></div>
       </div>
-      <button type="button" id="addManpower">Add Manpower</button>
-      <div class="preview-list" id="manpowerPreview"></div>
 
-      <!-- Equipment -->
-      <h3>Equipment</h3>
-      <div class="form-group">
+      <!-- Equipment Section -->
+      <div class="form-section">
+        <h3>Equipment</h3>
         <label for="equipmentName">Equipment Name</label>
         <input type="text" id="equipmentName">
-      </div>
-      <div class="form-group">
         <label for="workingHours">Working Hours</label>
         <input type="number" id="workingHours">
+        <button type="button" id="addEquipment">Add Equipment</button>
+        <div class="preview" id="equipmentPreview"></div>
       </div>
-      <button type="button" id="addEquipment">Add Equipment</button>
-      <div class="preview-list" id="equipmentPreview"></div>
 
-      <!-- Consumables -->
-      <h3>Consumables</h3>
-      <div class="form-group">
+      <!-- Consumables Section -->
+      <div class="form-section">
+        <h3>Consumables</h3>
         <label for="consumableName">Consumable Name</label>
         <input type="text" id="consumableName">
-      </div>
-      <div class="form-group">
         <label for="quantity">Quantity</label>
         <input type="text" id="quantity">
+        <button type="button" id="addConsumable">Add Consumable</button>
+        <div class="preview" id="consumablePreview"></div>
       </div>
-      <button type="button" id="addConsumable">Add Consumable</button>
-      <div class="preview-list" id="consumablePreview"></div>
 
       <!-- Save Button -->
-      <div class="action-buttons">
+      <div class="form-section">
         <button type="button" id="saveDws">Save DWS</button>
       </div>
     </form>
-    <div id="successMessage" class="success-message" style="display: none;">DWS saved successfully!</div>
+    <div id="successMessage" style="display: none; color: green; text-align: center;">
+      DWS saved successfully!
+    </div>
   </div>
 
   <script>
@@ -139,24 +136,64 @@
 
     document.addEventListener("DOMContentLoaded", () => {
       const dwsNumberField = document.getElementById("dwsNumber");
-      const structureNameField = document.getElementById("structureName");
-      const badgeNumberField = document.getElementById("badgeNumber");
-      const manpowerNameField = document.getElementById("manpowerName");
-      const normalHoursField = document.getElementById("normalHours");
-      const otHoursField = document.getElementById("otHours");
-      const equipmentNameField = document.getElementById("equipmentName");
-      const workingHoursField = document.getElementById("workingHours");
-      const consumableNameField = document.getElementById("consumableName");
-      const quantityField = document.getElementById("quantity");
-
-      const manpowerPreview = document.getElementById("manpowerPreview");
-      const equipmentPreview = document.getElementById("equipmentPreview");
-      const consumablePreview = document.getElementById("consumablePreview");
-      const saveDwsButton = document.getElementById("saveDws");
-      const successMessage = document.getElementById("successMessage");
-
-      // Assign a unique DWS number
       dwsNumberField.value = `DWS-${dwsCounter}`;
 
-      // Add manpower preview
-      document.getElementById("addMan
+      document.getElementById("addManpower").addEventListener("click", () => {
+        const badge = document.getElementById("badgeNumber").value;
+        const name = document.getElementById("manpowerName").value;
+        const normalHours = document.getElementById("normalHours").value;
+        const otHours = document.getElementById("otHours").value;
+
+        manpowerList.push({ badge, name, normalHours, otHours });
+        updatePreview("manpowerPreview", manpowerList);
+      });
+
+      document.getElementById("addEquipment").addEventListener("click", () => {
+        const equipmentName = document.getElementById("equipmentName").value;
+        const workingHours = document.getElementById("workingHours").value;
+
+        equipmentList.push({ equipmentName, workingHours });
+        updatePreview("equipmentPreview", equipmentList);
+      });
+
+      document.getElementById("addConsumable").addEventListener("click", () => {
+        const consumableName = document.getElementById("consumableName").value;
+        const quantity = document.getElementById("quantity").value;
+
+        consumableList.push({ consumableName, quantity });
+        updatePreview("consumablePreview", consumableList);
+      });
+
+      document.getElementById("saveDws").addEventListener("click", () => {
+        const structureName = document.getElementById("structureName").value;
+
+        const dwsData = {
+          dwsNumber: `DWS-${dwsCounter}`,
+          structureName,
+          manpower: manpowerList,
+          equipment: equipmentList,
+          consumables: consumableList
+        };
+
+        console.log("DWS Saved:", dwsData);
+        document.getElementById("successMessage").style.display = "block";
+        dwsCounter++;
+        resetForm();
+      });
+    });
+
+    function updatePreview(previewId, list) {
+      const preview = document.getElementById(previewId);
+      preview.innerHTML = `<ul>${list.map(item => `<li>${JSON.stringify(item)}</li>`).join('')}</ul>`;
+    }
+
+    function resetForm() {
+      document.getElementById("dwsForm").reset();
+      document.getElementById("dwsNumber").value = `DWS-${dwsCounter}`;
+      document.getElementById("manpowerPreview").innerHTML = "";
+      document.getElementById("equipmentPreview").innerHTML = "";
+      document.getElementById("consumablePreview").innerHTML = "";
+    }
+  </script>
+</body>
+</html>
