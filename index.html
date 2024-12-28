@@ -18,7 +18,7 @@
 
         .container {
             width: 100%;
-            max-width: 400px;
+            max-width: 500px;
             background: #ffffff;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 20px;
@@ -72,6 +72,35 @@
         }
 
         .hidden { display: none; }
+
+        .user-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .user-list li {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .user-list button {
+            margin-left: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .approve-btn {
+            background-color: green;
+            color: white;
+        }
+
+        .reject-btn {
+            background-color: red;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +132,9 @@
                 <label for="signupPassword">Password:</label>
                 <input type="password" id="signupPassword" placeholder="Enter Password" required>
 
+                <label for="secretCode">Secret Code:</label>
+                <input type="text" id="secretCode" placeholder="Enter Secret Code" required>
+
                 <button id="signupBtn">Sign Up</button>
                 <p class="error" id="signupError"></p>
             </div>
@@ -113,9 +145,22 @@
                 <h2>Forgot Password</h2>
                 <label for="forgotUsername">Enter Your Username:</label>
                 <input type="text" id="forgotUsername" placeholder="Enter Username" required>
+
+                <label for="forgotSecretCode">Enter Secret Code:</label>
+                <input type="text" id="forgotSecretCode" placeholder="Enter Secret Code" required>
+
                 <button id="resetPasswordBtn">Reset Password</button>
                 <p class="error" id="forgotError"></p>
             </div>
+        </div>
+
+        <!-- Admin Dashboard Section -->
+        <div id="adminDashboard" class="hidden">
+            <h2>Admin Dashboard</h2>
+            <p>Welcome, Admin! Here you can manage user sign-ups and approve or reject them.</p>
+            <h3>Pending Sign-Ups</h3>
+            <ul id="pendingUserList" class="user-list"></ul>
+            <button id="logoutAdminBtn">Logout</button>
         </div>
     </div>
 
@@ -126,7 +171,9 @@
         const signinPassword = document.getElementById("signinPassword");
         const signupUsername = document.getElementById("signupUsername");
         const signupPassword = document.getElementById("signupPassword");
+        const secretCode = document.getElementById("secretCode");
         const forgotUsername = document.getElementById("forgotUsername");
+        const forgotSecretCode = document.getElementById("forgotSecretCode");
 
         const signinError = document.getElementById("signinError");
         const signupError = document.getElementById("signupError");
@@ -135,6 +182,8 @@
         const signinSection = document.getElementById("signinSection");
         const signupSection = document.getElementById("signupSection");
         const forgotPasswordSection = document.getElementById("forgotPasswordSection");
+        const adminDashboard = document.getElementById("adminDashboard");
+        const pendingUserList = document.getElementById("pendingUserList");
 
         document.getElementById("goToSignupBtn").addEventListener("click", () => {
             signinSection.classList.add("hidden");
@@ -155,17 +204,20 @@
             forgotPasswordSection.classList.add("hidden");
             signinSection.classList.remove("hidden");
             forgotUsername.value = '';
+            forgotSecretCode.value = '';
             forgotError.textContent = '';
         });
 
         document.getElementById("signupBtn").addEventListener("click", () => {
             const username = signupUsername.value.trim();
             const password = signupPassword.value.trim();
-            if (username && password) {
+            const secret = secretCode.value.trim();
+
+            if (username && password && secret) {
                 if (users.some(user => user.username === username)) {
                     signupError.textContent = "Username already exists.";
                 } else {
-                    users.push({ username, password, isApproved: false });
+                    users.push({ username, password, secretCode: secret, isApproved: false });
                     localStorage.setItem("users", JSON.stringify(users));
                     signupError.textContent = "Sign up successful! Await admin approval.";
                 }
@@ -180,32 +232,73 @@
             const password = signinPassword.value.trim();
 
             if (username && password) {
-                // Check if it's an admin login first
                 if (username === "heyman" && password === "12345678") {
                     alert("Admin login successful!");
-                    // Proceed to Admin Dashboard
-                    // Here, you can navigate to the admin dashboard or show the appropriate sections
+                    signinSection.classList.add("hidden");
+                    adminDashboard.classList.remove("hidden");
+                    displayPendingUsers();
                     return;
                 }
 
-                // Check for normal users
                 const user = users.find(user => user.username === username && user.password === password && user.isApproved);
-                
                 if (user) {
                     alert("Login successful! Welcome to the project app.");
-                    // Proceed to project entry/dashboard
                 } else {
                     signinError.textContent = "Invalid credentials or not approved by admin.";
                 }
             } else {
-                signinError.textContent = "Please fill in all fields.";
+                                signinError.textContent = "Please fill in all fields.";
             }
         });
+
+        // Admin Logout
+        document.getElementById("logoutAdminBtn").addEventListener("click", () => {
+            adminDashboard.classList.add("hidden");
+            signinSection.classList.remove("hidden");
+        });
+
+        // Display pending users
+        function displayPendingUsers() {
+            pendingUserList.innerHTML = '';
+            const pendingUsers = users.filter(user => !user.isApproved);
+            pendingUsers.forEach(user => {
+                const li = document.createElement("li");
+                li.innerHTML = `${user.username} (Pending Approval)`;
+                const approveBtn = document.createElement("button");
+                approveBtn.textContent = "Approve";
+                approveBtn.classList.add("approve-btn");
+                approveBtn.onclick = () => approveUser(user);
+                
+                const rejectBtn = document.createElement("button");
+                rejectBtn.textContent = "Reject";
+                rejectBtn.classList.add("reject-btn");
+                rejectBtn.onclick = () => rejectUser(user);
+
+                li.appendChild(approveBtn);
+                li.appendChild(rejectBtn);
+                pendingUserList.appendChild(li);
+            });
+        }
+
+        // Approve user
+        function approveUser(user) {
+            user.isApproved = true;
+            localStorage.setItem("users", JSON.stringify(users));
+            displayPendingUsers(); // Refresh the list
+        }
+
+        // Reject user
+        function rejectUser(user) {
+            users = users.filter(u => u !== user);
+            localStorage.setItem("users", JSON.stringify(users));
+            displayPendingUsers(); // Refresh the list
+        }
 
         // Reset Password
         document.getElementById("resetPasswordBtn").addEventListener("click", () => {
             const username = forgotUsername.value.trim();
-            const user = users.find(u => u.username === username);
+            const secretCodeEntered = forgotSecretCode.value.trim();
+            const user = users.find(u => u.username === username && u.secretCode === secretCodeEntered);
             if (user) {
                 const newPassword = prompt("Enter your new password:");
                 if (newPassword) {
@@ -216,7 +309,7 @@
                     signinSection.classList.remove("hidden");
                 }
             } else {
-                forgotError.textContent = "Username not found.";
+                forgotError.textContent = "Username or secret code is incorrect.";
             }
         });
     </script>
