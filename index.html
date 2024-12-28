@@ -3,315 +3,323 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DWS Management System</title>
+  <title>Create DWS</title>
   <style>
     body {
-      font-family: 'Arial', sans-serif;
-      background-color: #f4f4f4;
-      margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
-
-    .container {
-      width: 90%;
-      max-width: 800px;
-      margin: 50px auto;
-      padding: 30px;
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .header {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 26px;
-      color: #333;
-    }
-
-    .form-group {
+    .form-section {
       margin-bottom: 20px;
     }
-
-    .form-group label {
-      font-size: 14px;
+    label {
       font-weight: bold;
-      color: #333;
       display: block;
-      margin-bottom: 5px;
+      margin-bottom: 8px;
     }
-
-    .form-group input,
-    .form-group select {
+    input[type="text"], input[type="number"] {
       width: 100%;
-      padding: 12px;
-      font-size: 14px;
+      padding: 8px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      box-sizing: border-box;
     }
-
-    .form-group button {
+    .preview-section {
+      margin-top: 10px;
+    }
+    .preview-section table {
       width: 100%;
-      padding: 12px;
-      background-color: #007bff;
+      border-collapse: collapse;
+    }
+    .preview-section table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
+    .error {
+      color: red;
+      font-size: 12px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
       color: white;
-      font-size: 16px;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.3s;
+      margin-top: 10px;
     }
-
-    .form-group button:hover {
-      background-color: #0056b3;
+    button:hover {
+      background-color: #45a049;
     }
-
-    .preview-container {
-      margin-top: 30px;
-    }
-
-    .preview-item {
-      background-color: #f9f9f9;
-      padding: 12px;
-      margin: 10px 0;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-      display: flex;
-      flex-wrap: wrap;
-    }
-
-    .preview-item span {
-      display: inline-block;
-      width: 45%;
-      margin-right: 10px;
-      margin-bottom: 10px;
-      color: #333;
-    }
-
-    .preview-item span:last-child {
-      margin-right: 0;
-    }
-
     .back-button {
-      padding: 12px 20px;
-      background-color: #28a745;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: block;
-      width: 100%;
       margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #f44336;
+      color: white;
+      border: none;
+      cursor: pointer;
     }
-
     .back-button:hover {
-      background-color: #218838;
+      background-color: #da190b;
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
-    <div class="header">
-      <h2>Create DWS</h2>
-    </div>
+  <h1>Create DWS</h1>
+  <div class="form-section">
+    <label for="structureName">Structure Name</label>
+    <input type="text" id="structureName">
+    <div class="error" id="structureNameError"></div>
+  </div>
 
-    <!-- DWS Form -->
-    <div id="dws-form">
-      <div class="form-group">
-        <label for="structure-name">Structure Name</label>
-        <input type="text" id="structure-name" placeholder="Enter structure name">
-      </div>
+  <div class="form-section">
+    <label for="siNo">SI No.</label>
+    <input type="text" id="siNo">
+    <div class="error" id="siNoError"></div>
+  </div>
 
-      <div class="form-group">
-        <label for="si-no">SI No.</label>
-        <input type="text" id="si-no" placeholder="Enter SI number">
-      </div>
+  <div class="form-section">
+    <label for="workDescription">Work Description</label>
+    <input type="text" id="workDescription">
+    <div class="error" id="workDescriptionError"></div>
+  </div>
 
-      <div class="form-group">
-        <label for="work-description">Work Description</label>
-        <input type="text" id="work-description" placeholder="Enter work description">
-      </div>
+  <div class="form-section">
+    <label for="location">Location</label>
+    <input type="text" id="location">
+    <div class="error" id="locationError"></div>
+  </div>
 
-      <div class="form-group">
-        <label for="location">Location</label>
-        <input type="text" id="location" placeholder="Enter location">
-      </div>
+  <!-- Manpower -->
+  <div class="form-section">
+    <h3>Manpower</h3>
+    <label for="badgeNo">Badge No.</label>
+    <input type="text" id="badgeNo">
+    <div class="error" id="badgeNoError"></div>
 
-      <!-- Manpower Section -->
-      <h3>Manpower</h3>
-      <div class="form-group">
-        <label for="manpower-badge-no">Badge No.</label>
-        <input type="text" id="manpower-badge-no" placeholder="Enter Badge No.">
-      </div>
-      <div class="form-group">
-        <label for="manpower-name">Name</label>
-        <input type="text" id="manpower-name" placeholder="Enter Name">
-      </div>
-      <div class="form-group">
-        <label for="manpower-normal-hours">Normal Hours</label>
-        <input type="number" id="manpower-normal-hours" placeholder="Enter Normal Hours">
-      </div>
-      <div class="form-group">
-        <label for="manpower-ot-hours">OT Hours</label>
-        <input type="number" id="manpower-ot-hours" placeholder="Enter OT Hours">
-      </div>
-      <div class="form-group">
-        <label for="manpower-holiday">Holiday</label>
-        <input type="text" id="manpower-holiday" placeholder="Enter Holiday (Yes/No)">
-      </div>
-      <div class="form-group">
-        <button id="add-manpower">Add Manpower</button>
-      </div>
+    <label for="manpowerName">Name</label>
+    <input type="text" id="manpowerName">
+    <div class="error" id="manpowerNameError"></div>
 
-      <!-- Equipment Section -->
-      <h3>Equipment</h3>
-      <div class="form-group">
-        <label for="equipment-name">Equipment Name</label>
-        <input type="text" id="equipment-name" placeholder="Enter Equipment Name">
-      </div>
-      <div class="form-group">
-        <label for="equipment-working-hours">Working Hours</label>
-        <input type="number" id="equipment-working-hours" placeholder="Enter Working Hours">
-      </div>
-      <div class="form-group">
-        <button id="add-equipment">Add Equipment</button>
-      </div>
+    <label for="normalHour">Normal Hour</label>
+    <input type="number" id="normalHour">
+    <div class="error" id="normalHourError"></div>
 
-      <!-- Consumables Section -->
-      <h3>Consumables</h3>
-      <div class="form-group">
-        <label for="consumable-name">Consumable Name</label>
-        <input type="text" id="consumable-name" placeholder="Enter Consumable Name">
-      </div>
-      <div class="form-group">
-        <label for="consumable-quantity">Quantity</label>
-        <input type="number" id="consumable-quantity" placeholder="Enter Quantity">
-      </div>
-      <div class="form-group">
-        <button id="add-consumable">Add Consumable</button>
-      </div>
+    <label for="otHour">OT Hour</label>
+    <input type="number" id="otHour">
+    <div class="error" id="otHourError"></div>
 
-      <!-- Preview Section -->
-      <div class="preview-container" id="preview-container"></div>
+    <label for="holiday">Holiday</label>
+    <input type="text" id="holiday">
+    <div class="error" id="holidayError"></div>
 
-      <div class="form-group">
-        <button id="save-dws">Save DWS</button>
-      </div>
+    <button type="button" onclick="addManpower()">Add Manpower</button>
 
-      <!-- Back Button -->
-      <button class="back-button" id="back-button">Back to Home</button>
+    <div class="preview-section" id="manpowerPreview">
+      <h4>Manpower Preview:</h4>
+      <table id="manpowerTable">
+        <tr>
+          <th>Badge No.</th>
+          <th>Name</th>
+          <th>Normal Hour</th>
+          <th>OT Hour</th>
+          <th>Holiday</th>
+        </tr>
+      </table>
     </div>
   </div>
 
+  <!-- Equipment -->
+  <div class="form-section">
+    <h3>Equipment</h3>
+    <label for="equipmentName">Equipment Name</label>
+    <input type="text" id="equipmentName">
+    <div class="error" id="equipmentNameError"></div>
+
+    <label for="workingHours">Working Hours</label>
+    <input type="number" id="workingHours">
+    <div class="error" id="workingHoursError"></div>
+
+    <button type="button" onclick="addEquipment()">Add Equipment</button>
+
+    <div class="preview-section" id="equipmentPreview">
+      <h4>Equipment Preview:</h4>
+      <table id="equipmentTable">
+        <tr>
+          <th>Equipment Name</th>
+          <th>Working Hours</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Consumable -->
+  <div class="form-section">
+    <h3>Consumables</h3>
+    <label for="consumableName">Consumable Name</label>
+    <input type="text" id="consumableName">
+    <div class="error" id="consumableNameError"></div>
+
+    <label for="quantity">Quantity (Nos/ML)</label>
+    <input type="number" id="quantity">
+    <div class="error" id="quantityError"></div>
+
+    <button type="button" onclick="addConsumable()">Add Consumable</button>
+
+    <div class="preview-section" id="consumablePreview">
+      <h4>Consumable Preview:</h4>
+      <table id="consumableTable">
+        <tr>
+          <th>Consumable Name</th>
+          <th>Quantity</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <button id="saveButton" onclick="saveData()">Save DWS</button>
+
+  <button class="back-button" onclick="goBack()">Back to Home</button>
+
   <script>
-    // Initialize lists to store data for preview
-    let manpowerList = [];
-    let equipmentList = [];
-    let consumableList = [];
-
-    // Function to update preview
-    function updatePreview() {
-      let previewContainer = document.getElementById('preview-container');
-      previewContainer.innerHTML = ''; // Clear previous preview
-
-      // Display Manpower List
-      manpowerList.forEach((item, index) => {
-        let previewItem = document.createElement('div');
-        previewItem.classList.add('preview-item');
-        previewItem.innerHTML = `
-          <span>Manpower #${index + 1}:</span>
-          <span>Badge No.: ${item.badgeNo}</span>
-          <span>Name: ${item.name}</span>
-          <span>Normal Hour: ${item.normalHour}</span>
-          <span>OT Hour: ${item.otHour}</span>
-          <span>Holiday: ${item.holiday}</span>
-        `;
-        previewContainer.appendChild(previewItem);
-      });
-
-      // Display Equipment List
-      equipmentList.forEach((item, index) => {
-        let previewItem = document.createElement('div');
-        previewItem.classList.add('preview-item');
-        previewItem.innerHTML = `
-          <span>Equipment #${index + 1}:</span>
-          <span>Equipment Name: ${item.equipmentName}</span>
-          <span>Working Hours: ${item.workingHours}</span>
-        `;
-        previewContainer.appendChild(previewItem);
-      });
-
-      // Display Consumable List
-      consumableList.forEach((item, index) => {
-        let previewItem = document.createElement('div');
-        previewItem.classList.add('preview-item');
-        previewItem.innerHTML = `
-          <span>Consumable #${index + 1}:</span>
-          <span>Consumable Name: ${item.materialName}</span>
-          <span>Quantity: ${item.quantity}</span>
-        `;
-        previewContainer.appendChild(previewItem);
-      });
+    function showError(elementId, errorMessage) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = errorMessage;
     }
 
-    // Add Manpower Function
-    document.getElementById('add-manpower').addEventListener('click', function() {
-      let badgeNo = document.getElementById('manpower-badge-no').value;
-      let name = document.getElementById('manpower-name').value;
-      let normalHour = document.getElementById('manpower-normal-hours').value;
-      let otHour = document.getElementById('manpower-ot-hours').value;
-      let holiday = document.getElementById('manpower-holiday').value;
+    function clearError(elementId) {
+      const errorElement = document.getElementById(elementId);
+      errorElement.innerText = '';
+    }
 
-      let manpower = { badgeNo, name, normalHour, otHour, holiday };
-      manpowerList.push(manpower);
-      updatePreview(); // Update the preview section
-    });
+    function addManpower() {
+      const badgeNo = document.getElementById('badgeNo').value;
+      const manpowerName = document.getElementById('manpowerName').value;
+      const normalHour = document.getElementById('normalHour').value;
+      const otHour = document.getElementById('otHour').value;
+      const holiday = document.getElementById('holiday').value;
 
-    // Add Equipment Function
-    document.getElementById('add-equipment').addEventListener('click', function() {
-      let equipmentName = document.getElementById('equipment-name').value;
-      let workingHours = document.getElementById('equipment-working-hours').value;
+      // Validation
+      let isValid = true;
+      if (!badgeNo) {
+        showError('badgeNoError', 'Badge No. is required');
+        isValid = false;
+      } else {
+        clearError('badgeNoError');
+      }
+      if (!manpowerName) {
+        showError('manpowerNameError', 'Name is required');
+        isValid = false;
+      } else {
+        clearError('manpowerNameError');
+      }
+      if (!normalHour) {
+        showError('normalHourError', 'Normal Hour is required');
+        isValid = false;
+      } else {
+        clearError('normalHourError');
+      }
+      if (!otHour) {
+        showError('otHourError', 'OT Hour is required');
+        isValid = false;
+      } else {
+        clearError('otHourError');
+      }
+      if (!holiday) {
+        showError('holidayError', 'Holiday is required');
+        isValid = false;
+      } else {
+        clearError('holidayError');
+      }
 
-      let equipment = { equipmentName, workingHours };
-      equipmentList.push(equipment);
-      updatePreview(); // Update the preview section
-    });
+      if (isValid) {
+        const table = document.getElementById('manpowerTable');
+        const row = table.insertRow();
+        row.innerHTML = `<td>${badgeNo}</td><td>${manpowerName}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
 
-    // Add Consumable Function
-    document.getElementById('add-consumable').addEventListener('click', function() {
-      let materialName = document.getElementById('consumable-name').value;
-      let quantity = document.getElementById('consumable-quantity').value;
+        // Clear input fields
+        document.getElementById('badgeNo').value = '';
+        document.getElementById('manpowerName').value = '';
+        document.getElementById('normalHour').value = '';
+        document.getElementById('otHour').value = '';
+        document.getElementById('holiday').value = '';
+      }
+    }
 
-      let consumable = { materialName, quantity };
-      consumableList.push(consumable);
-      updatePreview(); // Update the preview section
-    });
+    function addEquipment() {
+      const equipmentName = document.getElementById('equipmentName').value;
+      const workingHours = document.getElementById('workingHours').value;
 
-    // Save DWS Function
-    document.getElementById('save-dws').addEventListener('click', function() {
-      const dwsData = {
-        structureName: document.getElementById('structure-name').value,
-        siNo: document.getElementById('si-no').value,
-        workDescription: document.getElementById('work-description').value,
-        location: document.getElementById('location').value,
-        manpower: manpowerList,
-        equipment: equipmentList,
-        consumable: consumableList
-      };
+      // Validation
+      let isValid = true;
+      if (!equipmentName) {
+        showError('equipmentNameError', 'Equipment Name is required');
+        isValid = false;
+      } else {
+        clearError('equipmentNameError');
+      }
+      if (!workingHours) {
+        showError('workingHoursError', 'Working Hours are required');
+        isValid = false;
+      } else {
+        clearError('workingHoursError');
+      }
 
-      localStorage.setItem('savedDWS', JSON.stringify(dwsData));
-      alert('DWS data saved!');
-    });
+      if (isValid) {
+        const table = document.getElementById('equipmentTable');
+        const row = table.insertRow();
+        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
-    // Back Button Function
-    document.getElementById('back-button').addEventListener('click', function() {
-            alert('Going back to home!');
+        // Clear input fields
+        document.getElementById('equipmentName').value = '';
+        document.getElementById('workingHours').value = '';
+      }
+    }
+
+    function addConsumable() {
+      const consumableName = document.getElementById('consumableName').value;
+      const quantity = document.getElementById('quantity').value;
+
+      // Validation
+      let isValid = true;
+      if (!consumableName) {
+        showError('consumableNameError', 'Consumable Name is required');
+        isValid = false;
+      } else {
+        clearError('consumableNameError');
+      }
+      if (!quantity) {
+        showError('quantityError', 'Quantity is required');
+        isValid = false;
+      } else {
+        clearError('quantityError');
+      }
+
+      if (isValid) {
+        const table = document.getElementById('consumableTable');
+        const row = table.insertRow();
+        row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
+
+        // Clear input fields
+        document.getElementById('consumableName').value = '';
+        document.getElementById('quantity').value = '';
+      }
+    }
+
+    function saveData() {
+      // Implement the save functionality
+      alert('Data Saved Successfully');
+      // Here you can save data to localStorage or backend as needed
+    }
+
+    function goBack() {
+      alert('Going back to home!');
       // You can redirect to the home page or reset the form as needed
       window.location.reload(); // This will reload the page and reset the form
-    });
+    }
   </script>
 
 </body>
