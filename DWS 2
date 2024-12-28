@@ -121,11 +121,22 @@
         </div>
 
         <!-- Admin Dashboard Section -->
-        <div id="adminDashboard" class="hidden">
-            <h1>Admin Dashboard</h1>
-            <h3>Pending User Approvals</h3>
-            <ul id="pendingUsersList" class="pending-users-list"></ul>
+<div id="adminDashboard" class="hidden">
+    <h1>Admin Dashboard</h1>
+    <h3>Pending User Approvals</h3>
+    <ul id="pendingUsersList" class="pending-users-list"></ul>
+    <h3>Total Users: <span id="totalUsersCount">0</span></h3> <!-- Added user count -->
+    <h3>Registered Users</h3>
+    <ul id="userList" class="pending-users-list"></ul> <!-- Added list of users -->
+    <button onclick="logout()">Log Out</button>
+</div>
+
+        <!-- User Dashboard Section -->
+        <div id="userDashboard" class="hidden">
+            <h1>User Dashboard</h1>
             <button onclick="logout()">Log Out</button>
+            <h3>Welcome to the User Dashboard</h3>
+            <p>Your personal content goes here.</p>
         </div>
     </div>
 
@@ -173,36 +184,93 @@
             alert("User rejected!");
             updatePendingUsersList();
         }
+        
+        // Update the admin dashboard to show the list of registered users and user count
+function updateUserList() {
+    const list = document.getElementById("userList");
+    const totalUsersCount = document.getElementById("totalUsersCount");
+    list.innerHTML = ''; // Clear existing user list
+    users.forEach((user, index) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("pending-user");
+        listItem.innerHTML = `${user.username} 
+            <button onclick="removeUser(${index})">Remove</button>`;
+        list.appendChild(listItem);
+    });
+    totalUsersCount.textContent = users.length; // Update total users count
+}
 
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            const username = document.getElementById("signinUsername").value.trim();
-            const password = document.getElementById("signinPassword").value.trim();
+// Remove a user from the list
+function removeUser(index) {
+    const user = users.splice(index, 1)[0]; // Remove from the users list
+    localStorage.setItem("users", JSON.stringify(users)); // Update the local storage
+    alert(`${user.username} has been removed from the system.`);
+    updateUserList(); // Re-render the updated user list
+}
 
-            if (!username || !password) {
-                document.getElementById("signinError").textContent = "Please fill in all fields.";
-                return;
-            }
+function updatePendingUsersList() {
+    const list = document.getElementById("pendingUsersList");
+    list.innerHTML = '';
+    pendingUsers.forEach((user, index) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("pending-user");
+        listItem.innerHTML = `${user.username} 
+            <button onclick="approveUser(${index})">Approve</button>
+            <button onclick="rejectUser(${index})">Reject</button>`;
+        list.appendChild(listItem);
+    });
+}
 
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updatePendingUsersList();
-                return;
-            }
+// Approve a user
+function approveUser(index) {
+    const user = pendingUsers.splice(index, 1)[0];
+    user.approved = true;  // Mark user as approved
+    users.push(user);
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+    alert("User approved!");
+    updatePendingUsersList();
+    updateUserList(); // Update the user list after approval
+}
 
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById("signinError").textContent = "Invalid credentials.";
-                return;
-            }
+// Reject a user
+function rejectUser(index) {
+    pendingUsers.splice(index, 1);
+    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+    alert("User rejected!");
+    updatePendingUsersList();
+}
 
-            if (!user.approved) {
-                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                return;
-            }
+document.getElementById("signinBtn").addEventListener("click", () => {
+    const username = document.getElementById("signinUsername").value.trim();
+    const password = document.getElementById("signinPassword").value.trim();
 
-            alert("Login successful!");
-            clearInputs();
-        });
+    if (!username || !password) {
+        document.getElementById("signinError").textContent = "Please fill in all fields.";
+        return;
+    }
+
+    if (username === "admin" && password === "admin123") {
+        switchSection("adminDashboard");
+        updatePendingUsersList();
+        updateUserList(); // Also load the approved users
+        return;
+    }
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+        document.getElementById("signinError").textContent = "Invalid credentials.";
+        return;
+    }
+
+    if (!user.approved) {
+        document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+        return;
+    }
+
+    // Redirect to user dashboard
+    switchSection("userDashboard");
+});
 
         document.getElementById("signupBtn").addEventListener("click", () => {
             const username = document.getElementById("signupUsername").value.trim();
