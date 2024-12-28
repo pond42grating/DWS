@@ -165,79 +165,111 @@
   </div>
 
   <script>
-    // Preview and Save Functionality for Manpower, Equipment, and Consumable
+    // Initialize lists to store data for preview
     let manpowerList = [];
     let equipmentList = [];
     let consumableList = [];
 
+    // Function to update preview
+    function updatePreview() {
+      let previewContainer = document.getElementById('preview-container');
+      previewContainer.innerHTML = ''; // Clear previous preview
+
+      // Display Manpower List
+      manpowerList.forEach((item, index) => {
+        let previewItem = document.createElement('div');
+        previewItem.classList.add('preview-item');
+        previewItem.innerHTML = `
+          <span>Manpower #${index + 1}:</span>
+          <span>Badge No.: ${item.badgeNo}</span>
+          <span>Name: ${item.name}</span>
+          <span>Normal Hour: ${item.normalHour}</span>
+          <span>OT Hour: ${item.otHour}</span>
+          <span>Holiday: ${item.holiday}</span>
+        `;
+        previewContainer.appendChild(previewItem);
+      });
+
+      // Display Equipment List
+      equipmentList.forEach((item, index) => {
+        let previewItem = document.createElement('div');
+        previewItem.classList.add('preview-item');
+        previewItem.innerHTML = `
+          <span>Equipment #${index + 1}:</span>
+          <span>Equipment Name: ${item.equipmentName}</span>
+          <span>Working Hours: ${item.workingHours}</span>
+        `;
+        previewContainer.appendChild(previewItem);
+      });
+
+      // Display Consumable List
+      consumableList.forEach((item, index) => {
+        let previewItem = document.createElement('div');
+        previewItem.classList.add('preview-item');
+        previewItem.innerHTML = `
+          <span>Consumable #${index + 1}:</span>
+          <span>Consumable Name: ${item.materialName}</span>
+          <span>Quantity: ${item.quantity}</span>
+        `;
+        previewContainer.appendChild(previewItem);
+      });
+    }
+
+    // Add Manpower Function
     document.getElementById('add-manpower').addEventListener('click', function() {
-      let structureName = document.getElementById('structure-name').value;
-      let siNo = document.getElementById('si-no').value;
-      let workDescription = document.getElementById('work-description').value;
-      let location = document.getElementById('location').value;
-      
-      let manpowerPreview = document.createElement('div');
-      manpowerPreview.classList.add('preview-item');
-      manpowerPreview.innerHTML = `
-        <span>Structure: ${structureName}</span> 
-        <span>SI No.: ${siNo}</span>
-        <span>Work: ${workDescription}</span>
-        <span>Location: ${location}</span>
-      `;
-      manpowerList.push({structureName, siNo, workDescription, location});
-      document.getElementById('preview-container').appendChild(manpowerPreview);
+      let badgeNo = prompt("Enter Badge No.");
+      let name = prompt("Enter Name");
+      let normalHour = prompt("Enter Normal Hours");
+      let otHour = prompt("Enter OT Hours");
+      let holiday = prompt("Enter Holiday (Yes/No)");
+
+      let manpower = { badgeNo, name, normalHour, otHour, holiday };
+      manpowerList.push(manpower);
+      updatePreview(); // Update the preview section
     });
 
+    // Add Equipment Function
     document.getElementById('add-equipment').addEventListener('click', function() {
-      let structureName = document.getElementById('structure-name').value;
-      let siNo = document.getElementById('si-no').value;
-      let workDescription = document.getElementById('work-description').value;
-      let location = document.getElementById('location').value;
+      let equipmentName = prompt("Enter Equipment Name");
+      let workingHours = prompt("Enter Working Hours");
 
-      let equipmentPreview = document.createElement('div');
-      equipmentPreview.classList.add('preview-item');
-      equipmentPreview.innerHTML = `
-        <span>Structure: ${structureName}</span>
-        <span>SI No.: ${siNo}</span>
-        <span>Work: ${workDescription}</span>
-        <span>Location: ${location}</span>
-      `;
-      equipmentList.push({structureName, siNo, workDescription, location});
-      document.getElementById('preview-container').appendChild(equipmentPreview);
+      let equipment = { equipmentName, workingHours };
+      equipmentList.push(equipment);
+      updatePreview(); // Update the preview section
     });
 
+    // Add Consumable Function
     document.getElementById('add-consumable').addEventListener('click', function() {
-      let structureName = document.getElementById('structure-name').value;
-      let siNo = document.getElementById('si-no').value;
-      let workDescription = document.getElementById('work-description').value;
-      let location = document.getElementById('location').value;
+      let materialName = prompt("Enter Consumable Name");
+      let quantity = prompt("Enter Quantity (Nos/ML)");
 
-      let consumablePreview = document.createElement('div');
-      consumablePreview.classList.add('preview-item');
-      consumablePreview.innerHTML = `
-        <span>Structure: ${structureName}</span>
-        <span>SI No.: ${siNo}</span>
-        <span>Work: ${workDescription}</span>
-        <span>Location: ${location}</span>
-      `;
-      consumableList.push({structureName, siNo, workDescription, location});
-      document.getElementById('preview-container').appendChild(consumablePreview);
+      let consumable = { materialName, quantity };
+      consumableList.push(consumable);
+      updatePreview(); // Update the preview section
     });
 
+    // Save DWS Function
     document.getElementById('save-dws').addEventListener('click', function() {
       const dwsData = {
+        structureName: document.getElementById('structure-name').value,
+        siNo: document.getElementById('si-no').value,
+        workDescription: document.getElementById('work-description').value,
+        location: document.getElementById('location').value,
         manpower: manpowerList,
         equipment: equipmentList,
         consumable: consumableList
       };
+
       localStorage.setItem('savedDWS', JSON.stringify(dwsData));
       alert('DWS data saved!');
     });
 
+    // Back Button Function
     document.getElementById('back-button').addEventListener('click', function() {
       // Code to navigate back to home or previous page
       alert('Going back to home page.');
     });
   </script>
+
 </body>
 </html>
