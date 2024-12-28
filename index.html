@@ -78,13 +78,19 @@
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
   </div>
-
+  
+  
+  
   <div class="form-section">
     <label for="structureName">Structure Name</label>
     <input type="text" id="structureName">
     <div class="error" id="structureNameError"></div>
   </div>
-
+  <div class="form-section">
+  <label for="date">Date</label>
+  <input type="date" id="date">
+  <div class="error" id="dateError"></div>
+</div>
   <div class="form-section">
     <label for="siNo">SI No.</label>
     <input type="text" id="siNo">
@@ -210,7 +216,13 @@
     }
 
     // Manpower, Equipment, Consumable add functions here...
-
+     const date = document.getElementById('date').value;
+if (!date) {
+  showError('dateError', 'Date is required');
+  isValid = false;
+} else {
+  clearError('dateError');
+}
 function addManpower() {
       const badgeNo = document.getElementById('badgeNo').value;
       const manpowerName = document.getElementById('manpowerName').value;
