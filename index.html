@@ -65,6 +65,23 @@
             <button id="signupBtn">Sign Up</button>
             <p class="error" id="signupError"></p>
         </div>
+
+        <!-- Forget Password Section -->
+        <div id="forgetPasswordSection" class="auth-section hidden">
+            <span class="back-btn" id="backToSigninBtn">← Back to Sign In</span>
+            <h2>Forget Password</h2>
+            <label for="forgetUsername">Username:</label>
+            <input type="text" id="forgetUsername" placeholder="Enter Username" required><br><br>
+
+            <label for="secretCodeForReset">Secret Code:</label>
+            <input type="text" id="secretCodeForReset" placeholder="Enter Secret Code" required><br><br>
+
+            <label for="newPassword">New Password:</label>
+            <input type="password" id="newPassword" placeholder="Enter New Password" required><br><br>
+
+            <button id="resetPasswordBtn">Reset Password</button>
+            <p class="error" id="resetError"></p>
+        </div>
     </div>
 
     <!-- Admin Login Section -->
@@ -82,11 +99,11 @@
 
     <!-- Admin Dashboard (After Admin Login) -->
     <div id="adminDashboard" class="hidden">
-        <span class="back-btn" id="backToSignInBtn">← Back to Sign In</span> <!-- Back Button to Sign In -->
+        <span class="back-btn" id="backToSignInFromAdminBtn">← Back to Sign In</span>
+        <button id="logoutBtn">Logout</button>
         <h2>Admin Dashboard</h2>
         <h3>Sign-Up Requests</h3>
         <ul id="signupRequestsList"></ul>
-        <button id="adminLogoutBtn">Log Out</button> <!-- Log Out Button -->
     </div>
 
     <script>
@@ -98,23 +115,31 @@
         const signupBtn = document.getElementById("signupBtn");
         const signinBtn = document.getElementById("signinBtn");
         const adminLoginBtn = document.getElementById("adminLoginBtn");
-        const adminLogoutBtn = document.getElementById("adminLogoutBtn");
+        const resetPasswordBtn = document.getElementById("resetPasswordBtn");
 
         const signupUsername = document.getElementById("signupUsername");
         const signupPassword = document.getElementById("signupPassword");
         const confirmPassword = document.getElementById("confirmPassword");
         const secretCode = document.getElementById("secretCode");
+
         const signinUsername = document.getElementById("signinUsername");
         const signinPassword = document.getElementById("signinPassword");
+
+        const forgetUsername = document.getElementById("forgetUsername");
+        const secretCodeForReset = document.getElementById("secretCodeForReset");
+        const newPassword = document.getElementById("newPassword");
+
         const adminUsername = document.getElementById("adminUsername");
         const adminPassword = document.getElementById("adminPassword");
 
         const signupError = document.getElementById("signupError");
         const signinError = document.getElementById("signinError");
         const adminError = document.getElementById("adminError");
+        const resetError = document.getElementById("resetError");
 
         const authSection = document.getElementById("authSection");
         const signupSection = document.getElementById("signupSection");
+        const forgetPasswordSection = document.getElementById("forgetPasswordSection");
         const adminSection = document.getElementById("adminSection");
         const adminDashboard = document.getElementById("adminDashboard");
 
@@ -122,14 +147,14 @@
 
         // Show sign-up form
         document.getElementById("goToSignupBtn").addEventListener("click", () => {
-            authSection.classList.add("hidden");
+            document.getElementById("signinSection").classList.add("hidden");
             signupSection.classList.remove("hidden");
         });
 
         // Go back to login screen from sign-up
         document.getElementById("backToLoginBtn").addEventListener("click", () => {
             signupSection.classList.add("hidden");
-            authSection.classList.remove("hidden");
+            document.getElementById("signinSection").classList.remove("hidden");
 
             // Clear Sign Up fields when coming back to Login
             signupUsername.value = '';
@@ -138,25 +163,34 @@
             secretCode.value = '';
         });
 
+        // Go back to login screen from forget password
+        document.getElementById("backToSigninBtn").addEventListener("click", () => {
+            forgetPasswordSection.classList.add("hidden");
+            document.getElementById("signinSection").classList.remove("hidden");
+
+            // Clear Forget Password fields when coming back to Sign In
+            forgetUsername.value = '';
+            secretCodeForReset.value = '';
+            newPassword.value = '';
+        });
+
         // Go back to Sign-In screen from admin dashboard
-        document.getElementById("backToSignInBtn").addEventListener("click", () => {
-            adminDashboard.classList.add("hidden");
-            authSection.classList.remove("hidden");
+        document.getElementById("backToSignInFromAdminBtn").addEventListener("click", () => {
+            authSection.classList.remove("hidden"); // Show the sign-in section
+            adminDashboard.classList.add("hidden"); // Hide the admin dashboard
 
             // Clear Admin Login fields when coming back to Sign In
             adminUsername.value = '';
             adminPassword.value = '';
         });
 
-        // Log out from admin dashboard
-        adminLogoutBtn.addEventListener("click", () => {
+        // Logout from Admin Dashboard
+        document.getElementById("logoutBtn").addEventListener("click", () => {
             adminLoggedIn = false;
             adminDashboard.classList.add("hidden");
             authSection.classList.remove("hidden");
-
-            // Clear Sign-In credentials when logging out
-            signinUsername.value = '';
-            signinPassword.value = '';
+            adminUsername.value = '';
+            adminPassword.value = '';
         });
 
         // Sign-up a new user
@@ -164,9 +198,9 @@
             const username = signupUsername.value.trim();
             const password = signupPassword.value.trim();
             const confirmPass = confirmPassword.value.trim();
-            const code = secretCode.value.trim();
+            const secret = secretCode.value.trim();
 
-            if (username && password && confirmPass && code) {
+            if (username && password && confirmPass && secret) {
                 if (password !== confirmPass) {
                     signupError.textContent = "Passwords do not match.";
                     return;
@@ -176,7 +210,7 @@
                 if (existingUser) {
                     signupError.textContent = "Username already exists.";
                 } else {
-                    users.push({ username, password, secretCode: code, isApproved: false });
+                    users.push({ username, password, secret, isApproved: false });
                     localStorage.setItem("users", JSON.stringify(users));
                     signupError.textContent = "Sign up successful! Await admin approval.";
                     signupUsername.value = '';
@@ -195,11 +229,12 @@
             const password = signinPassword.value.trim();
 
             if (username && password) {
+                // Check if it's an admin login first
                 if (username === "admin" && password === "admin123") {
                     adminLoggedIn = true;
-                    authSection.classList.add("hidden");
-                    adminSection.classList.add("hidden");
-                    adminDashboard.classList.remove("hidden");
+                    authSection.classList.add("hidden"); // Hide the login section
+                    adminSection.classList.add("hidden"); // Hide the admin section
+                    adminDashboard.classList.remove("hidden"); // Show the admin dashboard
                     displaySignupRequests();
                     return;
                 }
@@ -224,8 +259,8 @@
 
             if (adminUsernameInput === "admin" && adminPasswordInput === "admin123") {
                 adminLoggedIn = true;
-                adminSection.classList.add("hidden");
-                adminDashboard.classList.remove("hidden");
+                adminSection.classList.add("hidden"); // Hide admin login
+                adminDashboard.classList.remove("hidden"); // Show admin dashboard
                 displaySignupRequests();
             } else {
                 adminError.textContent = "Invalid admin credentials.";
@@ -267,6 +302,31 @@
             localStorage.setItem("users", JSON.stringify(users));
             displaySignupRequests();
         };
+
+        // Reset password
+        resetPasswordBtn.addEventListener("click", () => {
+            const username = forgetUsername.value.trim();
+            const secret = secretCodeForReset.value.trim();
+            const newPass = newPassword.value.trim();
+
+            if (username && secret && newPass) {
+                const user = users.find(user => user.username === username && user.secret === secret);
+                
+                if (user) {
+                    user.password = newPass;
+                    localStorage.setItem("users", JSON.stringify(users));
+                    resetError.textContent = "Password reset successful!";
+                    forgetUsername.value = '';
+                    secretCodeForReset.value = '';
+                    newPassword.value = '';
+                } else {
+                    resetError.textContent = "Invalid username or secret code.";
+                }
+            } else {
+                resetError.textContent = "Please fill in all fields.";
+            }
+        });
     </script>
+
 </body>
 </html>
