@@ -11,6 +11,7 @@
       padding: 0;
       background-color: #f4f4f4;
     }
+
     .container {
       max-width: 1000px;
       margin: 20px auto;
@@ -19,18 +20,22 @@
       border-radius: 8px;
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     }
+
     h2 {
       text-align: center;
       color: #333;
     }
+
     .form-group {
       margin-bottom: 15px;
     }
+
     .form-group label {
       display: block;
       font-size: 14px;
       margin-bottom: 5px;
     }
+
     .form-group input, .form-group select {
       width: 100%;
       padding: 8px;
@@ -38,6 +43,7 @@
       border: 1px solid #ccc;
       border-radius: 4px;
     }
+
     button {
       padding: 10px 15px;
       background-color: #28a745;
@@ -47,29 +53,36 @@
       cursor: pointer;
       font-size: 16px;
     }
+
     button:hover {
       background-color: #218838;
     }
+
     .table-container {
       margin-top: 20px;
     }
+
     table {
       width: 100%;
       border-collapse: collapse;
     }
+
     table th, table td {
       padding: 8px;
       border: 1px solid #ccc;
       text-align: center;
     }
+
     .error {
       color: red;
       font-size: 12px;
     }
+
     .back-btn {
       margin-top: 20px;
       background-color: #007bff;
     }
+
     .back-btn:hover {
       background-color: #0056b3;
     }
@@ -86,30 +99,35 @@
       <input type="text" id="dwsNo" readonly value="DWS-1">
     </div>
 
+    <!-- Date Field -->
     <div class="form-group">
       <label for="dwsDate">Date</label>
       <input type="date" id="dwsDate">
       <div id="dateError" class="error"></div>
     </div>
 
+    <!-- Structure Name -->
     <div class="form-group">
       <label for="structureName">Structure Name</label>
       <input type="text" id="structureName">
       <div id="structureNameError" class="error"></div>
     </div>
 
+    <!-- SI No -->
     <div class="form-group">
       <label for="siNo">SI No.</label>
       <input type="text" id="siNo">
       <div id="siNoError" class="error"></div>
     </div>
 
+    <!-- Work Description -->
     <div class="form-group">
       <label for="workDescription">Work Description</label>
       <input type="text" id="workDescription">
       <div id="workDescriptionError" class="error"></div>
     </div>
 
+    <!-- Location -->
     <div class="form-group">
       <label for="location">Location</label>
       <input type="text" id="location">
@@ -168,16 +186,19 @@
   <script>
     let dwsCounter = 2; // Start DWS number from 2
 
+    // Display error message
     function showError(id, message) {
       const errorElement = document.getElementById(id);
       errorElement.textContent = message;
     }
 
+    // Clear error message
     function clearError(id) {
       const errorElement = document.getElementById(id);
       errorElement.textContent = '';
     }
 
+    // Add Manpower
     function addManpower() {
       const badgeNo = document.getElementById('badgeNo').value;
       const name = document.getElementById('name').value;
@@ -185,7 +206,6 @@
       const otHour = document.getElementById('otHour').value;
       const holiday = document.getElementById('holiday').value;
 
-      // Validation
       let isValid = true;
       if (!badgeNo) {
         showError('badgeNoError', 'Badge No. is required');
@@ -214,11 +234,11 @@
       }
     }
 
+    // Add Equipment
     function addEquipment() {
       const equipmentName = document.getElementById('equipmentName').value;
       const workingHours = document.getElementById('workingHours').value;
 
-      // Validation
       let isValid = true;
       if (!equipmentName) {
         showError('equipmentNameError', 'Equipment Name is required');
@@ -244,11 +264,11 @@
       }
     }
 
+    // Add Consumable
     function addConsumable() {
       const consumableName = document.getElementById('consumableName').value;
       const quantity = document.getElementById('quantity').value;
 
-      // Validation
       let isValid = true;
       if (!consumableName) {
         showError('consumableNameError', 'Consumable Name is required');
@@ -274,67 +294,122 @@
       }
     }
 
+    // Save DWS Data
     function saveData() {
-      const dwsNo = `DWS-${dwsCounter++}`;
+            const dwsNo = `DWS-${dwsCounter}`;
       const dwsDate = document.getElementById('dwsDate').value;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
       const workDescription = document.getElementById('workDescription').value;
       const location = document.getElementById('location').value;
 
-      if (!structureName || !siNo || !workDescription || !location || !dwsDate) {
-        alert('Please fill all the required fields!');
-        return;
+      let isValid = true;
+
+      // Check if all fields are filled
+      if (!dwsDate) {
+        showError('dateError', 'Date is required');
+        isValid = false;
+      } else {
+        clearError('dateError');
       }
 
-      // Save data in local storage or database
-      const dwsData = {
-        dwsNo: dwsNo,
-        dwsDate: dwsDate,
-        structureName: structureName,
-        siNo: siNo,
-        workDescription: workDescription,
-        location: location,
-        manpower: getTableData('manpowerTable'),
-        equipment: getTableData('equipmentTable'),
-        consumables: getTableData('consumableTable')
-      };
+      if (!structureName) {
+        showError('structureNameError', 'Structure Name is required');
+        isValid = false;
+      } else {
+        clearError('structureNameError');
+      }
 
-      let savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
-      savedData.push(dwsData);
-      localStorage.setItem('dwsData', JSON.stringify(savedData));
+      if (!siNo) {
+        showError('siNoError', 'SI No. is required');
+        isValid = false;
+      } else {
+        clearError('siNoError');
+      }
 
-      alert('DWS saved successfully!');
-      clearAllFields();
+      if (!workDescription) {
+        showError('workDescriptionError', 'Work Description is required');
+        isValid = false;
+      } else {
+        clearError('workDescriptionError');
+      }
+
+      if (!location) {
+        showError('locationError', 'Location is required');
+        isValid = false;
+      } else {
+        clearError('locationError');
+      }
+
+      if (isValid) {
+        const dwsData = {
+          dwsNo,
+          dwsDate,
+          structureName,
+          siNo,
+          workDescription,
+          location,
+          manpower: getTableData('manpowerTable'),
+          equipment: getTableData('equipmentTable'),
+          consumables: getTableData('consumableTable')
+        };
+
+        // Save data to localStorage (for example, to simulate saving)
+        let savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
+        savedData.push(dwsData);
+        localStorage.setItem('dwsData', JSON.stringify(savedData));
+
+        alert('DWS saved successfully!');
+
+        // Reset the form
+        document.getElementById('dwsDate').value = '';
+        document.getElementById('structureName').value = '';
+        document.getElementById('siNo').value = '';
+        document.getElementById('workDescription').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('manpowerTable').innerHTML = `
+          <tr>
+            <th>Badge No.</th>
+            <th>Name</th>
+            <th>Normal Hour</th>
+            <th>OT Hour</th>
+            <th>Holiday</th>
+          </tr>`;
+        document.getElementById('equipmentTable').innerHTML = `
+          <tr>
+            <th>Equipment Name</th>
+            <th>Working Hours</th>
+          </tr>`;
+        document.getElementById('consumableTable').innerHTML = `
+          <tr>
+            <th>Consumable Name</th>
+            <th>Quantity</th>
+          </tr>`;
+
+        // Increment DWS Number for next entry
+        dwsCounter++;
+      }
     }
 
+    // Helper function to get table data
     function getTableData(tableId) {
-      const rows = document.getElementById(tableId).rows;
+      const table = document.getElementById(tableId);
+      const rows = table.getElementsByTagName('tr');
       const data = [];
       for (let i = 1; i < rows.length; i++) {
-        const row = rows[i].cells;
-        let rowData = [];
-        for (let j = 0; j < row.length; j++) {
-          rowData.push(row[j].innerText);
+        const cells = rows[i].getElementsByTagName('td');
+        const rowData = [];
+        for (let j = 0; j < cells.length; j++) {
+          rowData.push(cells[j].innerText);
         }
         data.push(rowData);
       }
       return data;
     }
 
-    function clearAllFields() {
-      document.getElementById('dwsDate').value = '';
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
-      document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
-      document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
-    }
-
+    // Go back to the main page (reset the form)
     function goBack() {
-      alert('Returning to the main page...');
+      window.location.href = '/';
     }
   </script>
 
