@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 800px;
+            max-width: 400px;
         }
 
         h1, h3 {
@@ -69,12 +69,12 @@
             padding: 0;
         }
 
-        .pending-users-list, .user-list, .audit-log {
+        .pending-users-list {
             list-style-type: none;
             padding: 0;
         }
 
-        .pending-user, .user-item, .audit-entry {
+        .pending-user {
             padding: 10px;
             border: 1px solid #ccc;
             margin-bottom: 5px;
@@ -82,17 +82,43 @@
             justify-content: space-between;
         }
 
-        .role-select {
-            width: 150px;
+        /* Add button styles here */
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
         }
 
-        .bulk-actions {
-            margin: 20px 0;
+        .btn {
+            padding: 10px 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100px;
+            text-align: center;
         }
 
-        .bulk-actions button {
-            width: auto;
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        .action-btn {
             background-color: #28a745;
+        }
+
+        .action-btn:hover {
+            background-color: #218838;
+        }
+
+        .export-btn {
+            background-color: #ffc107;
+        }
+
+        .export-btn:hover {
+            background-color: #e0a800;
         }
     </style>
 </head>
@@ -160,30 +186,17 @@
         </div>
 
         <!-- User Dashboard Section -->
-<div id="userDashboard" class="hidden">
+        <div id="userDashboard" class="hidden">
     <h1>User Dashboard</h1>
-    <button onclick="logout()">Log Out</button>
+    <button onclick="logout()" class="btn primary-btn">Log Out</button>
     <h3>Welcome to the User Dashboard</h3>
-    <button id="createDWSBtn">Create DWS</button>
-    <button id="manageDWSBtn">Manage DWS</button>
-    <button id="searchDWSBtn">Search DWS</button>
+    <p>Your personal content goes here.</p>
     
-    <div id="createDWSSection" class="hidden">
-        <h3>Create DWS</h3>
-        <button onclick="createDWS()">Create DWS</button>
-        <p id="dwsMessage"></p>
-    </div>
-    
-    <div id="manageDWSSection" class="hidden">
-        <h3>Manage Your DWS</h3>
-        <ul id="userDWSList"></ul>
-    </div>
-
-    <div id="searchDWSSection" class="hidden">
-        <h3>Search DWS by Number</h3>
-        <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
-        <button onclick="searchDWS()">Search</button>
-        <p id="dwsSearchResult"></p>
+    <div class="button-group">
+        <button class="btn action-btn" onclick="createDWS()">Create DWS</button>
+        <button class="btn action-btn" onclick="manageDWS()">Manage DWS</button>
+        <button class="btn action-btn" onclick="searchDWS()">Search DWS</button>
+        <button class="btn action-btn" onclick="exportData()">Export</button>
     </div>
 </div>
 
