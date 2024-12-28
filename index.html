@@ -81,6 +81,39 @@
             display: flex;
             justify-content: space-between;
         }
+        
+        .pending-user button {
+    padding: 5px 10px;
+    font-size: 0.9em;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease;
+}
+
+.pending-user button:hover {
+    background-color: #0056b3;
+}
+
+.pending-user button.reject {
+    background-color: #dc3545;
+}
+
+.pending-user button.reject:hover {
+    background-color: #c82333;
+}
+
+.pending-user button.approve {
+    background-color: #28a745;
+}
+
+.pending-user button.approve:hover {
+    background-color: #218838;
+}
+        
     </style>
 </head>
 <body>
