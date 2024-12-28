@@ -160,29 +160,124 @@
         </div>
 
         <!-- User Dashboard Section -->
-        <div id="userDashboard" class="hidden">
-            <h1>User Dashboard</h1>
-            <button onclick="logout()">Log Out</button>
-            <h3>Welcome to the User Dashboard</h3>
-            <p>Your personal content goes here.</p>
-        </div>
+<div id="userDashboard" class="hidden">
+    <h1>User Dashboard</h1>
+    <button onclick="logout()">Log Out</button>
+    <h3>Welcome to the User Dashboard</h3>
+    <button id="createDWSBtn">Create DWS</button>
+    <button id="manageDWSBtn">Manage DWS</button>
+    <button id="searchDWSBtn">Search DWS</button>
+    
+    <div id="createDWSSection" class="hidden">
+        <h3>Create DWS</h3>
+        <button onclick="createDWS()">Create DWS</button>
+        <p id="dwsMessage"></p>
+    </div>
+    
+    <div id="manageDWSSection" class="hidden">
+        <h3>Manage Your DWS</h3>
+        <ul id="userDWSList"></ul>
     </div>
 
+    <div id="searchDWSSection" class="hidden">
+        <h3>Search DWS by Number</h3>
+        <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
+        <button onclick="searchDWS()">Search</button>
+        <p id="dwsSearchResult"></p>
+    </div>
+</div>
+
     <script>
+        
         const users = JSON.parse(localStorage.getItem("users")) || [];
-        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
-        const auditLogs = JSON.parse(localStorage.getItem("auditLogs")) || [];
+const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
 
-        function switchSection(sectionId) {
-            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-            clearInputs();
-        }
+// Helper function to update local storage
+function updateUsers() {
+    localStorage.setItem("users", JSON.stringify(users));
+}
 
-        function clearInputs() {
-            document.querySelectorAll('input').forEach(input => input.value = '');
-            document.querySelectorAll('.error').forEach(error => error.textContent = '');
+// Handle the "Create DWS" button
+document.getElementById("createDWSBtn").addEventListener("click", () => {
+    switchSection("createDWSSection");
+});
+
+function createDWS() {
+    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
+    if (!user) return;
+
+    const newDWS = {
+        dwsNumber: users.length + 1,  // Unique number based on the current number of users
+        createdAt: new Date(),
+    };
+
+    user.dws = user.dws || [];
+    user.dws.push(newDWS);
+    updateUsers();
+
+    document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
+}
+
+// Handle the "Manage DWS" button
+document.getElementById("manageDWSBtn").addEventListener("click", () => {
+    switchSection("manageDWSSection");
+    loadUserDWS();
+});
+
+function loadUserDWS() {
+    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with logged-in user
+    if (!user || !user.dws) {
+        document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
+        return;
+    }
+
+    const list = document.getElementById("userDWSList");
+    list.innerHTML = ""; // Clear existing list
+    user.dws.forEach(dws => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+        list.appendChild(listItem);
+    });
+}
+
+// Handle the "Search DWS" button
+document.getElementById("searchDWSBtn").addEventListener("click", () => {
+    switchSection("searchDWSSection");
+});
+
+function searchDWS() {
+    const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
+    const dws = findDWSByNumber(dwsNumber);
+
+    if (dws) {
+        document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+    } else {
+        document.getElementById("dwsSearchResult").textContent = "DWS not found.";
+    }
+}
+
+function findDWSByNumber(dwsNumber) {
+    for (const user of users) {
+        if (user.dws) {
+            const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
+            if (dws) return dws;
         }
+    }
+    return null;  // If DWS not found
+}
+
+// Switch between sections
+function switchSection(sectionId) {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+    clearInputs();
+}
+
+// Clear input fields and errors
+function clearInputs() {
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    document.querySelectorAll('.error').forEach(error => error.textContent = '');
+}
 
         function updatePendingUsersList() {
             const list = document.getElementById("pendingUsersList");
