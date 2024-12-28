@@ -1,117 +1,277 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Save, Retrieve, and Export Data</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-in-One Authentication System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        h1, h3 {
+            text-align: center;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .error {
+            color: red;
+            font-size: 0.9em;
+        }
+
+        .link-button {
+            background: none;
+            color: blue;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            padding: 0;
+        }
+
+        .pending-users-list {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .pending-user {
+            padding: 10px;
+            border: 1px solid #ccc;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+        }
+    </style>
 </head>
 <body>
-  <h1>User Information</h1>
+    <div class="container">
+        <!-- Login Section -->
+        <div id="loginSection">
+            <h1>Login</h1>
+            <input type="text" id="signinUsername" placeholder="Enter Username">
+            <input type="password" id="signinPassword" placeholder="Enter Password">
+            <button id="signinBtn">Sign In</button>
+            <p id="signinError" class="error"></p>
+            <button class="link-button" onclick="switchSection('signupSection')">Sign Up</button>
+            <button class="link-button" onclick="switchSection('forgotPasswordSection')">Forgot Password</button>
+        </div>
 
-  <!-- Form for Input -->
-  <label for="name">Name:</label>
-  <input type="text" id="name" placeholder="Enter Name" required><br><br>
+        <!-- Sign-Up Section -->
+        <div id="signupSection" class="hidden">
+            <h1>Sign Up</h1>
+            <input type="text" id="signupUsername" placeholder="Enter Username">
+            <input type="password" id="signupPassword" placeholder="Enter Password">
+            <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
+            <input type="text" id="signupSecretCode" placeholder="Enter Secret Code">
+            <button id="signupBtn">Sign Up</button>
+            <p id="signupError" class="error"></p>
+            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
+        </div>
 
-  <label for="age">Age:</label>
-  <input type="number" id="age" placeholder="Enter Age" required><br><br>
+        <!-- Forgot Password Section -->
+        <div id="forgotPasswordSection" class="hidden">
+            <h1>Forgot Password</h1>
+            <input type="text" id="resetUsername" placeholder="Enter Username">
+            <input type="text" id="resetSecretCode" placeholder="Enter Secret Code">
+            <input type="password" id="resetNewPassword" placeholder="Enter New Password">
+            <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password">
+            <button id="resetPasswordBtn">Reset Password</button>
+            <p id="resetError" class="error"></p>
+            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
+        </div>
 
-  <label for="placeOfBirth">Place of Birth:</label>
-  <input type="text" id="placeOfBirth" placeholder="Enter Place of Birth" required><br><br>
+        <!-- Admin Dashboard Section -->
+        <div id="adminDashboard" class="hidden">
+            <h1>Admin Dashboard</h1>
+            <h3>Pending User Approvals</h3>
+            <ul id="pendingUsersList" class="pending-users-list"></ul>
+            <button onclick="logout()">Log Out</button>
+        </div>
 
-  <button id="saveData">Save Data</button>
-  <button id="exportConsolidated">Export Consolidated Excel</button>
+        <!-- User Dashboard Section -->
+        <div id="userDashboard" class="hidden">
+            <h1>User Dashboard</h1>
+            <button onclick="logout()">Log Out</button>
+            <h3>Welcome to the User Dashboard</h3>
+            <p>Your personal content goes here.</p>
+        </div>
+    </div>
 
-  <h2>Search Users</h2>
-  <input type="text" id="searchName" placeholder="Enter Name to Search">
-  <button id="searchUser">Search</button>
-  <div id="searchResult"></div>
+    <script>
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
 
-  <h2>Saved Users:</h2>
-  <ul id="userList"></ul>
+        function switchSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            clearInputs();
+        }
 
-  <script>
-    // Load data from localStorage on page load
-    const savedData = JSON.parse(localStorage.getItem("userData")) || [];
+        function clearInputs() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            document.querySelectorAll('.error').forEach(error => error.textContent = '');
+        }
 
-    // Function to display saved users
-    const displayUsers = () => {
-      const userList = document.getElementById("userList");
-      userList.innerHTML = ""; // Clear existing list
-      savedData.forEach(user => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `${user.Name} (Age: ${user.Age}, Place of Birth: ${user.PlaceOfBirth})`;
-        listItem.innerHTML += ` <button onclick="exportIndividual('${user.Name}')">Export ${user.Name}'s Excel</button>`;
-        userList.appendChild(listItem);
-      });
-    };
+        function updatePendingUsersList() {
+            const list = document.getElementById("pendingUsersList");
+            list.innerHTML = '';
+            pendingUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("pending-user");
+                listItem.innerHTML = `${user.username} 
+                    <button onclick="approveUser(${index})">Approve</button>
+                    <button onclick="rejectUser(${index})">Reject</button>`;
+                list.appendChild(listItem);
+            });
+        }
 
-    // Save data and update localStorage
-    document.getElementById("saveData").addEventListener("click", () => {
-      const name = document.getElementById("name").value.trim();
-      const age = document.getElementById("age").value.trim();
-      const placeOfBirth = document.getElementById("placeOfBirth").value.trim();
+        function approveUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            user.approved = true;  // Mark user as approved
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User approved!");
+            updatePendingUsersList();
+        }
 
-      if (!name || !age || !placeOfBirth) {
-        alert("Please fill in all fields!");
-        return;
-      }
+        function rejectUser(index) {
+            pendingUsers.splice(index, 1);
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User rejected!");
+            updatePendingUsersList();
+        }
 
-      // Add new data to savedData array
-      savedData.push({ Name: name, Age: age, PlaceOfBirth: placeOfBirth });
+        document.getElementById("signinBtn").addEventListener("click", () => {
+            const username = document.getElementById("signinUsername").value.trim();
+            const password = document.getElementById("signinPassword").value.trim();
 
-      // Save to localStorage
-      localStorage.setItem("userData", JSON.stringify(savedData));
+            if (!username || !password) {
+                document.getElementById("signinError").textContent = "Please fill in all fields.";
+                return;
+            }
 
-      // Display updated users and clear inputs
-      displayUsers();
-      document.getElementById("name").value = "";
-      document.getElementById("age").value = "";
-      document.getElementById("placeOfBirth").value = "";
-    });
+            if (username === "admin" && password === "admin123") {
+                switchSection("adminDashboard");
+                updatePendingUsersList();
+                return;
+            }
 
-    // Export individual user's data to Excel
-    window.exportIndividual = (name) => {
-      const userData = savedData.find(user => user.Name === name);
-      if (!userData) {
-        alert("User not found!");
-        return;
-      }
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById("signinError").textContent = "Invalid credentials.";
+                return;
+            }
 
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet([userData]);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
-      XLSX.writeFile(workbook, `${name}.xlsx`);
-    };
+            if (!user.approved) {
+                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+                return;
+            }
 
-    // Export all data to a consolidated Excel file
-    document.getElementById("exportConsolidated").addEventListener("click", () => {
-      if (savedData.length === 0) {
-        alert("No data to export!");
-        return;
-      }
+            // Redirect to user dashboard
+            switchSection("userDashboard");
+        });
 
-      const workbook = XLSX.utils.book_new();
-      const worksheet = XLSX.utils.json_to_sheet(savedData);
-      XLSX.utils.book_append_sheet(workbook, worksheet, "All Users");
-      XLSX.writeFile(workbook, "Consolidated_Data.xlsx");
-    });
+        document.getElementById("signupBtn").addEventListener("click", () => {
+            const username = document.getElementById("signupUsername").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
+            const secretCode = document.getElementById("signupSecretCode").value.trim();
 
-    // Search for a user by name
-    document.getElementById("searchUser").addEventListener("click", () => {
-      const searchName = document.getElementById("searchName").value.trim().toLowerCase();
-      const result = savedData.filter(user => user.Name.toLowerCase() === searchName);
+            if (!username || !password || !confirmPassword || !secretCode) {
+                document.getElementById("signupError").textContent = "Please fill in all fields.";
+                return;
+            }
 
-      const searchResult = document.getElementById("searchResult");
-      if (result.length > 0) {
-        searchResult.innerHTML = `<strong>Found:</strong> ${result[0].Name} (Age: ${result[0].Age}, Place of Birth: ${result[0].PlaceOfBirth})`;
-      } else {
-        searchResult.textContent = "No user found with that name.";
-      }
-    });
+            if (password !== confirmPassword) {
+                document.getElementById("signupError").textContent = "Passwords do not match.";
+                return;
+            }
 
-    // Display users on page load
-    displayUsers();
-  </script>
+            if (users.some(user => user.username === username)) {
+                document.getElementById("signupError").textContent = "Username already exists.";
+                return;
+            }
+
+            pendingUsers.push({ username, password, secretCode, approved: false });
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+
+            alert("Sign-up successful! Awaiting admin approval.");
+            switchSection("loginSection");
+        });
+
+        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
+            const username = document.getElementById("resetUsername").value.trim();
+            const secretCode = document.getElementById("resetSecretCode").value.trim();
+            const newPassword = document.getElementById("resetNewPassword").value.trim();
+            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+
+            if (!username || !secretCode || !newPassword || !confirmPassword) {
+                document.getElementById("resetError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById("resetError").textContent = "Passwords do not match.";
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.secretCode === secretCode);
+            if (!user) {
+                document.getElementById("resetError").textContent = "Invalid username or secret code.";
+                return;
+            }
+
+            user.password = newPassword;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Password reset successful!");
+            switchSection("loginSection");
+        });
+
+        function logout() {
+            switchSection("loginSection");
+        }
+    </script>
 </body>
 </html>
