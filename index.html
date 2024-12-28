@@ -8,38 +8,65 @@
     /* General Styling */
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f7f6;
     }
     .container {
-      max-width: 1200px;
+      max-width: 800px;
       margin: auto;
+      padding: 20px;
+      background-color: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
     }
     h1 {
       text-align: center;
+      color: #333;
       margin-bottom: 20px;
     }
     .button-container {
-      text-align: center;
-      margin-top: 30px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
     }
     button {
-      padding: 10px 15px;
-      margin: 10px;
+      padding: 12px 20px;
+      margin: 5px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
       font-size: 16px;
+      border-radius: 5px;
+      width: 200px;
     }
     button:hover {
       background-color: #45a049;
     }
     .section {
       display: none;
+    }
+    .section.active {
+      display: block;
+    }
+    #searchDWSSection input {
+      padding: 10px;
+      margin-top: 10px;
+      width: 80%;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    #searchResult {
       margin-top: 20px;
     }
-    #createDWSSection, #manageDWSSection, #searchDWSSection {
-      display: block;
+    .back-button {
+      background-color: #f44336;
+      width: 150px;
+    }
+    .back-button:hover {
+      background-color: #e53935;
     }
   </style>
 </head>
@@ -47,37 +74,37 @@
 
   <div class="container">
     <h1>DWS Management System</h1>
-    
+
     <!-- Navigation Buttons -->
-    <div class="button-container">
+    <div id="navButtons" class="button-container">
       <button onclick="showSection('createDWSSection')">Create DWS</button>
       <button onclick="showSection('manageDWSSection')">Manage DWS</button>
       <button onclick="showSection('searchDWSSection')">Search DWS</button>
-      <button onclick="exportToExcel()">Export DWS Data</button>
     </div>
 
     <!-- Create DWS Section -->
     <div id="createDWSSection" class="section">
       <h2>Create New DWS</h2>
-      <!-- Include your existing "Create DWS" form fields here -->
       <button onclick="createDWS()">Create DWS</button>
+      <button class="back-button" onclick="showSection('navButtons')">Back</button>
     </div>
 
     <!-- Manage DWS Section -->
     <div id="manageDWSSection" class="section">
       <h2>Manage DWS</h2>
-      <p>Here you can manage and edit the existing DWS records.</p>
-      <!-- Example management actions like edit and delete buttons -->
       <button onclick="editDWS()">Edit DWS</button>
       <button onclick="deleteDWS()">Delete DWS</button>
+      <button class="back-button" onclick="showSection('navButtons')">Back</button>
     </div>
 
     <!-- Search DWS Section -->
-    <div id="searchDWSSection" class="section">
+    <div id="searchDWSSection" class="section active">
       <h2>Search DWS</h2>
       <input type="text" id="searchQuery" placeholder="Search by DWS Number or Name">
       <button onclick="searchDWS()">Search</button>
-      <p id="searchResult"></p>
+      <button onclick="exportToExcel()" class="back-button">Export</button>
+      <button class="back-button" onclick="showSection('navButtons')">Back</button>
+      <div id="searchResult"></div>
     </div>
 
   </div>
@@ -85,17 +112,13 @@
   <script>
     // Function to toggle visibility of different sections
     function showSection(sectionId) {
-      // Hide all sections first
       const sections = document.querySelectorAll('.section');
-      sections.forEach(section => section.style.display = 'none');
-
-      // Show the selected section
-      document.getElementById(sectionId).style.display = 'block';
+      sections.forEach(section => section.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
     }
 
     // Export to Excel function
     function exportToExcel() {
-      // You can modify this based on how your data is stored
       const wb = XLSX.utils.book_new();
       const data = [
         ['DWS No.', 'Structure Name', 'SI No.', 'Work Description', 'Location'],
