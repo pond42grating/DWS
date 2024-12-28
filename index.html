@@ -22,7 +22,7 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 400px;
+            max-width: 800px;
         }
 
         h1, h3 {
@@ -69,12 +69,12 @@
             padding: 0;
         }
 
-        .pending-users-list {
+        .pending-users-list, .user-list, .audit-log {
             list-style-type: none;
             padding: 0;
         }
 
-        .pending-user {
+        .pending-user, .user-item, .audit-entry {
             padding: 10px;
             border: 1px solid #ccc;
             margin-bottom: 5px;
@@ -82,43 +82,17 @@
             justify-content: space-between;
         }
 
-        /* Add button styles here */
-        .button-group {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
+        .role-select {
+            width: 150px;
         }
 
-        .btn {
-            padding: 10px 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-            width: 100px;
-            text-align: center;
+        .bulk-actions {
+            margin: 20px 0;
         }
 
-        .btn:hover {
-            background-color: #0056b3;
-        }
-
-        .action-btn {
+        .bulk-actions button {
+            width: auto;
             background-color: #28a745;
-        }
-
-        .action-btn:hover {
-            background-color: #218838;
-        }
-
-        .export-btn {
-            background-color: #ffc107;
-        }
-
-        .export-btn:hover {
-            background-color: #e0a800;
         }
     </style>
 </head>
@@ -187,329 +161,297 @@
 
         <!-- User Dashboard Section -->
         <div id="userDashboard" class="hidden">
-    <h1>User Dashboard</h1>
-    <button onclick="logout()" class="btn primary-btn">Log Out</button>
-    <h3>Welcome to the User Dashboard</h3>
-    <p>Your personal content goes here.</p>
-    
-    <div class="button-group">
-        <button class="btn action-btn" onclick="createDWS()">Create DWS</button>
-        <button class="btn action-btn" onclick="manageDWS()">Manage DWS</button>
-        <button class="btn action-btn" onclick="searchDWS()">Search DWS</button>
-        <button class="btn action-btn" onclick="exportData()">Export</button>
+            <h1>User Dashboard</h1>
+            <button onclick="logout()">Log Out</button>
+            <h3>Welcome to the User Dashboard</h3>
+            <button id="createDWSBtn">Create DWS</button>
+            <button id="manageDWSBtn">Manage DWS</button>
+            <button id="searchDWSBtn">Search DWS</button>
+            
+            <div id="createDWSSection" class="hidden">
+                <h3>Create DWS</h3>
+                <button onclick="createDWS()">Create DWS</button>
+                <p id="dwsMessage"></p>
+            </div>
+            
+            <div id="manageDWSSection" class="hidden">
+                <h3>Manage Your DWS</h3>
+                <ul id="userDWSList"></ul>
+            </div>
+
+            <div id="searchDWSSection" class="hidden">
+                <h3>Search DWS by Number</h3>
+                <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
+                <button onclick="searchDWS()">Search</button>
+                <p id="dwsSearchResult"></p>
+            </div>
+        </div>
     </div>
-</div>
 
     <script>
-        
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+    const users = JSON.parse(localStorage.getItem("users")) || [];
+    const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+    const auditLogs = JSON.parse(localStorage.getItem("auditLogs")) || [];
 
-// Helper function to update local storage
-function updateUsers() {
-    localStorage.setItem("users", JSON.stringify(users));
-}
-
-// Handle the "Create DWS" button
-document.getElementById("createDWSBtn").addEventListener("click", () => {
-    switchSection("createDWSSection");
-});
-
-function createDWS() {
-    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
-    if (!user) return;
-
-    const newDWS = {
-        dwsNumber: users.length + 1,  // Unique number based on the current number of users
-        createdAt: new Date(),
-    };
-
-    user.dws = user.dws || [];
-    user.dws.push(newDWS);
-    updateUsers();
-
-    document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
-}
-
-// Handle the "Manage DWS" button
-document.getElementById("manageDWSBtn").addEventListener("click", () => {
-    switchSection("manageDWSSection");
-    loadUserDWS();
-});
-
-function loadUserDWS() {
-    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with logged-in user
-    if (!user || !user.dws) {
-        document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
-        return;
+    // Helper function to update local storage
+    function updateUsers() {
+        localStorage.setItem("users", JSON.stringify(users));
     }
 
-    const list = document.getElementById("userDWSList");
-    list.innerHTML = ""; // Clear existing list
-    user.dws.forEach(dws => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
-        list.appendChild(listItem);
+    // Helper function to switch between sections
+    function switchSection(sectionId) {
+        document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+        document.getElementById(sectionId).classList.remove('hidden');
+        clearInputs();
+    }
+
+    // Clear input fields and errors
+    function clearInputs() {
+        document.querySelectorAll('input').forEach(input => input.value = '');
+        document.querySelectorAll('.error').forEach(error => error.textContent = '');
+    }
+
+    // Handle the "Create DWS" button
+    document.getElementById("createDWSBtn").addEventListener("click", () => {
+        switchSection("createDWSSection");
     });
-}
 
-// Handle the "Search DWS" button
-document.getElementById("searchDWSBtn").addEventListener("click", () => {
-    switchSection("searchDWSSection");
-});
+    function createDWS() {
+        const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
+        if (!user) return;
 
-function searchDWS() {
-    const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
-    const dws = findDWSByNumber(dwsNumber);
+        const newDWS = {
+            dwsNumber: users.length + 1,  // Unique number based on the current number of users
+            createdAt: new Date(),
+        };
 
-    if (dws) {
-        document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
-    } else {
-        document.getElementById("dwsSearchResult").textContent = "DWS not found.";
+        user.dws = user.dws || [];
+        user.dws.push(newDWS);
+        updateUsers();
+
+        document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
     }
-}
 
-function findDWSByNumber(dwsNumber) {
-    for (const user of users) {
-        if (user.dws) {
-            const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
-            if (dws) return dws;
+    // Handle the "Manage DWS" button
+    document.getElementById("manageDWSBtn").addEventListener("click", () => {
+        switchSection("manageDWSSection");
+        loadUserDWS();
+    });
+
+    function loadUserDWS() {
+        const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with logged-in user
+        if (!user || !user.dws) {
+            document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
+            return;
+        }
+
+        const list = document.getElementById("userDWSList");
+        list.innerHTML = ""; // Clear existing list
+        user.dws.forEach(dws => {
+            const listItem = document.createElement("li");
+            listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+            list.appendChild(listItem);
+        });
+    }
+
+    // Handle the "Search DWS" button
+    document.getElementById("searchDWSBtn").addEventListener("click", () => {
+        switchSection("searchDWSSection");
+    });
+
+    function searchDWS() {
+        const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
+        const dws = findDWSByNumber(dwsNumber);
+
+        if (dws) {
+            document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+        } else {
+            document.getElementById("dwsSearchResult").textContent = "DWS not found.";
         }
     }
-    return null;  // If DWS not found
-}
 
-// Switch between sections
-function switchSection(sectionId) {
-    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-    document.getElementById(sectionId).classList.remove('hidden');
-    clearInputs();
-}
+    function findDWSByNumber(dwsNumber) {
+        for (const user of users) {
+            if (user.dws) {
+                const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
+                if (dws) return dws;
+            }
+        }
+        return null;  // If DWS not found
+    }
 
-// Clear input fields and errors
-function clearInputs() {
-    document.querySelectorAll('input').forEach(input => input.value = '');
-    document.querySelectorAll('.error').forEach(error => error.textContent = '');
-}
+    // Logout functionality
+    function logout() {
+        switchSection("loginSection");
+    }
 
-        function updatePendingUsersList() {
-            const list = document.getElementById("pendingUsersList");
-            list.innerHTML = '';
-            pendingUsers.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("pending-user");
-                listItem.innerHTML = `${user.username} 
-                    <button onclick="approveUser(${index})">Approve</button>
-                    <button onclick="rejectUser(${index})">Reject</button>`;
-                list.appendChild(listItem);
-            });
+    // Sign-in functionality
+    document.getElementById("signinBtn").addEventListener("click", () => {
+        const username = document.getElementById("signinUsername").value.trim();
+        const password = document.getElementById("signinPassword").value.trim();
+
+        if (!username || !password) {
+            document.getElementById("signinError").textContent = "Please fill in all fields.";
+            return;
         }
 
-        function updateUserList() {
-            const list = document.getElementById("userList");
-            const totalUsersCount = document.getElementById("totalUsersCount");
-            list.innerHTML = ''; // Clear existing user list
-            users.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("user-item");
-                listItem.innerHTML = `${user.username} 
-                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
-                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
-                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                    </select>
-                    <button onclick="removeUser(${index})">Remove</button>`;
-                list.appendChild(listItem);
-            });
-            totalUsersCount.textContent = users.length;
+        const user = users.find(u => u.username === username && u.password === password);
+        if (!user) {
+            document.getElementById("signinError").textContent = "Invalid credentials.";
+            return;
         }
 
-        function updateAuditLog(action, username) {
-            const log = { action, username, timestamp: new Date().toISOString() };
-            auditLogs.push(log);
-            localStorage.setItem("auditLogs", JSON.stringify(auditLogs));
-            renderAuditLog();
+        if (!user.approved) {
+            document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+            return;
         }
 
-        function renderAuditLog() {
-            const list = document.getElementById("auditLog");
-            list.innerHTML = '';
-            auditLogs.forEach(log => {
-                const logItem = document.createElement("li");
-                logItem.classList.add("audit-entry");
-                logItem.innerHTML = `${log.timestamp}: ${log.username} - ${log.action}`;
-                list.appendChild(logItem);
-            });
+        switchSection("userDashboard");
+    });
+
+    // Sign-up functionality
+    document.getElementById("signupBtn").addEventListener("click", () => {
+        const username = document.getElementById("signupUsername").value.trim();
+        const password = document.getElementById("signupPassword").value.trim();
+        const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
+        const secretCode = document.getElementById("signupSecretCode").value.trim();
+
+        if (!username || !password || !confirmPassword || !secretCode) {
+            document.getElementById("signupError").textContent = "Please fill in all fields.";
+            return;
         }
 
-        function approveUser(index) {
-            const user = pendingUsers.splice(index, 1)[0];
+        if (password !== confirmPassword) {
+            document.getElementById("signupError").textContent = "Passwords do not match.";
+            return;
+        }
+
+        if (users.some(user => user.username === username)) {
+            document.getElementById("signupError").textContent = "Username already exists.";
+            return;
+        }
+
+        pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
+        localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+
+        alert("Sign-up successful! Awaiting admin approval.");
+        switchSection("loginSection");
+    });
+
+    // Forgot password functionality
+    document.getElementById("resetPasswordBtn").addEventListener("click", () => {
+        const username = document.getElementById("resetUsername").value.trim();
+        const secretCode = document.getElementById("resetSecretCode").value.trim();
+        const newPassword = document.getElementById("resetNewPassword").value.trim();
+        const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+
+        if (!username || !secretCode || !newPassword || !confirmPassword) {
+            document.getElementById("resetError").textContent = "Please fill in all fields.";
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            document.getElementById("resetError").textContent = "Passwords do not match.";
+            return;
+        }
+
+        const user = users.find(u => u.username === username && u.secretCode === secretCode);
+        if (!user) {
+            document.getElementById("resetError").textContent = "Invalid username or secret code.";
+            return;
+        }
+
+        user.password = newPassword;
+        localStorage.setItem("users", JSON.stringify(users));
+
+        alert("Password reset successful!");
+        switchSection("loginSection");
+    });
+
+    // Bulk approve functionality
+    function bulkApprove() {
+        pendingUsers.forEach((user, index) => {
             user.approved = true;
             users.push(user);
-            localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User approved!");
-            updatePendingUsersList();
-            updateUserList();
-            updateAuditLog('Approved', user.username);
-        }
-
-        function rejectUser(index) {
-            const user = pendingUsers.splice(index, 1)[0];
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User rejected!");
-            updatePendingUsersList();
-            updateAuditLog('Rejected', user.username);
-        }
-
-        function removeUser(index) {
-            const user = users.splice(index, 1)[0];
-            localStorage.setItem("users", JSON.stringify(users));
-            alert(`${user.username} has been removed from the system.`);
-            updateUserList();
-            updateAuditLog('Removed', user.username);
-        }
-
-        function changeUserRole(index, role) {
-            users[index].role = role;
-            localStorage.setItem("users", JSON.stringify(users));
-            updateAuditLog('Role changed', users[index].username);
-        }
-
-        function bulkApprove() {
-            pendingUsers.forEach((user, index) => {
-                user.approved = true;
-                users.push(user);
-                updateAuditLog('Bulk approved', user.username);
-            });
-            localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("pendingUsers", JSON.stringify([]));
-            alert("Bulk approval successful.");
-            updatePendingUsersList();
-            updateUserList();
-        }
-
-        function bulkReject() {
-            pendingUsers.forEach((user, index) => {
-                updateAuditLog('Bulk rejected', user.username);
-            });
-            localStorage.setItem("pendingUsers", JSON.stringify([]));
-            alert("Bulk rejection successful.");
-            updatePendingUsersList();
-        }
-
-        function searchUsers() {
-            const searchTerm = document.getElementById("searchUser").value.trim().toLowerCase();
-            const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchTerm));
-            renderFilteredUsers(filteredUsers);
-        }
-
-        function renderFilteredUsers(filteredUsers) {
-            const list = document.getElementById("userList");
-            list.innerHTML = ''; // Clear existing list
-            filteredUsers.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("user-item");
-                listItem.innerHTML = `${user.username} 
-                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
-                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
-                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                    </select>
-                    <button onclick="removeUser(${index})">Remove</button>`;
-                list.appendChild(listItem);
-            });
-        }
-
-        function logout() {
-            switchSection("loginSection");
-        }
-
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            const username = document.getElementById("signinUsername").value.trim();
-            const password = document.getElementById("signinPassword").value.trim();
-
-            if (!username || !password) {
-                document.getElementById("signinError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updatePendingUsersList();
-                updateUserList();
-                renderAuditLog();
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById("signinError").textContent = "Invalid credentials.";
-                return;
-            }
-
-            if (!user.approved) {
-                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                return;
-            }
-
-            switchSection("userDashboard");
+            updateAuditLog('Bulk approved', user.username);
         });
+        localStorage.setItem("users", JSON.stringify(users));
+        localStorage.setItem("pendingUsers", JSON.stringify([]));
+        alert("Bulk approval successful.");
+        updatePendingUsersList();
+        updateUserList();
+    }
 
-        document.getElementById("signupBtn").addEventListener("click", () => {
-            const username = document.getElementById("signupUsername").value.trim();
-            const password = document.getElementById("signupPassword").value.trim();
-            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
-            const secretCode = document.getElementById("signupSecretCode").value.trim();
-
-            if (!username || !password || !confirmPassword || !secretCode) {
-                document.getElementById("signupError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                document.getElementById("signupError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            if (users.some(user => user.username === username)) {
-                document.getElementById("signupError").textContent = "Username already exists.";
-                return;
-            }
-
-            pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-
-            alert("Sign-up successful! Awaiting admin approval.");
-            switchSection("loginSection");
+    // Bulk reject functionality
+    function bulkReject() {
+        pendingUsers.forEach((user, index) => {
+            updateAuditLog('Bulk rejected', user.username);
         });
+        localStorage.setItem("pendingUsers", JSON.stringify([]));
+        alert("Bulk rejection successful.");
+        updatePendingUsersList();
+    }
 
-        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
-            const username = document.getElementById("resetUsername").value.trim();
-            const secretCode = document.getElementById("resetSecretCode").value.trim();
-            const newPassword = document.getElementById("resetNewPassword").value.trim();
-            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+    // Search users functionality
+    function searchUsers() {
+        const searchTerm = document.getElementById("searchUser").value.trim().toLowerCase();
+        const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchTerm));
+        renderFilteredUsers(filteredUsers);
+    }
 
-            if (!username || !secretCode || !newPassword || !confirmPassword) {
-                document.getElementById("resetError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                document.getElementById("resetError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.secretCode === secretCode);
-            if (!user) {
-                document.getElementById("resetError").textContent = "Invalid username or secret code.";
-                return;
-            }
-
-            user.password = newPassword;
-            localStorage.setItem("users", JSON.stringify(users));
-
-            alert("Password reset successful!");
-            switchSection("loginSection");
+    // Render filtered users list
+    function renderFilteredUsers(filteredUsers) {
+        const list = document.getElementById("userList");
+        list.innerHTML = ''; // Clear existing list
+        filteredUsers.forEach((user, index) => {
+            const listItem = document.createElement("li");
+            listItem.classList.add("user-item");
+            listItem.innerHTML = `${user.username} 
+                <select class="role-select" onchange="changeUserRole(${index}, this.value)">
+                    <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
+                    <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
+                </select>
+                <button onclick="removeUser(${index})">Remove</button>`;
+            list.appendChild(listItem);
         });
-    </script>
+    }
+
+    // Remove user functionality
+    function removeUser(index) {
+        const user = users.splice(index, 1)[0];
+        localStorage.setItem("users", JSON.stringify(users));
+        alert(`${user.username} has been removed from the system.`);
+        updateUserList();
+        updateAuditLog('Removed', user.username);
+    }
+
+    // Change user role functionality
+    function changeUserRole(index, role) {
+        users[index].role = role;
+        localStorage.setItem("users", JSON.stringify(users));
+        updateAuditLog('Role changed', users[index].username);
+    }
+
+    // Update audit log
+    function updateAuditLog(action, username) {
+        const log = { action, username, timestamp: new Date().toISOString() };
+        auditLogs.push(log);
+        localStorage.setItem("auditLogs", JSON.stringify(auditLogs));
+        renderAuditLog();
+    }
+
+    // Render audit logs
+    function renderAuditLog() {
+        const list = document.getElementById("auditLog");
+        list.innerHTML = '';
+        auditLogs.forEach(log => {
+            const logItem = document.createElement("li");
+            logItem.classList.add("audit-entry");
+            logItem.innerHTML = `${log.timestamp}: ${log.username} - ${log.action}`;
+            list.appendChild(logItem);
+        });
+    }
+
+</script>
 </body>
 </html>
