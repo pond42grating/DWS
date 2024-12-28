@@ -216,27 +216,34 @@ button:hover {
             adminPassword.value = '';
         });
 
-        // Sign-in functionality
-        signinBtn.addEventListener("click", () => {
-            const username = signinUsername.value.trim();
-            const password = signinPassword.value.trim();
+        // Sign-in
+signinBtn.addEventListener("click", () => {
+    const username = signinUsername.value.trim();
+    const password = signinPassword.value.trim();
 
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                if (user.isApproved) {
-                    alert("Sign In Successful!");
-                    signinUsername.value = '';
-                    signinPassword.value = '';
-                    // Redirect to admin dashboard or user page
-                    adminDashboard.classList.remove("hidden");
-                    document.getElementById("signinSection").classList.add("hidden");
-                } else {
-                    signinError.textContent = "Your account is pending approval.";
-                }
-            } else {
-                signinError.textContent = "Invalid credentials.";
-            }
-        });
+    if (username && password) {
+        // Check if it's an admin login first
+        if (username === "heyman" && password === "12345678") {
+            adminLoggedIn = true;
+            authSection.classList.add("hidden"); // Hide the login section
+            adminSection.classList.add("hidden"); // Hide the admin section
+            adminDashboard.classList.remove("hidden"); // Show the admin dashboard
+            displaySignupRequests(); // Display the sign-up requests
+            return; // Prevent further checks if it's an admin login
+        }
+
+        const user = users.find(user => user.username === username && user.password === password && user.isApproved);
+        
+        if (user) {
+            alert("Login successful! Welcome to the project app.");
+            // Proceed to project entry/dashboard for normal user
+        } else {
+            signinError.textContent = "Invalid credentials or not approved by admin.";
+        }
+    } else {
+        signinError.textContent = "Please fill in all fields.";
+    }
+});
 
         // Admin login functionality
         adminLoginBtn.addEventListener("click", () => {
