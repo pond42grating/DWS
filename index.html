@@ -24,16 +24,18 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #add8e6; /* Light Blue */
-            color: white;
-            padding: 10px;
-            border: none;
-            cursor: pointer;
-            margin: 5px 0;
-        }
-        button:hover {
-            background-color: #87ceeb; /* Light Blue Hover */
-        }
+    background-color: #4b6cb7; /* Dark Blue */
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    margin: 5px 0;
+    border-radius: 5px; /* Optional, to round the button corners */
+}
+
+button:hover {
+    background-color: #3a5f8c; /* Slightly lighter blue on hover */
+}
         .container {
             max-width: 600px;
             margin: auto;
@@ -134,7 +136,8 @@
     <script>
         // Initialize storage for users
         let users = JSON.parse(localStorage.getItem("users")) || [];
-        let adminLoggedIn = false;
+        const adminUsernameStored = "admin"; // Predefined Admin Username
+        const adminPasswordStored = "admin123"; // Predefined Admin Password
 
         // DOM Elements
         const signupBtn = document.getElementById("signupBtn");
@@ -232,6 +235,20 @@
                 }
             } else {
                 signinError.textContent = "Invalid credentials.";
+            }
+        });
+
+        // Admin login functionality
+        adminLoginBtn.addEventListener("click", () => {
+            const username = adminUsername.value.trim();
+            const password = adminPassword.value.trim();
+
+            if (username === adminUsernameStored && password === adminPasswordStored) {
+                alert("Admin Login Successful!");
+                adminDashboard.classList.remove("hidden");
+                adminSection.classList.add("hidden");
+            } else {
+                adminError.textContent = "Invalid Admin credentials.";
             }
         });
 
