@@ -1,332 +1,218 @@
-l<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Registration and Admin Control</title>
+    <title>User Authentication System</title>
     <style>
         body {
-            background-color: #f0f4f8;
             font-family: Arial, sans-serif;
+            background-color: #f0f4f8;
+            padding: 20px;
         }
-        .hidden { display: none; }
-        .auth-section, .error { margin-bottom: 15px; }
-        .back-btn { cursor: pointer; color: blue; font-size: 14px; }
-        .error { color: red; }
+        .hidden {
+            display: none;
+        }
+        .auth-section {
+            margin-bottom: 20px;
+        }
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
         button {
-            background-color: lightblue;
-            padding: 10px 20px;
+            background-color: #4cbbf0;
+            color: white;
             border: none;
-            cursor: pointer;
+            padding: 10px 20px;
             border-radius: 5px;
+            cursor: pointer;
         }
         button:hover {
-            background-color: #4cbbf0;
+            background-color: #38a1db;
+        }
+        .back-btn {
+            cursor: pointer;
+            color: #007bff;
+            text-decoration: underline;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
+    <h1>User Authentication System</h1>
 
-    <h1>User Registration and Admin Control</h1>
-
-    <!-- Authentication Section (Sign-In and Sign-Up) -->
-    <div id="authSection">
-        <!-- Sign-In Section -->
-        <div class="auth-section" id="signinSection">
-            <h2>Sign In</h2>
-            <label for="signinUsername">Username:</label>
-            <input type="text" id="signinUsername" placeholder="Enter Username" required><br><br>
-
-            <label for="signinPassword">Password:</label>
-            <input type="password" id="signinPassword" placeholder="Enter Password" required><br><br>
-
-            <button id="signinBtn">Sign In</button>
-            <p class="error" id="signinError"></p>
-            <button id="goToSignupBtn">Sign Up</button> <!-- Button to go to Sign Up -->
-            <button id="goToForgetPasswordBtn">Forget Password</button> <!-- Button to go to Forget Password -->
-        </div>
-
-        <!-- Sign-Up Section -->
-        <div id="signupSection" class="auth-section hidden">
-            <span class="back-btn" id="backToLoginBtn">← Back to Login</span> <!-- Back Button -->
-            <h2>Sign Up</h2>
-            <label for="signupUsername">Username:</label>
-            <input type="text" id="signupUsername" placeholder="Enter Username" required><br><br>
-
-            <label for="signupPassword">Password:</label>
-            <input type="password" id="signupPassword" placeholder="Enter Password" required><br><br>
-
-            <label for="confirmPassword">Confirm Password:</label>
-            <input type="password" id="confirmPassword" placeholder="Confirm Password" required><br><br>
-
-            <label for="secretCode">Secret Code:</label>
-            <input type="text" id="secretCode" placeholder="Enter Secret Code" required><br><br>
-
-            <button id="signupBtn">Sign Up</button>
-            <p class="error" id="signupError"></p>
-        </div>
-
-        <!-- Forget Password Section -->
-        <div id="forgetPasswordSection" class="auth-section hidden">
-            <span class="back-btn" id="backToSigninBtn">← Back to Sign In</span>
-            <h2>Forget Password</h2>
-            <label for="forgetUsername">Username:</label>
-            <input type="text" id="forgetUsername" placeholder="Enter Username" required><br><br>
-
-            <label for="secretCodeForReset">Secret Code:</label>
-            <input type="text" id="secretCodeForReset" placeholder="Enter Secret Code" required><br><br>
-
-            <label for="newPassword">New Password:</label>
-            <input type="password" id="newPassword" placeholder="Enter New Password" required><br><br>
-
-            <button id="resetPasswordBtn">Reset Password</button>
-            <p class="error" id="resetError"></p>
-        </div>
+    <!-- Sign-In Section -->
+    <div id="signinSection">
+        <h2>Sign In</h2>
+        <label for="signinUsername">Username:</label>
+        <input type="text" id="signinUsername" placeholder="Enter your username"><br><br>
+        <label for="signinPassword">Password:</label>
+        <input type="password" id="signinPassword" placeholder="Enter your password"><br><br>
+        <button id="signinBtn">Sign In</button>
+        <p id="signinError" class="error"></p>
+        <br>
+        <button id="signupPageBtn">Sign Up</button>
+        <button id="forgetPasswordPageBtn">Forgot Password</button>
     </div>
 
-    <!-- Admin Login Section -->
-    <div id="adminSection" class="hidden">
-        <h2>Admin Login</h2>
-        <label for="adminUsername">Admin Username:</label>
-        <input type="text" id="adminUsername" placeholder="Enter Admin Username" required><br><br>
-
-        <label for="adminPassword">Admin Password:</label>
-        <input type="password" id="adminPassword" placeholder="Enter Admin Password" required><br><br>
-
-        <button id="adminLoginBtn">Login as Admin</button>
-        <p class="error" id="adminError"></p>
+    <!-- Sign-Up Section -->
+    <div id="signupSection" class="hidden">
+        <span id="backToSigninFromSignup" class="back-btn">← Back to Sign In</span>
+        <h2>Sign Up</h2>
+        <label for="signupUsername">Username:</label>
+        <input type="text" id="signupUsername" placeholder="Choose a username"><br><br>
+        <label for="signupPassword">Password:</label>
+        <input type="password" id="signupPassword" placeholder="Choose a password"><br><br>
+        <label for="confirmSignupPassword">Confirm Password:</label>
+        <input type="password" id="confirmSignupPassword" placeholder="Confirm your password"><br><br>
+        <label for="signupSecretCode">Secret Code:</label>
+        <input type="text" id="signupSecretCode" placeholder="Enter a secret code"><br><br>
+        <button id="signupBtn">Sign Up</button>
+        <p id="signupError" class="error"></p>
     </div>
 
-    <!-- Admin Dashboard (After Admin Login) -->
+    <!-- Forget Password Section -->
+    <div id="forgetPasswordSection" class="hidden">
+        <span id="backToSigninFromForgetPassword" class="back-btn">← Back to Sign In</span>
+        <h2>Forgot Password</h2>
+        <label for="forgetUsername">Username:</label>
+        <input type="text" id="forgetUsername" placeholder="Enter your username"><br><br>
+        <label for="forgetSecretCode">Secret Code:</label>
+        <input type="text" id="forgetSecretCode" placeholder="Enter your secret code"><br><br>
+        <label for="newPassword">New Password:</label>
+        <input type="password" id="newPassword" placeholder="Enter your new password"><br><br>
+        <button id="resetPasswordBtn">Reset Password</button>
+        <p id="forgetPasswordError" class="error"></p>
+    </div>
+
+    <!-- Admin Dashboard -->
     <div id="adminDashboard" class="hidden">
-        <span class="back-btn" id="backToSignInFromAdminBtn">← Back to Sign In</span>
-        <button id="logoutBtn">Logout</button>
+        <span id="logoutBtn" class="back-btn">← Log Out</span>
         <h2>Admin Dashboard</h2>
-        <h3>Sign-Up Requests</h3>
-        <ul id="signupRequestsList"></ul>
+        <p>Welcome to the admin dashboard.</p>
     </div>
 
     <script>
-        // Initialize storage for users
-        let users = JSON.parse(localStorage.getItem("users")) || [];
-        let adminLoggedIn = false;
+        let users = JSON.parse(localStorage.getItem('users')) || [];
 
         // DOM Elements
-        const signupBtn = document.getElementById("signupBtn");
-        const signinBtn = document.getElementById("signinBtn");
-        const adminLoginBtn = document.getElementById("adminLoginBtn");
-        const resetPasswordBtn = document.getElementById("resetPasswordBtn");
+        const signinSection = document.getElementById('signinSection');
+        const signupSection = document.getElementById('signupSection');
+        const forgetPasswordSection = document.getElementById('forgetPasswordSection');
+        const adminDashboard = document.getElementById('adminDashboard');
 
-        const signupUsername = document.getElementById("signupUsername");
-        const signupPassword = document.getElementById("signupPassword");
-        const confirmPassword = document.getElementById("confirmPassword");
-        const secretCode = document.getElementById("secretCode");
+        const signinUsername = document.getElementById('signinUsername');
+        const signinPassword = document.getElementById('signinPassword');
+        const signinError = document.getElementById('signinError');
 
-        const signinUsername = document.getElementById("signinUsername");
-        const signinPassword = document.getElementById("signinPassword");
+        const signupUsername = document.getElementById('signupUsername');
+        const signupPassword = document.getElementById('signupPassword');
+        const confirmSignupPassword = document.getElementById('confirmSignupPassword');
+        const signupSecretCode = document.getElementById('signupSecretCode');
+        const signupError = document.getElementById('signupError');
 
-        const forgetUsername = document.getElementById("forgetUsername");
-        const secretCodeForReset = document.getElementById("secretCodeForReset");
-        const newPassword = document.getElementById("newPassword");
+        const forgetUsername = document.getElementById('forgetUsername');
+        const forgetSecretCode = document.getElementById('forgetSecretCode');
+        const newPassword = document.getElementById('newPassword');
+        const forgetPasswordError = document.getElementById('forgetPasswordError');
 
-        const adminUsername = document.getElementById("adminUsername");
-        const adminPassword = document.getElementById("adminPassword");
-
-        const signupError = document.getElementById("signupError");
-        const signinError = document.getElementById("signinError");
-        const adminError = document.getElementById("adminError");
-        const resetError = document.getElementById("resetError");
-
-        const authSection = document.getElementById("authSection");
-        const signupSection = document.getElementById("signupSection");
-        const forgetPasswordSection = document.getElementById("forgetPasswordSection");
-        const adminSection = document.getElementById("adminSection");
-        const adminDashboard = document.getElementById("adminDashboard");
-
-        const signupRequestsList = document.getElementById("signupRequestsList");
-
-        // Show sign-up form
-        document.getElementById("goToSignupBtn").addEventListener("click", () => {
-            document.getElementById("signinSection").classList.add("hidden");
-            signupSection.classList.remove("hidden");
-        });
-
-        // Go back to login screen from sign-up
-        document.getElementById("backToLoginBtn").addEventListener("click", () => {
-            signupSection.classList.add("hidden");
-            document.getElementById("signinSection").classList.remove("hidden");
-
-            // Clear Sign Up fields when coming back to Login
-            signupUsername.value = '';
-            signupPassword.value = '';
-            confirmPassword.value = '';
-            secretCode.value = '';
-        });
-
-        // Go back to login screen from forget password
-        document.getElementById("backToSigninBtn").addEventListener("click", () => {
-            forgetPasswordSection.classList.add("hidden");
-            document.getElementById("signinSection").classList.remove("hidden");
-
-            // Clear Forget Password fields when coming back to Sign In
-            forgetUsername.value = '';
-            secretCodeForReset.value = '';
-            newPassword.value = '';
-        });
-
-        // Go back to Sign-In screen from admin dashboard
-        document.getElementById("backToSignInFromAdminBtn").addEventListener("click", () => {
-            authSection.classList.remove("hidden"); // Show the sign-in section
-            adminDashboard.classList.add("hidden"); // Hide the admin dashboard
-
-            // Clear Admin Login fields when coming back to Sign In
-            adminUsername.value = '';
-            adminPassword.value = '';
-        });
-
-        // Logout from Admin Dashboard
-        document.getElementById("logoutBtn").addEventListener("click", () => {
-            adminLoggedIn = false;
-            adminDashboard.classList.add("hidden");
-            authSection.classList.remove("hidden");
-            adminUsername.value = '';
-            adminPassword.value = '';
-        });
-
-        // Sign-up a new user
-        signupBtn.addEventListener("click", () => {
-            const username = signupUsername.value.trim();
-            const password = signupPassword.value.trim();
-            const confirmPass = confirmPassword.value.trim();
-            const secret = secretCode.value.trim();
-
-            if (username && password && confirmPass && secret) {
-                if (password !== confirmPass) {
-                    signupError.textContent = "Passwords do not match.";
-                    return;
-                }
-
-                const existingUser = users.find(user => user.username === username);
-                if (existingUser) {
-                    signupError.textContent = "Username already exists.";
-                } else {
-                    users.push({ username, password, secret, isApproved: false });
-                    localStorage.setItem("users", JSON.stringify(users));
-                    signupError.textContent = "Sign up successful! Await admin approval.";
-                    signupUsername.value = '';
-                    signupPassword.value = '';
-                    confirmPassword.value = '';
-                    secretCode.value = '';
-                }
-            } else {
-                signupError.textContent = "Please fill in all fields.";
-            }
-        });
-
-        // Sign-in
-        signinBtn.addEventListener("click", () => {
+        // Event Listeners
+        document.getElementById('signinBtn').addEventListener('click', () => {
             const username = signinUsername.value.trim();
             const password = signinPassword.value.trim();
 
-            if (username && password) {
-                // Check if it's an admin login first
-                if (username === "admin" && password === "admin123") {
-                    adminLoggedIn = true;
-                    authSection.classList.add("hidden"); // Hide the login section
-                    adminSection.classList.add("hidden"); // Hide the admin section
-                    adminDashboard.classList.remove("hidden"); // Show the admin dashboard
-                    displaySignupRequests();
-                    return;
-                }
+            if (!username || !password) {
+                signinError.textContent = "All fields are required.";
+                return;
+            }
 
-                const user = users.find(user => user.username === username && user.password === password && user.isApproved);
-                
-                if (user) {
-                    alert("Login successful! Welcome to the project app.");
-                    // Proceed to project entry/dashboard
-                } else {
-                    signinError.textContent = "Invalid credentials or not approved by admin.";
-                }
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                signinError.textContent = "Sign-in successful!";
+                clearInputs();
             } else {
-                signinError.textContent = "Please fill in all fields.";
+                signinError.textContent = "Invalid credentials.";
             }
         });
 
-        // Admin login
-        adminLoginBtn.addEventListener("click", () => {
-            const adminUsernameInput = adminUsername.value.trim();
-            const adminPasswordInput = adminPassword.value.trim();
-
-            if (adminUsernameInput === "admin" && adminPasswordInput === "admin123") {
-                adminLoggedIn = true;
-                adminSection.classList.add("hidden"); // Hide admin login
-                adminDashboard.classList.remove("hidden"); // Show admin dashboard
-                displaySignupRequests();
-            } else {
-                adminError.textContent = "Invalid admin credentials.";
-            }
+        document.getElementById('signupPageBtn').addEventListener('click', () => {
+            signinSection.classList.add('hidden');
+            signupSection.classList.remove('hidden');
         });
 
-        // Display sign-up requests for admin to approve/reject
-        const displaySignupRequests = () => {
-            signupRequestsList.innerHTML = "";
-            const pendingUsers = users.filter(user => !user.isApproved);
-            pendingUsers.forEach(user => {
-                const li = document.createElement("li");
-                li.textContent = `${user.username} (Pending Approval)`;
+        document.getElementById('backToSigninFromSignup').addEventListener('click', () => {
+            clearInputs();
+            signupSection.classList.add('hidden');
+            signinSection.classList.remove('hidden');
+        });
 
-                const approveBtn = document.createElement("button");
-                approveBtn.textContent = "Approve";
-                approveBtn.onclick = () => approveUser(user);
+        document.getElementById('signupBtn').addEventListener('click', () => {
+            const username = signupUsername.value.trim();
+            const password = signupPassword.value.trim();
+            const confirmPassword = confirmSignupPassword.value.trim();
+            const secretCode = signupSecretCode.value.trim();
 
-                const rejectBtn = document.createElement("button");
-                rejectBtn.textContent = "Reject";
-                rejectBtn.onclick = () => rejectUser(user);
+            if (!username || !password || !confirmPassword || !secretCode) {
+                signupError.textContent = "All fields are required.";
+                return;
+            }
 
-                li.appendChild(approveBtn);
-                li.appendChild(rejectBtn);
-                signupRequestsList.appendChild(li);
-            });
-        };
+            if (password !== confirmPassword) {
+                signupError.textContent = "Passwords do not match.";
+                return;
+            }
 
-        // Approve user
-        const approveUser = (user) => {
-            user.isApproved = true;
-            localStorage.setItem("users", JSON.stringify(users));
-            displaySignupRequests();
-        };
+            users.push({ username, password, secretCode });
+            localStorage.setItem('users', JSON.stringify(users));
+            signupError.textContent = "Sign-up successful!";
+            clearInputs();
+        });
 
-        // Reject user
-        const rejectUser = (user) => {
-            users = users.filter(u => u !== user);
-            localStorage.setItem("users", JSON.stringify(users));
-            displaySignupRequests();
-        };
+        document.getElementById('forgetPasswordPageBtn').addEventListener('click', () => {
+            signinSection.classList.add('hidden');
+            forgetPasswordSection.classList.remove('hidden');
+        });
 
-        // Reset password
-        resetPasswordBtn.addEventListener("click", () => {
+        document.getElementById('backToSigninFromForgetPassword').addEventListener('click', () => {
+            clearInputs();
+            forgetPasswordSection.classList.add('hidden');
+            signinSection.classList.remove('hidden');
+        });
+
+        document.getElementById('resetPasswordBtn').addEventListener('click', () => {
             const username = forgetUsername.value.trim();
-            const secret = secretCodeForReset.value.trim();
+            const secretCode = forgetSecretCode.value.trim();
             const newPass = newPassword.value.trim();
 
-            if (username && secret && newPass) {
-                const user = users.find(user => user.username === username && user.secret === secret);
-                
-                if (user) {
-                    user.password = newPass;
-                    localStorage.setItem("users", JSON.stringify(users));
-                    resetError.textContent = "Password reset successful!";
-                    forgetUsername.value = '';
-                    secretCodeForReset.value = '';
-                    newPassword.value = '';
-                } else {
-                    resetError.textContent = "Invalid username or secret code.";
-                }
+            if (!username || !secretCode || !newPass) {
+                forgetPasswordError.textContent = "All fields are required.";
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.secretCode === secretCode);
+            if (user) {
+                user.password = newPass;
+                localStorage.setItem('users', JSON.stringify(users));
+                forgetPasswordError.textContent = "Password reset successful!";
+                clearInputs();
             } else {
-                resetError.textContent = "Please fill in all fields.";
+                forgetPasswordError.textContent = "Invalid username or secret code.";
             }
         });
-    </script>
 
+        // Utility to clear all input fields
+        function clearInputs() {
+            signinUsername.value = '';
+            signinPassword.value = '';
+            signupUsername.value = '';
+            signupPassword.value = '';
+            confirmSignupPassword.value = '';
+            signupSecretCode.value = '';
+            forgetUsername.value = '';
+            forgetSecretCode.value = '';
+            newPassword.value = '';
+        }
+    </script>
 </body>
 </html>
