@@ -6,16 +6,17 @@
   <title>DWS Management System</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
       background-color: #f4f4f4;
       margin: 0;
       padding: 0;
     }
 
     .container {
-      width: 80%;
+      width: 90%;
+      max-width: 800px;
       margin: 50px auto;
-      padding: 20px;
+      padding: 30px;
       background-color: #fff;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -23,38 +24,43 @@
 
     .header {
       text-align: center;
-      margin-bottom: 20px;
-      font-size: 24px;
+      margin-bottom: 30px;
+      font-size: 26px;
       color: #333;
     }
 
     .form-group {
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
 
     .form-group label {
       font-size: 14px;
       font-weight: bold;
+      color: #333;
+      display: block;
+      margin-bottom: 5px;
     }
 
     .form-group input,
     .form-group select {
       width: 100%;
-      padding: 8px;
+      padding: 12px;
       font-size: 14px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      margin-top: 5px;
+      box-sizing: border-box;
     }
 
     .form-group button {
-      padding: 10px 20px;
+      width: 100%;
+      padding: 12px;
       background-color: #007bff;
       color: white;
       font-size: 16px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      transition: background-color 0.3s;
     }
 
     .form-group button:hover {
@@ -66,32 +72,38 @@
     }
 
     .preview-item {
-      background-color: #f8f8f8;
-      padding: 10px;
-      margin: 5px 0;
+      background-color: #f9f9f9;
+      padding: 12px;
+      margin: 10px 0;
       border: 1px solid #ddd;
       border-radius: 4px;
+      display: flex;
+      flex-wrap: wrap;
     }
 
     .preview-item span {
       display: inline-block;
-      width: 200px;
+      width: 45%;
+      margin-right: 10px;
+      margin-bottom: 10px;
+      color: #333;
     }
 
-    .preview-list {
-      margin-top: 20px;
+    .preview-item span:last-child {
+      margin-right: 0;
     }
 
     .back-button {
-      display: inline-block;
-      margin-top: 20px;
-      padding: 10px 20px;
+      padding: 12px 20px;
       background-color: #28a745;
       color: white;
       font-size: 16px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      display: block;
+      width: 100%;
+      margin-top: 20px;
     }
 
     .back-button:hover {
@@ -153,24 +165,78 @@
   </div>
 
   <script>
-    // Functionality for preview and saving data will be added here
+    // Preview and Save Functionality for Manpower, Equipment, and Consumable
+    let manpowerList = [];
+    let equipmentList = [];
+    let consumableList = [];
+
     document.getElementById('add-manpower').addEventListener('click', function() {
       let structureName = document.getElementById('structure-name').value;
       let siNo = document.getElementById('si-no').value;
       let workDescription = document.getElementById('work-description').value;
       let location = document.getElementById('location').value;
-      let previewContainer = document.getElementById('preview-container');
       
       let manpowerPreview = document.createElement('div');
       manpowerPreview.classList.add('preview-item');
-      manpowerPreview.innerHTML = `<span>Structure: ${structureName}</span> <span>SI No.: ${siNo}</span> <span>Work: ${workDescription}</span> <span>Location: ${location}</span>`;
-      
-      previewContainer.appendChild(manpowerPreview);
+      manpowerPreview.innerHTML = `
+        <span>Structure: ${structureName}</span> 
+        <span>SI No.: ${siNo}</span>
+        <span>Work: ${workDescription}</span>
+        <span>Location: ${location}</span>
+      `;
+      manpowerList.push({structureName, siNo, workDescription, location});
+      document.getElementById('preview-container').appendChild(manpowerPreview);
+    });
+
+    document.getElementById('add-equipment').addEventListener('click', function() {
+      let structureName = document.getElementById('structure-name').value;
+      let siNo = document.getElementById('si-no').value;
+      let workDescription = document.getElementById('work-description').value;
+      let location = document.getElementById('location').value;
+
+      let equipmentPreview = document.createElement('div');
+      equipmentPreview.classList.add('preview-item');
+      equipmentPreview.innerHTML = `
+        <span>Structure: ${structureName}</span>
+        <span>SI No.: ${siNo}</span>
+        <span>Work: ${workDescription}</span>
+        <span>Location: ${location}</span>
+      `;
+      equipmentList.push({structureName, siNo, workDescription, location});
+      document.getElementById('preview-container').appendChild(equipmentPreview);
+    });
+
+    document.getElementById('add-consumable').addEventListener('click', function() {
+      let structureName = document.getElementById('structure-name').value;
+      let siNo = document.getElementById('si-no').value;
+      let workDescription = document.getElementById('work-description').value;
+      let location = document.getElementById('location').value;
+
+      let consumablePreview = document.createElement('div');
+      consumablePreview.classList.add('preview-item');
+      consumablePreview.innerHTML = `
+        <span>Structure: ${structureName}</span>
+        <span>SI No.: ${siNo}</span>
+        <span>Work: ${workDescription}</span>
+        <span>Location: ${location}</span>
+      `;
+      consumableList.push({structureName, siNo, workDescription, location});
+      document.getElementById('preview-container').appendChild(consumablePreview);
+    });
+
+    document.getElementById('save-dws').addEventListener('click', function() {
+      const dwsData = {
+        manpower: manpowerList,
+        equipment: equipmentList,
+        consumable: consumableList
+      };
+      localStorage.setItem('savedDWS', JSON.stringify(dwsData));
+      alert('DWS data saved!');
     });
 
     document.getElementById('back-button').addEventListener('click', function() {
       // Code to navigate back to home or previous page
-      alert("Going back to home page.");
+      alert('Going back to home page.');
     });
   </script>
 </body>
