@@ -24,7 +24,7 @@
             box-sizing: border-box;
         }
         button {
-            background-color: #4CAF50;
+            background-color: #add8e6; /* Light Blue */
             color: white;
             padding: 10px;
             border: none;
@@ -32,7 +32,7 @@
             margin: 5px 0;
         }
         button:hover {
-            background-color: #45a049;
+            background-color: #87ceeb; /* Light Blue Hover */
         }
         .container {
             max-width: 600px;
@@ -211,6 +211,28 @@
             // Clear Admin Login fields
             adminUsername.value = '';
             adminPassword.value = '';
+        });
+
+        // Sign-in functionality
+        signinBtn.addEventListener("click", () => {
+            const username = signinUsername.value.trim();
+            const password = signinPassword.value.trim();
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (user) {
+                if (user.isApproved) {
+                    alert("Sign In Successful!");
+                    signinUsername.value = '';
+                    signinPassword.value = '';
+                    // Redirect to admin dashboard or user page
+                    adminDashboard.classList.remove("hidden");
+                    document.getElementById("signinSection").classList.add("hidden");
+                } else {
+                    signinError.textContent = "Your account is pending approval.";
+                }
+            } else {
+                signinError.textContent = "Invalid credentials.";
+            }
         });
 
         // Sign-up a new user with password confirmation
