@@ -81,34 +81,10 @@
             display: flex;
             justify-content: space-between;
         }
-
-        .user-list {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px;
-            margin: 5px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Admin Login Section -->
-        <div id="adminLoginSection">
-            <h1>Admin Login</h1>
-            <input type="text" id="adminUsername" placeholder="Enter Admin Username">
-            <input type="password" id="adminPassword" placeholder="Enter Admin Password">
-            <button id="adminLoginBtn">Log In</button>
-            <p id="adminLoginError" class="error"></p>
-            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
-        </div>
-
         <!-- Login Section -->
         <div id="loginSection">
             <h1>Login</h1>
@@ -145,12 +121,15 @@
         </div>
 
         <!-- Admin Dashboard Section -->
-        <div id="adminDashboard" class="hidden">
-            <h1>Admin Dashboard</h1>
-            <h3>All Users</h3>
-            <ul id="userList" class="user-list"></ul>
-            <button onclick="logout()">Log Out</button>
-        </div>
+<div id="adminDashboard" class="hidden">
+    <h1>Admin Dashboard</h1>
+    <h3>Pending User Approvals</h3>
+    <ul id="pendingUsersList" class="pending-users-list"></ul>
+    <h3>Total Users: <span id="totalUsersCount">0</span></h3> <!-- Added user count -->
+    <h3>Registered Users</h3>
+    <ul id="userList" class="pending-users-list"></ul> <!-- Added list of users -->
+    <button onclick="logout()">Log Out</button>
+</div>
 
         <!-- User Dashboard Section -->
         <div id="userDashboard" class="hidden">
@@ -176,36 +155,58 @@
             document.querySelectorAll('.error').forEach(error => error.textContent = '');
         }
 
-        function updateUserList() {
-            const list = document.getElementById("userList");
+        function updatePendingUsersList() {
+            const list = document.getElementById("pendingUsersList");
             list.innerHTML = '';
-            users.forEach((user, index) => {
+            pendingUsers.forEach((user, index) => {
                 const listItem = document.createElement("li");
-                listItem.classList.add("user-item");
+                listItem.classList.add("pending-user");
                 listItem.innerHTML = `${user.username} 
-                    <button onclick="removeUser(${index})">Remove</button>`;
+                    <button onclick="approveUser(${index})">Approve</button>
+                    <button onclick="rejectUser(${index})">Reject</button>`;
                 list.appendChild(listItem);
             });
         }
 
-        function removeUser(index) {
-            users.splice(index, 1);
+        function approveUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            user.approved = true;  // Mark user as approved
+            users.push(user);
             localStorage.setItem("users", JSON.stringify(users));
-            updateUserList();
-            alert("User removed!");
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User approved!");
+            updatePendingUsersList();
         }
 
-        document.getElementById("adminLoginBtn").addEventListener("click", () => {
-            const username = document.getElementById("adminUsername").value.trim();
-            const password = document.getElementById("adminPassword").value.trim();
+        function rejectUser(index) {
+            pendingUsers.splice(index, 1);
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User rejected!");
+            updatePendingUsersList();
+        }
+        
+        // Update the admin dashboard to show the list of registered users and user count
+function updateUserList() {
+    const list = document.getElementById("userList");
+    const totalUsersCount = document.getElementById("totalUsersCount");
+    list.innerHTML = ''; // Clear existing user list
+    users.forEach((user, index) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("pending-user");
+        listItem.innerHTML = `${user.username} 
+            <button onclick="removeUser(${index})">Remove</button>`;
+        list.appendChild(listItem);
+    });
+    totalUsersCount.textContent = users.length; // Update total users count
+}
 
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updateUserList();
-            } else {
-                document.getElementById("adminLoginError").textContent = "Invalid admin credentials.";
-            }
-        });
+// Remove a user from the list
+function removeUser(index) {
+    const user = users.splice(index, 1)[0]; // Remove from the users list
+    localStorage.setItem("users", JSON.stringify(users)); // Update the local storage
+    alert(`${user.username} has been removed from the system.`);
+    updateUserList(); // Re-render the updated user list
+}
 
         document.getElementById("signinBtn").addEventListener("click", () => {
             const username = document.getElementById("signinUsername").value.trim();
@@ -218,7 +219,7 @@
 
             if (username === "admin" && password === "admin123") {
                 switchSection("adminDashboard");
-                updateUserList();
+                updatePendingUsersList();
                 return;
             }
 
@@ -244,7 +245,7 @@
             const secretCode = document.getElementById("signupSecretCode").value.trim();
 
             if (!username || !password || !confirmPassword || !secretCode) {
-                            document.getElementById("signupError").textContent = "Please fill in all fields.";
+                document.getElementById("signupError").textContent = "Please fill in all fields.";
                 return;
             }
 
