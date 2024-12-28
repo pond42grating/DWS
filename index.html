@@ -248,8 +248,8 @@ function updatePendingUsersList() {
         const listItem = document.createElement("li");
         listItem.classList.add("pending-user");
         listItem.innerHTML = `${user.username} 
-            <button onclick="approveUser(${index})">Approve</button>
-            <button onclick="rejectUser(${index})">Reject</button>`;
+            <button class="approve" onclick="approveUser(${index})">Approve</button>
+            <button class="reject" onclick="rejectUser(${index})">Reject</button>`;
         list.appendChild(listItem);
     });
 }
