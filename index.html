@@ -188,7 +188,7 @@
     <h3>Total Users: <span id="totalUsersCount">0</span></h3> <!-- Added user count -->
     <h3>Registered Users</h3>
     <ul id="userList" class="pending-users-list"></ul> <!-- Added list of users -->
-    <button onclick="logout()">Log Out</button>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
 </div>
 
         <!-- User Dashboard Section -->
@@ -254,7 +254,7 @@ function updateUserList() {
         const listItem = document.createElement("li");
         listItem.classList.add("pending-user");
         listItem.innerHTML = `${user.username} 
-            <button onclick="removeUser(${index})">Remove</button>`;
+            <button class="remove-btn" onclick="removeUser(${index})">Remove</button>`;
         list.appendChild(listItem);
     });
     totalUsersCount.textContent = users.length; // Update total users count
@@ -266,6 +266,11 @@ function removeUser(index) {
     localStorage.setItem("users", JSON.stringify(users)); // Update the local storage
     alert(`${user.username} has been removed from the system.`);
     updateUserList(); // Re-render the updated user list
+}
+
+// Log out function
+function logout() {
+    switchSection("loginSection");
 }
 
 function updatePendingUsersList() {
