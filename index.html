@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-in-One Authentication System</title>
+    <title>Create, Manage, and Search DWS</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -22,14 +22,14 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             width: 100%;
-            max-width: 800px;
+            max-width: 1000px;
         }
 
-        h1, h3 {
+        h1 {
             text-align: center;
         }
 
-        input {
+        input, select {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
@@ -55,451 +55,331 @@
             display: none;
         }
 
-        .error {
-            color: red;
-            font-size: 0.9em;
+        .table-container {
+            margin-top: 20px;
         }
 
-        .link-button {
-            background: none;
-            color: blue;
-            border: none;
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 0;
+        table {
+            width: 100%;
+            border-collapse: collapse;
         }
 
-        .pending-users-list, .user-list, .audit-log {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        .pending-user, .user-item, .audit-entry {
+        th, td {
+            border: 1px solid #ddd;
             padding: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 5px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .export-btns {
+            margin-top: 20px;
             display: flex;
             justify-content: space-between;
-        }
-
-        .role-select {
-            width: 150px;
-        }
-
-        .bulk-actions {
-            margin: 20px 0;
-        }
-
-        .bulk-actions button {
-            width: auto;
-            background-color: #28a745;
         }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <!-- Login Section -->
-        <div id="loginSection">
-            <h1>Login</h1>
-            <input type="text" id="signinUsername" placeholder="Enter Username">
-            <input type="password" id="signinPassword" placeholder="Enter Password">
-            <button id="signinBtn">Sign In</button>
-            <p id="signinError" class="error"></p>
-            <button class="link-button" onclick="switchSection('signupSection')">Sign Up</button>
-            <button class="link-button" onclick="switchSection('forgotPasswordSection')">Forgot Password</button>
+        <!-- Create DWS Section -->
+        <div id="createDWSSection">
+            <h1>Create DWS</h1>
+            <form id="createDWSForm">
+                <input type="text" id="dwsNo" placeholder="DWS No." required>
+                <input type="date" id="date" placeholder="Date" required>
+                <input type="text" id="structureName" placeholder="Structure Name" required>
+                <input type="text" id="siNo" placeholder="SI No." required>
+                <input type="text" id="workDescription" placeholder="Work Description" required>
+                <input type="text" id="location" placeholder="Location" required>
+                <!-- Manpower Section -->
+                <h3>Manpower</h3>
+                <div id="manpowerSection">
+                    <div class="manpower-entry">
+                        <input type="text" class="badgeNo" placeholder="Badge No.">
+                        <input type="text" class="manpowerName" placeholder="Name">
+                        <input type="number" class="normalHours" placeholder="Normal Hours">
+                        <input type="number" class="otHours" placeholder="OT Hours">
+                        <input type="number" class="holiday" placeholder="Holiday Hours">
+                    </div>
+                </div>
+                <button type="button" id="addManpowerBtn">Add Manpower</button>
+                <!-- Equipment Section -->
+                <h3>Equipment</h3>
+                <div id="equipmentSection">
+                    <div class="equipment-entry">
+                        <input type="text" class="equipmentName" placeholder="Equipment Name">
+                        <input type="number" class="workingHours" placeholder="Working Hours">
+                    </div>
+                </div>
+                <button type="button" id="addEquipmentBtn">Add Equipment</button>
+                <!-- Consumables Section -->
+                <h3>Consumables / Materials</h3>
+                <div id="consumablesSection">
+                    <div class="consumables-entry">
+                        <input type="text" class="consumableName" placeholder="Consumables Name">
+                        <input type="number" class="quantity" placeholder="Quantity">
+                    </div>
+                </div>
+                <button type="button" id="addConsumableBtn">Add Consumable</button>
+                <button type="submit" id="saveDWSBtn">Save DWS</button>
+            </form>
         </div>
 
-        <!-- Sign-Up Section -->
-        <div id="signupSection" class="hidden">
-            <h1>Sign Up</h1>
-            <input type="text" id="signupUsername" placeholder="Enter Username">
-            <input type="password" id="signupPassword" placeholder="Enter Password">
-            <input type="password" id="signupConfirmPassword" placeholder="Confirm Password">
-            <input type="text" id="signupSecretCode" placeholder="Enter Secret Code">
-            <button id="signupBtn">Sign Up</button>
-            <p id="signupError" class="error"></p>
-            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
-        </div>
-
-        <!-- Forgot Password Section -->
-        <div id="forgotPasswordSection" class="hidden">
-            <h1>Forgot Password</h1>
-            <input type="text" id="resetUsername" placeholder="Enter Username">
-            <input type="text" id="resetSecretCode" placeholder="Enter Secret Code">
-            <input type="password" id="resetNewPassword" placeholder="Enter New Password">
-            <input type="password" id="resetConfirmPassword" placeholder="Confirm New Password">
-            <button id="resetPasswordBtn">Reset Password</button>
-            <p id="resetError" class="error"></p>
-            <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
-        </div>
-
-        <!-- Admin Dashboard Section -->
-        <div id="adminDashboard" class="hidden">
-            <h1>Admin Dashboard</h1>
-
-            <!-- Search Users -->
-            <input type="text" id="searchUser" placeholder="Search User by Username" oninput="searchUsers()">
-
-            <!-- User Role Management -->
-            <div class="bulk-actions">
-                <button onclick="bulkApprove()">Bulk Approve</button>
-                <button onclick="bulkReject()">Bulk Reject</button>
+        <!-- Manage DWS Section -->
+        <div id="manageDWSSection" class="hidden">
+            <h1>Manage DWS</h1>
+            <div class="table-container">
+                <table id="dwsTable">
+                    <thead>
+                        <tr>
+                            <th>DWS No.</th>
+                            <th>Date</th>
+                            <th>Structure Name</th>
+                            <th>SI No.</th>
+                            <th>Work Description</th>
+                            <th>Location</th>
+                            <th>Manpower</th>
+                            <th>Equipment</th>
+                            <th>Consumables</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dwsTableBody">
+                    </tbody>
+                </table>
             </div>
-
-            <h3>Pending User Approvals</h3>
-            <ul id="pendingUsersList" class="pending-users-list"></ul>
-            <h3>Total Users: <span id="totalUsersCount">0</span></h3>
-
-            <h3>Registered Users</h3>
-            <ul id="userList" class="user-list"></ul>
-
-            <h3>Audit Logs</h3>
-            <ul id="auditLog" class="audit-log"></ul>
-
-            <button onclick="logout()">Log Out</button>
-        </div>
-
-        <!-- User Dashboard Section -->
-        <div id="userDashboard" class="hidden">
-            <h1>User Dashboard</h1>
-            <button onclick="logout()">Log Out</button>
-            <h3>Welcome to the User Dashboard</h3>
-            <button id="createDWSBtn">Create DWS</button>
-            <button id="manageDWSBtn">Manage DWS</button>
-            <button id="searchDWSBtn">Search DWS</button>
-
-            <div id="createDWSSection" class="hidden">
-                <h3>Create DWS</h3>
-                <button onclick="createDWS()">Create DWS</button>
-                <p id="dwsMessage"></p>
-            </div>
-
-            <div id="manageDWSSection" class="hidden">
-                <h3>Manage Your DWS</h3>
-                <ul id="userDWSList"></ul>
-            </div>
-
-            <div id="searchDWSSection" class="hidden">
-                <h3>Search DWS by Number</h3>
-                <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
-                <button onclick="searchDWS()">Search</button>
-                <p id="dwsSearchResult"></p>
+            <div class="export-btns">
+                <button id="exportToExcelBtn">Export to Excel</button>
+                <button id="exportToPDFBtn">Export to PDF</button>
             </div>
         </div>
 
+        <!-- Search DWS Section -->
+        <div id="searchDWSSection" class="hidden">
+            <h1>Search DWS</h1>
+            <input type="text" id="searchDWSNo" placeholder="Enter DWS No.">
+            <button type="button" id="searchDWSBtn">Search</button>
+            <div id="searchResult"></div>
+        </div>
     </div>
 
     <script>
-        const users = JSON.parse(localStorage.getItem("users")) || [];
-        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+        let dwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+        let currentDWSNo = dwsData.length + 1;
 
-        // Helper function to update local storage
-        function updateUsers() {
-            localStorage.setItem("users", JSON.stringify(users));
-        }
-
-        // Handle the "Create DWS" button
-        document.getElementById("createDWSBtn").addEventListener("click", () => {
-            switchSection("createDWSSection");
+        document.getElementById('addManpowerBtn').addEventListener('click', () => {
+            const manpowerEntry = document.createElement('div');
+            manpowerEntry.classList.add('manpower-entry');
+            manpowerEntry.innerHTML = `
+                <input type="text" class="badgeNo" placeholder="Badge No.">
+                <input type="text" class="manpowerName" placeholder="Name">
+                <input type="number" class="normalHours" placeholder="Normal Hours">
+                <input type="number" class="otHours" placeholder="OT Hours">
+                <input type="number" class="holiday" placeholder="Holiday Hours">
+            `;
+            document.getElementById('manpowerSection').appendChild(manpowerEntry);
         });
 
-        function createDWS() {
-            const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
-            if (!user) return;
+        document.getElementById('addEquipmentBtn').addEventListener('click', () => {
+            const equipmentEntry = document.createElement('div');
+            equipmentEntry.classList.add('equipment-entry');
+            equipmentEntry.innerHTML = `
+                <input type="text" class="equipmentName" placeholder="Equipment Name">
+                <input type="number" class="workingHours" placeholder="Working Hours">
+            `;
+            document.getElementById('equipmentSection').appendChild(equipmentEntry);
+        });
 
-            const newDWS = {
-                dwsNumber: users.length + 1,  // Unique number based on the current number of users
-                createdAt: new Date(),
+        document.getElementById('addConsumableBtn').addEventListener('click', () => {
+            const consumableEntry = document.createElement('div');
+            consumableEntry.classList.add('consumables-entry');
+            consumableEntry.innerHTML = `
+                <input type="text" class="consumableName" placeholder="Consumable Name">
+                <input type="number" class="quantity" placeholder="Quantity">
+            `;
+            document.getElementById('consumablesSection').appendChild(consumableEntry);
+        });
+
+        document.getElementById('createDWSForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const dws = {
+                dwsNo: currentDWSNo,
+                date: document.getElementById('date').value,
+                structureName: document.getElementById('structureName').value,
+                siNo: document.getElementById('siNo').value,
+                workDescription: document.getElementById('workDescription').value,
+                location: document.getElementById('location').value,
+                manpower: getManpowerData(),
+                equipment: getEquipmentData(),
+                consumables: getConsumablesData(),
             };
 
-            user.dws = user.dws || [];
-            user.dws.push(newDWS);
-            updateUsers();
+            dwsData.push(dws);
+            localStorage.setItem('dwsData', JSON.stringify(dwsData));
+            currentDWSNo++;
 
-            document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
-        }
-
-        // Handle the "Manage DWS" button
-        document.getElementById("manageDWSBtn").addEventListener("click", () => {
-            switchSection("manageDWSSection");
-            loadUserDWS();
+            alert('DWS saved successfully!');
+            switchSection('manageDWSSection');
+            loadDWSData();
         });
 
-        function loadUserDWS() {
-            const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with logged-in user
-            if (!user || !user.dws) {
-                document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
-                return;
-            }
-
-            const list = document.getElementById("userDWSList");
-            list.innerHTML = ""; // Clear existing list
-            user.dws.forEach(dws => {
-                const listItem = document.createElement("li");
-                listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
-                list.appendChild(listItem);
+        function getManpowerData() {
+            const manpowerEntries = document.querySelectorAll('.manpower-entry');
+            const manpowerData = [];
+            manpowerEntries.forEach(entry => {
+                manpowerData.push({
+                    badgeNo: entry.querySelector('.badgeNo').value,
+                    name: entry.querySelector('.manpowerName').value,
+                    normalHours: entry.querySelector('.normalHours').value,
+                    otHours: entry.querySelector('.otHours').value,
+                    holiday: entry.querySelector('.holiday').value,
+                });
             });
+            return manpowerData;
         }
 
-        // Handle the "Search DWS" button
-        document.getElementById("searchDWSBtn").addEventListener("click", () => {
-            switchSection("searchDWSSection");
-        });
-
-        function searchDWS() {
-            const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
-            const dws = findDWSByNumber(dwsNumber);
-
-            if (dws) {
-                document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
-            } else {
-                document.getElementById("dwsSearchResult").textContent = "DWS not found.";
-            }
+        function getEquipmentData() {
+            const equipmentEntries = document.querySelectorAll('.equipment-entry');
+            const equipmentData = [];
+            equipmentEntries.forEach(entry => {
+                equipmentData.push({
+                    equipmentName: entry.querySelector('.equipmentName').value,
+                    workingHours: entry.querySelector('.workingHours').value,
+                });
+            });
+            return equipmentData;
         }
 
-        function findDWSByNumber(dwsNumber) {
-            for (const user of users) {
-                if (user.dws) {
-                    const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
-                    if (dws) return dws;
-                }
-            }
-            return null;  // If DWS not found
+        function getConsumablesData() {
+            const consumablesEntries = document.querySelectorAll('.consumables-entry');
+            const consumablesData = [];
+            consumablesEntries.forEach(entry => {
+                consumablesData.push({
+                    consumableName: entry.querySelector('.consumableName').value,
+                    quantity: entry.querySelector('.quantity').value,
+                });
+            });
+            return consumablesData;
         }
 
-        // Switch between sections
         function switchSection(sectionId) {
             document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
             document.getElementById(sectionId).classList.remove('hidden');
-            clearInputs();
         }
 
-        // Clear input fields and errors
-        function clearInputs() {
-            document.querySelectorAll('input').forEach(input => input.value = '');
-            document.querySelectorAll('.error').forEach(error => error.textContent = '');
-        }
-
-        // Update lists, audit log, and other functionalities...
-        // (remaining JavaScript functions for user management, approval, etc.)
-        function updatePendingUsersList() {
-            const list = document.getElementById("pendingUsersList");
-            list.innerHTML = '';
-            pendingUsers.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("pending-user");
-                listItem.innerHTML = `${user.username} 
-                    <button onclick="approveUser(${index})">Approve</button>
-                    <button onclick="rejectUser(${index})">Reject</button>`;
-                list.appendChild(listItem);
+        function loadDWSData() {
+            const tbody = document.getElementById('dwsTableBody');
+            tbody.innerHTML = '';
+            dwsData.forEach(dws => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dws.dwsNo}</td>
+                                        <td>${dws.date}</td>
+                    <td>${dws.structureName}</td>
+                    <td>${dws.siNo}</td>
+                    <td>${dws.workDescription}</td>
+                    <td>${dws.location}</td>
+                    <td>
+                        ${dws.manpower.map(man => `
+                            <div>${man.name} (${man.badgeNo}): Normal Hours: ${man.normalHours}, OT Hours: ${man.otHours}, Holiday: ${man.holiday}</div>
+                        `).join('')}
+                    </td>
+                    <td>
+                        ${dws.equipment.map(eq => `
+                            <div>${eq.equipmentName}: ${eq.workingHours} hours</div>
+                        `).join('')}
+                    </td>
+                    <td>
+                        ${dws.consumables.map(cons => `
+                            <div>${cons.consumableName}: ${cons.quantity}</div>
+                        `).join('')}
+                    </td>
+                    <td>
+                        <button class="editBtn" onclick="editDWS(${dws.dwsNo})">Edit</button>
+                        <button class="deleteBtn" onclick="deleteDWS(${dws.dwsNo})">Delete</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
         }
 
-        function updateUserList() {
-            const list = document.getElementById("userList");
-            const totalUsersCount = document.getElementById("totalUsersCount");
-            list.innerHTML = ''; // Clear existing user list
-            users.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("user-item");
-                listItem.innerHTML = `${user.username} 
-                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
-                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
-                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                    </select>
-                    <button onclick="removeUser(${index})">Remove</button>`;
-                list.appendChild(listItem);
-            });
-            totalUsersCount.textContent = users.length;
+        function editDWS(dwsNo) {
+            const dws = dwsData.find(item => item.dwsNo === dwsNo);
+            // Populate the form for editing with the existing data
+            document.getElementById('dwsNo').value = dws.dwsNo;
+            document.getElementById('date').value = dws.date;
+            document.getElementById('structureName').value = dws.structureName;
+            document.getElementById('siNo').value = dws.siNo;
+            document.getElementById('workDescription').value = dws.workDescription;
+            document.getElementById('location').value = dws.location;
+            // Add code to populate manpower, equipment, and consumables sections
+            switchSection('createDWSSection');
         }
 
-        function updateAuditLog(action, username) {
-            const log = { action, username, timestamp: new Date().toISOString() };
-            auditLogs.push(log);
-            localStorage.setItem("auditLogs", JSON.stringify(auditLogs));
-            renderAuditLog();
-        }
-
-        function renderAuditLog() {
-            const list = document.getElementById("auditLog");
-            list.innerHTML = '';
-            auditLogs.forEach(log => {
-                const logItem = document.createElement("li");
-                logItem.classList.add("audit-entry");
-                logItem.innerHTML = `${log.timestamp}: ${log.username} - ${log.action}`;
-                list.appendChild(logItem);
-            });
-        }
-
-        function approveUser(index) {
-            const user = pendingUsers.splice(index, 1)[0];
-            user.approved = true;
-            users.push(user);
-            localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User approved!");
-            updatePendingUsersList();
-            updateUserList();
-            updateAuditLog('Approved', user.username);
-        }
-
-        function rejectUser(index) {
-            const user = pendingUsers.splice(index, 1)[0];
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-            alert("User rejected!");
-            updatePendingUsersList();
-            updateAuditLog('Rejected', user.username);
-        }
-
-        function removeUser(index) {
-            const user = users.splice(index, 1)[0];
-            localStorage.setItem("users", JSON.stringify(users));
-            alert(`${user.username} has been removed from the system.`);
-            updateUserList();
-            updateAuditLog('Removed', user.username);
-        }
-
-        function changeUserRole(index, role) {
-            users[index].role = role;
-            localStorage.setItem("users", JSON.stringify(users));
-            updateAuditLog('Role changed', users[index].username);
-        }
-
-        function bulkApprove() {
-            pendingUsers.forEach((user, index) => {
-                user.approved = true;
-                users.push(user);
-                updateAuditLog('Bulk approved', user.username);
-            });
-            localStorage.setItem("users", JSON.stringify(users));
-            localStorage.setItem("pendingUsers", JSON.stringify([]));
-            alert("Bulk approval successful.");
-            updatePendingUsersList();
-            updateUserList();
-        }
-
-        function bulkReject() {
-            pendingUsers.forEach((user, index) => {
-                updateAuditLog('Bulk rejected', user.username);
-            });
-            localStorage.setItem("pendingUsers", JSON.stringify([]));
-            alert("Bulk rejection successful.");
-            updatePendingUsersList();
-        }
-
-        function searchUsers() {
-            const searchTerm = document.getElementById("searchUser").value.trim().toLowerCase();
-            const filteredUsers = users.filter(user => user.username.toLowerCase().includes(searchTerm));
-            renderFilteredUsers(filteredUsers);
-        }
-
-        function renderFilteredUsers(filteredUsers) {
-            const list = document.getElementById("userList");
-            list.innerHTML = ''; // Clear existing list
-            filteredUsers.forEach((user, index) => {
-                const listItem = document.createElement("li");
-                listItem.classList.add("user-item");
-                listItem.innerHTML = `${user.username} 
-                    <select class="role-select" onchange="changeUserRole(${index}, this.value)">
-                        <option value="user" ${user.role === "user" ? "selected" : ""}>User</option>
-                        <option value="admin" ${user.role === "admin" ? "selected" : ""}>Admin</option>
-                    </select>
-                    <button onclick="removeUser(${index})">Remove</button>`;
-                list.appendChild(listItem);
-            });
-        }
-
-        function logout() {
-            switchSection("loginSection");
-        }
-
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            const username = document.getElementById("signinUsername").value.trim();
-            const password = document.getElementById("signinPassword").value.trim();
-
-            if (!username || !password) {
-                document.getElementById("signinError").textContent = "Please fill in all fields.";
-                return;
+        function deleteDWS(dwsNo) {
+            if (confirm('Are you sure you want to delete this DWS?')) {
+                dwsData = dwsData.filter(item => item.dwsNo !== dwsNo);
+                localStorage.setItem('dwsData', JSON.stringify(dwsData));
+                loadDWSData();
             }
+        }
 
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updatePendingUsersList();
-                updateUserList();
-                renderAuditLog();
-                return;
+        document.getElementById('searchDWSBtn').addEventListener('click', () => {
+            const searchNo = document.getElementById('searchDWSNo').value;
+            const result = dwsData.find(dws => dws.dwsNo == searchNo);
+            const searchResultDiv = document.getElementById('searchResult');
+            if (result) {
+                searchResultDiv.innerHTML = `
+                    <h3>Search Results</h3>
+                    <p>DWS No: ${result.dwsNo}</p>
+                    <p>Date: ${result.date}</p>
+                    <p>Structure Name: ${result.structureName}</p>
+                    <p>SI No: ${result.siNo}</p>
+                    <p>Work Description: ${result.workDescription}</p>
+                    <p>Location: ${result.location}</p>
+                `;
+            } else {
+                searchResultDiv.innerHTML = '<p>No results found.</p>';
             }
-
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById("signinError").textContent = "Invalid credentials.";
-                return;
-            }
-
-            if (!user.approved) {
-                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                return;
-            }
-
-            switchSection("userDashboard");
         });
 
-        document.getElementById("signupBtn").addEventListener("click", () => {
-            const username = document.getElementById("signupUsername").value.trim();
-            const password = document.getElementById("signupPassword").value.trim();
-            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
-            const secretCode = document.getElementById("signupSecretCode").value.trim();
-
-            if (!username || !password || !confirmPassword || !secretCode) {
-                document.getElementById("signupError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                document.getElementById("signupError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            if (users.some(user => user.username === username)) {
-                document.getElementById("signupError").textContent = "Username already exists.";
-                return;
-            }
-
-            pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
-            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
-
-            alert("Sign-up successful! Awaiting admin approval.");
-            switchSection("loginSection");
+        document.getElementById('exportToExcelBtn').addEventListener('click', () => {
+            // Export data to Excel
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(dwsData);
+            XLSX.utils.book_append_sheet(wb, ws, 'DWS Data');
+            XLSX.writeFile(wb, 'DWS_Data.xlsx');
         });
 
-        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
-            const username = document.getElementById("resetUsername").value.trim();
-            const secretCode = document.getElementById("resetSecretCode").value.trim();
-            const newPassword = document.getElementById("resetNewPassword").value.trim();
-            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
-
-            if (!username || !secretCode || !newPassword || !confirmPassword) {
-                document.getElementById("resetError").textContent = "Please fill in all fields.";
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                document.getElementById("resetError").textContent = "Passwords do not match.";
-                return;
-            }
-
-            const user = users.find(u => u.username === username && u.secretCode === secretCode);
-            if (!user) {
-                document.getElementById("resetError").textContent = "Invalid username or secret code.";
-                return;
-            }
-
-            user.password = newPassword;
-            localStorage.setItem("users", JSON.stringify(users));
-
-            alert("Password reset successful!");
-            switchSection("loginSection");
+        document.getElementById('exportToPDFBtn').addEventListener('click', () => {
+            // Export data to PDF
+            const doc = new jsPDF();
+            doc.autoTable({
+                head: [['DWS No.', 'Date', 'Structure Name', 'SI No.', 'Work Description', 'Location']],
+                body: dwsData.map(dws => [
+                    dws.dwsNo, dws.date, dws.structureName, dws.siNo, dws.workDescription, dws.location
+                ]),
+            });
+            doc.save('DWS_Data.pdf');
         });
+
+        // Load the data on page load
+        if (dwsData.length > 0) {
+            switchSection('manageDWSSection');
+            loadDWSData();
+        } else {
+            switchSection('createDWSSection');
+        }
     </script>
+
+    <!-- Include external libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.4/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.autotable.min.js"></script>
+
 </body>
 </html>
