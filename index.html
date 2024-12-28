@@ -113,12 +113,53 @@
         .form-container {
             margin-bottom: 30px;
         }
+
+        .main-page-button {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: block;
+            margin: 20px auto;
+        }
+
+        .main-page-button:hover {
+            background-color: #0056b3;
+        }
+
+        .search-section {
+            margin-top: 30px;
+        }
+
+        #searchResults {
+            margin-top: 20px;
+        }
+
+        #searchResults table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #searchResults th, #searchResults td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
     </style>
 </head>
 
 <body>
 
-    <div class="container">
+    <div class="container" id="mainPageContainer">
+        <h2>DWS Management System</h2>
+        <button class="main-page-button" onclick="goToCreatePage()">Create DWS</button>
+        <button class="main-page-button" onclick="goToSearchPage()">Search DWS</button>
+        <button class="main-page-button" onclick="exportToExcel()">Export DWS to Excel</button>
+    </div>
+
+    <div class="container" id="createDwsContainer" style="display:none;">
         <h2>Create DWS</h2>
         <div id="createDwsForm">
             <!-- DWS Main Details -->
@@ -185,8 +226,20 @@
             </div>
 
             <button class="button" onclick="saveDWS()">Save DWS</button>
-
         </div>
+
+        <button class="back-button" onclick="backToMainPage()">Back to Main</button>
+    </div>
+
+    <div class="container" id="searchPageContainer" style="display:none;">
+        <h2>Search DWS</h2>
+        <div class="section">
+            <label for="searchDwsNumber">Search by DWS Number:</label>
+            <input type="text" id="searchDwsNumber" />
+            <button class="button" onclick="searchDWS()">Search</button>
+        </div>
+
+        <div id="searchResults"></div>
 
         <button class="back-button" onclick="backToMainPage()">Back to Main</button>
     </div>
@@ -196,6 +249,69 @@
         let manpowerList = [];
         let equipmentList = [];
         let consumableList = [];
+
+        // Navigate to Create DWS Page
+        function goToCreatePage() {
+            document.getElementById('mainPageContainer').style.display = 'none';
+            document.getElementById('createDwsContainer').style.display = 'block';
+            document.getElementById('dwsNumber').value = dwsNumber;
+        }
+
+        // Navigate to Search DWS Page
+        function goToSearchPage() {
+            document.getElementById('mainPageContainer').style.display = 'none';
+            document.getElementById('searchPageContainer').style.display = 'block';
+        }
+
+        // Back to Main Page
+        function backToMainPage() {
+            document.getElementById('mainPageContainer').style.display = 'block';
+            document.getElementById('createDwsContainer').style.display = 'none';
+            document.getElementById('searchPageContainer').style.display = 'none';
+        }
+
+        // Save DWS Data
+        function saveDWS() {
+            const dwsData = {
+                dwsNumber,
+                date: document.getElementById('date').value,
+                structure: document.getElementById('structure').value,
+                siNo: document.getElementById('siNo').value,
+                workDescription: document.getElementById('workDescription').value,
+                location: document.getElementById('location').value,
+                manpower: manpowerList,
+                equipment: equipmentList,
+                consumables: consumableList
+            };
+
+            if (!dwsData.date || !dwsData.structure || !dwsData.siNo || !dwsData.workDescription || !dwsData.location) {
+                alert('Please fill all the main fields');
+                return;
+            }
+
+            let storedDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            storedDwsData.push(dwsData);
+            localStorage.setItem('dwsData', JSON.stringify(storedDwsData));
+
+            alert('DWS Saved Successfully');
+            dwsNumber++; // Auto Increment DWS Number
+            resetForm();
+        }
+
+        // Reset Form After Save
+        function resetForm() {
+            document.getElementById('date').value = '';
+            document.getElementById('structure').value = '';
+            document.getElementById('siNo').value = '';
+            document.getElementById('workDescription').value = '';
+            document.getElementById('location').value = '';
+            manpowerList = [];
+            equipmentList = [];
+            consumableList = [];
+            displayManpower();
+            displayEquipment();
+            displayConsumable();
+        }
 
         // Add Manpower
         function addManpower() {
@@ -263,7 +379,7 @@
             equipmentList.forEach((equipment, index) => {
                 const item = document.createElement('div');
                 item.classList.add('preview-item');
-                item.innerHTML = `${equipment.name} - Working Hours: ${equipment.hours} <button class="remove" onclick="removeEquipment(${index})">Remove</button>`;
+                               item.innerHTML = `${equipment.name} - Working Hours: ${equipment.hours} <button class="remove" onclick="removeEquipment(${index})">Remove</button>`;
                 preview.appendChild(item);
             });
         }
@@ -280,77 +396,103 @@
             });
         }
 
-        // Remove Manpower Item
+        // Remove Manpower
         function removeManpower(index) {
             manpowerList.splice(index, 1);
             displayManpower();
         }
 
-        // Remove Equipment Item
+        // Remove Equipment
         function removeEquipment(index) {
             equipmentList.splice(index, 1);
             displayEquipment();
         }
 
-        // Remove Consumable Item
+        // Remove Consumable
         function removeConsumable(index) {
             consumableList.splice(index, 1);
             displayConsumable();
         }
 
-        // Save DWS Data to Local Storage
-        function saveDWS() {
-            const dwsData = {
-                dwsNumber,
-                date: document.getElementById('date').value,
-                structure: document.getElementById('structure').value,
-                siNo: document.getElementById('siNo').value,
-                workDescription: document.getElementById('workDescription').value,
-                location: document.getElementById('location').value,
-                manpower: manpowerList,
-                equipment: equipmentList,
-                consumables: consumableList
-            };
+        // Search DWS by Number
+        function searchDWS() {
+            const searchValue = document.getElementById('searchDwsNumber').value;
+            let storedDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
+            const searchResults = storedDwsData.filter(dws => dws.dwsNumber.toString().includes(searchValue));
 
-            if (!dwsData.date || !dwsData.structure || !dwsData.siNo || !dwsData.workDescription || !dwsData.location) {
-                alert('Please fill all the main fields');
+            displaySearchResults(searchResults);
+        }
+
+        // Display Search Results
+        function displaySearchResults(results) {
+            const searchResultsContainer = document.getElementById('searchResults');
+            searchResultsContainer.innerHTML = '';
+
+            if (results.length === 0) {
+                searchResultsContainer.innerHTML = '<p>No results found.</p>';
                 return;
             }
 
-            // Save DWS Data to Local Storage
+            const table = document.createElement('table');
+            table.innerHTML = `
+                <tr>
+                    <th>DWS Number</th>
+                    <th>Date</th>
+                    <th>Structure</th>
+                    <th>SI No.</th>
+                    <th>Work Description</th>
+                    <th>Location</th>
+                    <th>Manpower</th>
+                    <th>Equipment</th>
+                    <th>Consumables</th>
+                </tr>
+            `;
+
+            results.forEach(dws => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dws.dwsNumber}</td>
+                    <td>${dws.date}</td>
+                    <td>${dws.structure}</td>
+                    <td>${dws.siNo}</td>
+                    <td>${dws.workDescription}</td>
+                    <td>${dws.location}</td>
+                    <td>${dws.manpower.map(m => `${m.name} - ${m.normalHours}H / ${m.otHours}OT`).join(', ')}</td>
+                    <td>${dws.equipment.map(e => `${e.name} - ${e.hours}H`).join(', ')}</td>
+                    <td>${dws.consumables.map(c => `${c.name} - ${c.qty}`).join(', ')}</td>
+                `;
+                table.appendChild(row);
+            });
+
+            searchResultsContainer.appendChild(table);
+        }
+
+        // Export to Excel
+        function exportToExcel() {
             let storedDwsData = JSON.parse(localStorage.getItem('dwsData')) || [];
-            storedDwsData.push(dwsData);
-            localStorage.setItem('dwsData', JSON.stringify(storedDwsData));
+            if (storedDwsData.length === 0) {
+                alert('No data available to export');
+                return;
+            }
 
-            alert('DWS Saved Successfully');
-            dwsNumber++;  // Auto Increment DWS Number
-            resetForm();
+            let csvContent = "DWS Number,Date,Structure Name,SI No.,Work Description,Location,Manpower,Equipment,Consumables\n";
+            storedDwsData.forEach(dws => {
+                const manpower = dws.manpower.map(m => `${m.name} - ${m.normalHours}H / ${m.otHours}OT`).join('; ');
+                const equipment = dws.equipment.map(e => `${e.name} - ${e.hours}H`).join('; ');
+                const consumables = dws.consumables.map(c => `${c.name} - ${c.qty}`).join('; ');
+
+                csvContent += `${dws.dwsNumber},${dws.date},${dws.structure},${dws.siNo},${dws.workDescription},${dws.location},${manpower},${equipment},${consumables}\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'dws_data.csv';
+            link.click();
         }
 
-        // Reset Form After Save
-        function resetForm() {
-            document.getElementById('date').value = '';
-            document.getElementById('structure').value = '';
-            document.getElementById('siNo').value = '';
-            document.getElementById('workDescription').value = '';
-            document.getElementById('location').value = '';
-            manpowerList = [];
-            equipmentList = [];
-            consumableList = [];
-            displayManpower();
-            displayEquipment();
-            displayConsumable();
-        }
-
-        // Go Back to Main Page
-        function backToMainPage() {
-            location.reload();
-        }
-
-        window.onload = function () {
-            document.getElementById('dwsNumber').value = dwsNumber;
-        }
     </script>
+
 </body>
 
 </html>
