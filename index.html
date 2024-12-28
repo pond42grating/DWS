@@ -1,4 +1,4 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -132,129 +132,153 @@
             <p id="resetError" class="error"></p>
             <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
         </div>
+
+        <!-- Admin Dashboard Section -->
+        <div id="adminDashboard" class="hidden">
+            <h1>Admin Dashboard</h1>
+
+            <!-- Search Users -->
+            <input type="text" id="searchUser" placeholder="Search User by Username" oninput="searchUsers()">
+
+            <!-- User Role Management -->
+            <div class="bulk-actions">
+                <button onclick="bulkApprove()">Bulk Approve</button>
+                <button onclick="bulkReject()">Bulk Reject</button>
+            </div>
+
+            <h3>Pending User Approvals</h3>
+            <ul id="pendingUsersList" class="pending-users-list"></ul>
+            <h3>Total Users: <span id="totalUsersCount">0</span></h3>
+
+            <h3>Registered Users</h3>
+            <ul id="userList" class="user-list"></ul>
+
+            <h3>Audit Logs</h3>
+            <ul id="auditLog" class="audit-log"></ul>
+
+            <button onclick="logout()">Log Out</button>
+        </div>
+
+        <!-- User Dashboard Section -->
+<div id="userDashboard" class="hidden">
+    <h1>User Dashboard</h1>
+    <button onclick="logout()">Log Out</button>
+    <h3>Welcome to the User Dashboard</h3>
+    <button id="createDWSBtn">Create DWS</button>
+    <button id="manageDWSBtn">Manage DWS</button>
+    <button id="searchDWSBtn">Search DWS</button>
+    
+    <div id="createDWSSection" class="hidden">
+        <h3>Create DWS</h3>
+        <button onclick="createDWS()">Create DWS</button>
+        <p id="dwsMessage"></p>
     </div>
     
-    <!-- Admin Dashboard Section -->
-    <div id="adminDashboard" class="hidden">
-        <h1>Admin Dashboard</h1>
-
-        <!-- Search Users -->
-        <input type="text" id="searchUser" placeholder="Search User by Username" oninput="searchUsers()">
-
-        <!-- User Role Management -->
-        <div class="bulk-actions">
-            <button onclick="bulkApprove()">Bulk Approve</button>
-            <button onclick="bulkReject()">Bulk Reject</button>
-        </div>
-
-        <h3>Pending User Approvals</h3>
-        <ul id="pendingUsersList" class="pending-users-list"></ul>
-        <h3>Total Users: <span id="totalUsersCount">0</span></h3>
-
-        <h3>Registered Users</h3>
-        <ul id="userList" class="user-list"></ul>
-
-        <h3>Audit Logs</h3>
-        <ul id="auditLog" class="audit-log"></ul>
-
-        <button onclick="logout()">Log Out</button>
+    <div id="manageDWSSection" class="hidden">
+        <h3>Manage Your DWS</h3>
+        <ul id="userDWSList"></ul>
     </div>
 
-    <!-- User Dashboard Section -->
-    <div id="userDashboard" class="hidden">
-        <h1>User Dashboard</h1>
-        <button onclick="logout()">Log Out</button>
-        <h3>Welcome to the User Dashboard</h3>
-        <button id="createDWSBtn">Create DWS</button>
-        <button id="manageDWSBtn">Manage DWS</button>
-        <button id="searchDWSBtn">Search DWS</button>
-        
-        <div id="createDWSSection" class="hidden">
-            <h3>Create DWS</h3>
-            <button onclick="createDWS()">Create DWS</button>
-            <p id="dwsMessage"></p>
-        </div>
-        
-        <div id="manageDWSSection" class="hidden">
-            <h3>Manage Your DWS</h3>
-            <ul id="userDWSList"></ul>
-        </div>
-
-        <div id="searchDWSSection" class="hidden">
-            <h3>Search DWS by Number</h3>
-            <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
-            <button onclick="searchDWS()">Search</button>
-            <p id="dwsSearchResult"></p>
-        </div>
+    <div id="searchDWSSection" class="hidden">
+        <h3>Search DWS by Number</h3>
+        <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
+        <button onclick="searchDWS()">Search</button>
+        <p id="dwsSearchResult"></p>
     </div>
-    
-        <script>
+</div>
+
+    <script>
+        
         const users = JSON.parse(localStorage.getItem("users")) || [];
-        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
 
-        // Helper function to update local storage
-        function updateUsers() {
-            localStorage.setItem("users", JSON.stringify(users));
+// Helper function to update local storage
+function updateUsers() {
+    localStorage.setItem("users", JSON.stringify(users));
+}
+
+// Handle the "Create DWS" button
+document.getElementById("createDWSBtn").addEventListener("click", () => {
+    switchSection("createDWSSection");
+});
+
+function createDWS() {
+    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
+    if (!user) return;
+
+    const newDWS = {
+        dwsNumber: users.length + 1,  // Unique number based on the current number of users
+        createdAt: new Date(),
+    };
+
+    user.dws = user.dws || [];
+    user.dws.push(newDWS);
+    updateUsers();
+
+    document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
+}
+
+// Handle the "Manage DWS" button
+document.getElementById("manageDWSBtn").addEventListener("click", () => {
+    switchSection("manageDWSSection");
+    loadUserDWS();
+});
+
+function loadUserDWS() {
+    const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with logged-in user
+    if (!user || !user.dws) {
+        document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
+        return;
+    }
+
+    const list = document.getElementById("userDWSList");
+    list.innerHTML = ""; // Clear existing list
+    user.dws.forEach(dws => {
+        const listItem = document.createElement("li");
+        listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+        list.appendChild(listItem);
+    });
+}
+
+// Handle the "Search DWS" button
+document.getElementById("searchDWSBtn").addEventListener("click", () => {
+    switchSection("searchDWSSection");
+});
+
+function searchDWS() {
+    const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
+    const dws = findDWSByNumber(dwsNumber);
+
+    if (dws) {
+        document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+    } else {
+        document.getElementById("dwsSearchResult").textContent = "DWS not found.";
+    }
+}
+
+function findDWSByNumber(dwsNumber) {
+    for (const user of users) {
+        if (user.dws) {
+            const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
+            if (dws) return dws;
         }
+    }
+    return null;  // If DWS not found
+}
 
-        // Create DWS Function
-        function createDWS() {
-            const user = users.find(u => u.username === "currentUser"); // Replace "currentUser" with the logged-in user logic
-            if (!user) return;
+// Switch between sections
+function switchSection(sectionId) {
+    document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+    document.getElementById(sectionId).classList.remove('hidden');
+    clearInputs();
+}
 
-            const newDWS = {
-                dwsNumber: users.length + 1,  // Unique number based on the current number of users
-                createdAt: new Date(),
-            };
+// Clear input fields and errors
+function clearInputs() {
+    document.querySelectorAll('input').forEach(input => input.value = '');
+    document.querySelectorAll('.error').forEach(error => error.textContent = '');
+}
 
-            user.dws = user.dws || [];
-            user.dws.push(newDWS);
-            updateUsers();
-
-            document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
-        }
-
-        // Search DWS Function
-        function searchDWS() {
-            const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
-            const dws = findDWSByNumber(dwsNumber);
-
-            if (dws) {
-                document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
-            } else {
-                document.getElementById("dwsSearchResult").textContent = "DWS not found.";
-            }
-        }
-
-        function findDWSByNumber(dwsNumber) {
-            for (const user of users) {
-                if (user.dws) {
-                    const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
-                    if (dws) return dws;
-                }
-            }
-            return null;  // If DWS not found
-        }
-
-        // Switch between sections
-        function switchSection(sectionId) {
-            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-            document.getElementById(sectionId).classList.remove('hidden');
-            clearInputs();
-        }
-
-        // Clear input fields and errors
-        function clearInputs() {
-            document.querySelectorAll('input').forEach(input => input.value = '');
-            document.querySelectorAll('.error').forEach(error => error.textContent = '');
-        }
-
-        function logout() {
-            switchSection("loginSection");
-        }
-        
-        // Handle user sign-in, sign-up, and password reset actions here.
-        // Continue adding the necessary event listeners and logic...
         function updatePendingUsersList() {
             const list = document.getElementById("pendingUsersList");
             list.innerHTML = '';
@@ -476,4 +500,3 @@
     </script>
 </body>
 </html>
-    
