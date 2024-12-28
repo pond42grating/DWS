@@ -155,7 +155,36 @@
             document.querySelectorAll('.error').forEach(error => error.textContent = '');
         }
 
-        //admin
+        function updatePendingUsersList() {
+            const list = document.getElementById("pendingUsersList");
+            list.innerHTML = '';
+            pendingUsers.forEach((user, index) => {
+                const listItem = document.createElement("li");
+                listItem.classList.add("pending-user");
+                listItem.innerHTML = `${user.username} 
+                    <button onclick="approveUser(${index})">Approve</button>
+                    <button onclick="rejectUser(${index})">Reject</button>`;
+                list.appendChild(listItem);
+            });
+        }
+
+        function approveUser(index) {
+            const user = pendingUsers.splice(index, 1)[0];
+            user.approved = true;  // Mark user as approved
+            users.push(user);
+            localStorage.setItem("users", JSON.stringify(users));
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User approved!");
+            updatePendingUsersList();
+        }
+
+        function rejectUser(index) {
+            pendingUsers.splice(index, 1);
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+            alert("User rejected!");
+            updatePendingUsersList();
+        }
+        
         // Update the admin dashboard to show the list of registered users and user count
 function updateUserList() {
     const list = document.getElementById("userList");
@@ -242,8 +271,6 @@ document.getElementById("signinBtn").addEventListener("click", () => {
     // Redirect to user dashboard
     switchSection("userDashboard");
 });
-        
-        });
 
         document.getElementById("signupBtn").addEventListener("click", () => {
             const username = document.getElementById("signupUsername").value.trim();
