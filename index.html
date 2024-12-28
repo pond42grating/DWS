@@ -159,6 +159,7 @@
 
         function approveUser(index) {
             const user = pendingUsers.splice(index, 1)[0];
+            user.approved = true;  // Mark user as approved
             users.push(user);
             localStorage.setItem("users", JSON.stringify(users));
             localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
