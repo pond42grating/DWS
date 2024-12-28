@@ -4,84 +4,144 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All-in-One Authentication System</title>
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
 
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 400px;
-        }
+    .container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        width: 100%;
+        max-width: 400px;
+    }
 
-        h1, h3 {
-            text-align: center;
-        }
+    h1, h3 {
+        text-align: center;
+    }
 
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
+    input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
 
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
+    button {
+        width: 100%;
+        padding: 10px;
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
 
-        button:hover {
-            background-color: #0056b3;
-        }
+    button:hover {
+        background-color: #0056b3;
+    }
 
-        .hidden {
-            display: none;
-        }
+    .hidden {
+        display: none;
+    }
 
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
+    .error {
+        color: red;
+        font-size: 0.9em;
+    }
 
-        .link-button {
-            background: none;
-            color: blue;
-            border: none;
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 0;
-        }
+    .link-button {
+        background: none;
+        color: blue;
+        border: none;
+        text-decoration: underline;
+        cursor: pointer;
+        padding: 0;
+    }
 
-        .pending-users-list {
-            list-style-type: none;
-            padding: 0;
-        }
+    .pending-users-list {
+        list-style-type: none;
+        padding: 0;
+    }
 
-        .pending-user {
-            padding: 10px;
-            border: 1px solid #ccc;
-            margin-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-    </style>
+    .pending-user {
+        padding: 10px;
+        border: 1px solid #ccc;
+        margin-bottom: 5px;
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .pending-user button {
+        padding: 5px 10px;
+        font-size: 0.9em;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 0 5px;
+        transition: background-color 0.3s ease;
+    }
+
+    .pending-user button:hover {
+        background-color: #0056b3;
+    }
+
+    .pending-user button.reject {
+        background-color: #dc3545;
+    }
+
+    .pending-user button.reject:hover {
+        background-color: #c82333;
+    }
+
+    .pending-user button.approve {
+        background-color: #28a745;
+    }
+
+    .pending-user button.approve:hover {
+        background-color: #218838;
+    }
+
+    .remove-btn, .logout-btn {
+        padding: 5px 10px;
+        font-size: 0.9em;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin: 5px 0;
+        width: auto;
+    }
+
+    .remove-btn:hover, .logout-btn:hover {
+        background-color: #c82333;
+    }
+
+    .remove-btn {
+        background-color: #dc3545;
+    }
+
+    .logout-btn {
+        background-color: #007bff;
+    }
+</style>
+    
 </head>
 <body>
     <div class="container">
@@ -121,12 +181,15 @@
         </div>
 
         <!-- Admin Dashboard Section -->
-        <div id="adminDashboard" class="hidden">
-            <h1>Admin Dashboard</h1>
-            <h3>Pending User Approvals</h3>
-            <ul id="pendingUsersList" class="pending-users-list"></ul>
-            <button onclick="logout()">Log Out</button>
-        </div>
+<div id="adminDashboard" class="hidden">
+    <h1>Admin Dashboard</h1>
+    <h3>Pending User Approvals</h3>
+    <ul id="pendingUsersList" class="pending-users-list"></ul>
+    <h3>Total Users: <span id="totalUsersCount">0</span></h3> <!-- Added user count -->
+    <h3>Registered Users</h3>
+    <ul id="userList" class="pending-users-list"></ul> <!-- Added list of users -->
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+</div>
 
         <!-- User Dashboard Section -->
         <div id="userDashboard" class="hidden">
@@ -181,36 +244,98 @@
             alert("User rejected!");
             updatePendingUsersList();
         }
+        
+        // Update the admin dashboard to show the list of registered users and user count
+function updateUserList() {
+    const list = document.getElementById("userList");
+    const totalUsersCount = document.getElementById("totalUsersCount");
+    list.innerHTML = ''; // Clear existing user list
+    users.forEach((user, index) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("pending-user");
+        listItem.innerHTML = `${user.username} 
+            <button class="remove-btn" onclick="removeUser(${index})">Remove</button>`;
+        list.appendChild(listItem);
+    });
+    totalUsersCount.textContent = users.length; // Update total users count
+}
 
-        document.getElementById("signinBtn").addEventListener("click", () => {
-            const username = document.getElementById("signinUsername").value.trim();
-            const password = document.getElementById("signinPassword").value.trim();
+// Remove a user from the list
+function removeUser(index) {
+    const user = users.splice(index, 1)[0]; // Remove from the users list
+    localStorage.setItem("users", JSON.stringify(users)); // Update the local storage
+    alert(`${user.username} has been removed from the system.`);
+    updateUserList(); // Re-render the updated user list
+}
 
-            if (!username || !password) {
-                document.getElementById("signinError").textContent = "Please fill in all fields.";
-                return;
-            }
+// Log out function
+function logout() {
+    switchSection("loginSection");
+}
 
-            if (username === "admin" && password === "admin123") {
-                switchSection("adminDashboard");
-                updatePendingUsersList();
-                return;
-            }
+function updatePendingUsersList() {
+    const list = document.getElementById("pendingUsersList");
+    list.innerHTML = '';
+    pendingUsers.forEach((user, index) => {
+        const listItem = document.createElement("li");
+        listItem.classList.add("pending-user");
+        listItem.innerHTML = `${user.username} 
+            <button class="approve" onclick="approveUser(${index})">Approve</button>
+            <button class="reject" onclick="rejectUser(${index})">Reject</button>`;
+        list.appendChild(listItem);
+    });
+}
 
-            const user = users.find(u => u.username === username && u.password === password);
-            if (!user) {
-                document.getElementById("signinError").textContent = "Invalid credentials.";
-                return;
-            }
+// Approve a user
+function approveUser(index) {
+    const user = pendingUsers.splice(index, 1)[0];
+    user.approved = true;  // Mark user as approved
+    users.push(user);
+    localStorage.setItem("users", JSON.stringify(users));
+    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+    alert("User approved!");
+    updatePendingUsersList();
+    updateUserList(); // Update the user list after approval
+}
 
-            if (!user.approved) {
-                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                return;
-            }
+// Reject a user
+function rejectUser(index) {
+    pendingUsers.splice(index, 1);
+    localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+    alert("User rejected!");
+    updatePendingUsersList();
+}
 
-            // Redirect to user dashboard
-            switchSection("userDashboard");
-        });
+document.getElementById("signinBtn").addEventListener("click", () => {
+    const username = document.getElementById("signinUsername").value.trim();
+    const password = document.getElementById("signinPassword").value.trim();
+
+    if (!username || !password) {
+        document.getElementById("signinError").textContent = "Please fill in all fields.";
+        return;
+    }
+
+    if (username === "admin" && password === "admin123") {
+        switchSection("adminDashboard");
+        updatePendingUsersList();
+        updateUserList(); // Also load the approved users
+        return;
+    }
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+        document.getElementById("signinError").textContent = "Invalid credentials.";
+        return;
+    }
+
+    if (!user.approved) {
+        document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+        return;
+    }
+
+    // Redirect to user dashboard
+    switchSection("userDashboard");
+});
 
         document.getElementById("signupBtn").addEventListener("click", () => {
             const username = document.getElementById("signupUsername").value.trim();
