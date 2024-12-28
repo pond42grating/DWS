@@ -5,7 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create DWS</title>
   <style>
-    body {
+    /* Your existing styles */
+  body {
       font-family: Arial, sans-serif;
       margin: 20px;
     }
@@ -65,11 +66,13 @@
       background-color: #da190b;
     }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 </head>
 <body>
 
   <h1>Create DWS</h1>
   
+  <!-- Your existing form fields -->
   <!-- DWS Number (Auto Assigned) -->
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
@@ -187,12 +190,14 @@
     </div>
   </div>
 
+  <!-- Save and Export Buttons -->
   <button id="saveButton" onclick="saveData()">Save DWS</button>
+  <button type="button" onclick="exportToExcel()">Export to Excel</button>
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
-    let dwsCounter = 1; // Initial DWS number
+    let dwsCounter = 1;
 
     function showError(elementId, errorMessage) {
       const errorElement = document.getElementById(elementId);
@@ -204,7 +209,9 @@
       errorElement.innerText = '';
     }
 
-    function addManpower() {
+    // Manpower, Equipment, Consumable add functions here...
+
+function addManpower() {
       const badgeNo = document.getElementById('badgeNo').value;
       const manpowerName = document.getElementById('manpowerName').value;
       const normalHour = document.getElementById('normalHour').value;
@@ -318,8 +325,88 @@
       }
     }
 
-    function saveData() {
+    // Export to Excel function
+    function exportToExcel() {
+      const wb = XLSX.utils.book_new();
+      
+      // Get all data (Manpower, Equipment, Consumables)
+      const allData = getAllData();
+
+      // Create a single sheet with all the data
+      const sheet = XLSX.utils.aoa_to_sheet(allData);
+      XLSX.utils.book_append_sheet(wb, sheet, 'DWS Data');
+
+      // Export to Excel
+      XLSX.writeFile(wb, 'DWS_Data.xlsx');
+    }
+
+    // Function to collect all data
+    function getAllData() {
+      // Column headers
+      const headers = [
+        'DWS No.', 'Structure Name', 'SI No.', 'Work Description', 'Location',
+        'Badge No.', 'Manpower Name', 'Normal Hour', 'OT Hour', 'Holiday',
+        'Equipment Name', 'Working Hours',
+        'Consumable Name', 'Quantity'
+      ];
+      
+      // Initialize the data array
+      const data = [headers];
+
+      // Gather input fields for DWS information
       const dwsNo = `DWS-${dwsCounter++}`;
+      const structureName = document.getElementById('structureName').value;
+      const siNo = document.getElementById('siNo').value;
+      const workDescription = document.getElementById('workDescription').value;
+      const location = document.getElementById('location').value;
+
+      // Get table data
+      const manpowerData = getTableData('manpowerTable');
+      const equipmentData = getTableData('equipmentTable');
+      const consumableData = getTableData('consumableTable');
+
+      // Loop through all data and format it in rows
+      const maxRows = Math.max(manpowerData.length, equipmentData.length, consumableData.length);
+      
+      for (let i = 0; i < maxRows; i++) {
+        // For each row, we will create a combination of data from each section
+        const row = [
+          dwsNo, structureName, siNo, workDescription, location,
+          manpowerData[i] ? manpowerData[i][0] : '', 
+          manpowerData[i] ? manpowerData[i][1] : '',
+          manpowerData[i] ? manpowerData[i][2] : '', 
+          manpowerData[i] ? manpowerData[i][3] : '', 
+          manpowerData[i] ? manpowerData[i][4] : '',
+          equipmentData[i] ? equipmentData[i][0] : '',
+          equipmentData[i] ? equipmentData[i][1] : '',
+          consumableData[i] ? consumableData[i][0] : '',
+          consumableData[i] ? consumableData[i][1] : ''
+        ];
+        data.push(row);
+      }
+
+      return data;
+    }
+
+    // Get Table Data function (already implemented)
+    function getTableData(tableId) {
+      const rows = document.getElementById(tableId).rows;
+      const data = [];
+      for (let i = 1; i < rows.length; i++) {
+        const row = rows[i].cells;
+        let rowData = [];
+        for (let j = 0; j < row.length; j++) {
+          rowData.push(row[j].innerText);
+        }
+        data.push(rowData);
+      }
+      return data;
+    }
+
+    // Save Data function
+    function saveData() {
+      // Your existing saveData function here...
+    const dwsNo = `DWS-${dwsCounter++}`;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
       const workDescription = document.getElementById('workDescription').value;
@@ -379,6 +466,8 @@
       alert('Returning to the main page...');
       // Example: window.location.href = 'index.html';
     }
+
+    // Clear Fields and other functions...
   </script>
 
 </body>
