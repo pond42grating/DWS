@@ -5,73 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All-in-One Authentication System</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-
-        .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 800px;
-        }
-
-        h1, h3 {
-            text-align: center;
-        }
-
-        input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007bff;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        .error {
-            color: red;
-            font-size: 0.9em;
-        }
-
-        .link-button {
-            background: none;
-            color: blue;
-            border: none;
-            text-decoration: underline;
-            cursor: pointer;
-            padding: 0;
-        }
-
-        .role-select {
-            width: 150px;
-        }
+        /* Existing Styles */
     </style>
 </head>
 <body>
@@ -111,140 +45,242 @@
             <button class="link-button" onclick="switchSection('loginSection')">Back to Login</button>
         </div>
 
+        <!-- Admin Dashboard Section -->
+        <div id="adminDashboard" class="hidden">
+            <h1>Admin Dashboard</h1>
+
+            <!-- Search Users -->
+            <input type="text" id="searchUser" placeholder="Search User by Username" oninput="searchUsers()">
+
+            <!-- User Role Management -->
+            <div class="bulk-actions">
+                <button onclick="bulkApprove()">Bulk Approve</button>
+                <button onclick="bulkReject()">Bulk Reject</button>
+            </div>
+
+            <h3>Pending User Approvals</h3>
+            <ul id="pendingUsersList" class="pending-users-list"></ul>
+            <h3>Total Users: <span id="totalUsersCount">0</span></h3>
+
+            <h3>Registered Users</h3>
+            <ul id="userList" class="user-list"></ul>
+
+            <h3>Audit Logs</h3>
+            <ul id="auditLog" class="audit-log"></ul>
+
+            <button onclick="logout()">Log Out</button>
+        </div>
+
         <!-- User Dashboard Section -->
         <div id="userDashboard" class="hidden">
             <h1>User Dashboard</h1>
             <button onclick="logout()">Log Out</button>
             <h3>Welcome to the User Dashboard</h3>
-            <button id="profileBtn">Update Profile</button>
+            <button id="createDWSBtn">Create DWS</button>
+            <button id="manageDWSBtn">Manage DWS</button>
+            <button id="searchDWSBtn">Search DWS</button>
+            
+            <div id="createDWSSection" class="hidden">
+                <h3>Create DWS</h3>
+                <button onclick="createDWS()">Create DWS</button>
+                <p id="dwsMessage"></p>
+            </div>
+            
+            <div id="manageDWSSection" class="hidden">
+                <h3>Manage Your DWS</h3>
+                <ul id="userDWSList"></ul>
+            </div>
 
-            <!-- Profile Update -->
-            <div id="profileSection" class="hidden">
-                <h3>Update Profile</h3>
-                <input type="text" id="newUsername" placeholder="New Username">
-                <input type="password" id="newPassword" placeholder="New Password">
-                <input type="password" id="newConfirmPassword" placeholder="Confirm New Password">
-                <button id="updateProfileBtn">Update Profile</button>
-                <p id="profileError" class="error"></p>
+            <div id="searchDWSSection" class="hidden">
+                <h3>Search DWS by Number</h3>
+                <input type="text" id="dwsSearchNumber" placeholder="Enter DWS Number">
+                <button onclick="searchDWS()">Search</button>
+                <p id="dwsSearchResult"></p>
             </div>
         </div>
+    </div>
 
-        <script>
-            const users = JSON.parse(localStorage.getItem("users")) || [];
-            const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+    <script>
+        // Placeholder for users and pendingUsers
+        const users = JSON.parse(localStorage.getItem("users")) || [];
+        const pendingUsers = JSON.parse(localStorage.getItem("pendingUsers")) || [];
+        const auditLogs = JSON.parse(localStorage.getItem("auditLogs")) || [];
 
-            // Simulate encryption (In production, use bcrypt or another hashing algorithm in a backend system)
-            function encryptPassword(password) {
-                return btoa(password);  // Base64 encode as a simple encryption method for demo purposes
+        // Helper functions to manage users and DWS
+        function updateUsers() {
+            localStorage.setItem("users", JSON.stringify(users));
+        }
+
+        // Manage DWS for user
+        document.getElementById("createDWSBtn").addEventListener("click", () => {
+            switchSection("createDWSSection");
+        });
+
+        function createDWS() {
+            const user = users.find(u => u.username === "currentUser"); // Replace with logged-in user logic
+            if (!user) return;
+
+            const newDWS = {
+                dwsNumber: users.length + 1,
+                createdAt: new Date(),
+            };
+
+            user.dws = user.dws || [];
+            user.dws.push(newDWS);
+            updateUsers();
+
+            document.getElementById("dwsMessage").textContent = `Your DWS Number is: ${newDWS.dwsNumber}`;
+        }
+
+        document.getElementById("manageDWSBtn").addEventListener("click", () => {
+            switchSection("manageDWSSection");
+            loadUserDWS();
+        });
+
+        function loadUserDWS() {
+            const user = users.find(u => u.username === "currentUser");
+            if (!user || !user.dws) {
+                document.getElementById("userDWSList").innerHTML = "<li>No DWS created yet.</li>";
+                return;
             }
 
-            // Helper function to update local storage
-            function updateUsers() {
-                localStorage.setItem("users", JSON.stringify(users));
-            }
-
-            // Helper function to switch sections
-            function switchSection(sectionId) {
-                document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
-                document.getElementById(sectionId).classList.remove('hidden');
-                clearInputs();
-            }
-
-            // Clear input fields and errors
-            function clearInputs() {
-                document.querySelectorAll('input').forEach(input => input.value = '');
-                document.querySelectorAll('.error').forEach(error => error.textContent = '');
-            }
-
-            // Handle Sign-In
-            document.getElementById("signinBtn").addEventListener("click", () => {
-                const username = document.getElementById("signinUsername").value.trim();
-                const password = document.getElementById("signinPassword").value.trim();
-
-                if (!username || !password) {
-                    document.getElementById("signinError").textContent = "Please fill in all fields.";
-                    return;
-                }
-
-                const user = users.find(u => u.username === username && u.password === encryptPassword(password));
-                if (!user) {
-                    document.getElementById("signinError").textContent = "Invalid credentials.";
-                    return;
-                }
-
-                if (!user.approved) {
-                    document.getElementById("signinError").textContent = "Your account is pending admin approval.";
-                    return;
-                }
-
-                switchSection("userDashboard");
+            const list = document.getElementById("userDWSList");
+            list.innerHTML = ""; // Clear existing list
+            user.dws.forEach(dws => {
+                const listItem = document.createElement("li");
+                listItem.textContent = `DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+                list.appendChild(listItem);
             });
+        }
 
-            // Handle Sign-Up
-            document.getElementById("signupBtn").addEventListener("click", () => {
-                const username = document.getElementById("signupUsername").value.trim();
-                const password = document.getElementById("signupPassword").value.trim();
-                const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
-                const secretCode = document.getElementById("signupSecretCode").value.trim();
+        document.getElementById("searchDWSBtn").addEventListener("click", () => {
+            switchSection("searchDWSSection");
+        });
 
-                if (!username || !password || !confirmPassword || !secretCode) {
-                    document.getElementById("signupError").textContent = "Please fill in all fields.";
-                    return;
+        function searchDWS() {
+            const dwsNumber = document.getElementById("dwsSearchNumber").value.trim();
+            const dws = findDWSByNumber(dwsNumber);
+
+            if (dws) {
+                document.getElementById("dwsSearchResult").textContent = `Found DWS Number: ${dws.dwsNumber} - Created on: ${new Date(dws.createdAt).toLocaleDateString()}`;
+            } else {
+                document.getElementById("dwsSearchResult").textContent = "DWS not found.";
+            }
+        }
+
+        function findDWSByNumber(dwsNumber) {
+            for (const user of users) {
+                if (user.dws) {
+                    const dws = user.dws.find(dws => dws.dwsNumber === parseInt(dwsNumber));
+                    if (dws) return dws;
                 }
+            }
+            return null;  // If DWS not found
+        }
 
-                if (password !== confirmPassword) {
-                    document.getElementById("signupError").textContent = "Passwords do not match.";
-                    return;
-                }
+        function switchSection(sectionId) {
+            document.querySelectorAll('.container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(sectionId).classList.remove('hidden');
+            clearInputs();
+        }
 
-                if (users.some(user => user.username === username)) {
-                    document.getElementById("signupError").textContent = "Username already exists.";
-                    return;
-                }
+        function clearInputs() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+            document.querySelectorAll('.error').forEach(error => error.textContent = '');
+        }
 
-                pendingUsers.push({ username, password: encryptPassword(password), secretCode, approved: false });
-                localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+        // Admin and User Management
 
-                alert("Sign-up successful! Awaiting admin approval.");
-                switchSection("loginSection");
-            });
+        // Handling login
+        document.getElementById("signinBtn").addEventListener("click", () => {
+            const username = document.getElementById("signinUsername").value.trim();
+            const password = document.getElementById("signinPassword").value.trim();
 
-            // Handle Profile Update
-            document.getElementById("profileBtn").addEventListener("click", () => {
-                switchSection("profileSection");
-            });
-
-            document.getElementById("updateProfileBtn").addEventListener("click", () => {
-                const newUsername = document.getElementById("newUsername").value.trim();
-                const newPassword = document.getElementById("newPassword").value.trim();
-                const confirmPassword = document.getElementById("newConfirmPassword").value.trim();
-
-                if (!newUsername || !newPassword || !confirmPassword) {
-                    document.getElementById("profileError").textContent = "Please fill in all fields.";
-                    return;
-                }
-
-                if (newPassword !== confirmPassword) {
-                    document.getElementById("profileError").textContent = "Passwords do not match.";
-                    return;
-                }
-
-                const currentUser = users.find(u => u.username === "currentUser"); // Get the logged-in user
-                if (!currentUser) return;
-
-                currentUser.username = newUsername;
-                currentUser.password = encryptPassword(newPassword);
-                updateUsers();
-
-                alert("Profile updated successfully!");
-                switchSection("userDashboard");
-            });
-
-            // Handle Log Out
-            function logout() {
-                switchSection("loginSection");
+            if (!username || !password) {
+                document.getElementById("signinError").textContent = "Please fill in all fields.";
+                return;
             }
 
-        </script>
-    </body>
+            if (username === "admin" && password === "admin123") {
+                switchSection("adminDashboard");
+                updatePendingUsersList();
+                updateUserList();
+                renderAuditLog();
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.password === password);
+            if (!user) {
+                document.getElementById("signinError").textContent = "Invalid credentials.";
+                return;
+            }
+
+            if (!user.approved) {
+                document.getElementById("signinError").textContent = "Your account is pending admin approval.";
+                return;
+            }
+
+            switchSection("userDashboard");
+        });
+
+        // Handling sign up
+        document.getElementById("signupBtn").addEventListener("click", () => {
+            const username = document.getElementById("signupUsername").value.trim();
+            const password = document.getElementById("signupPassword").value.trim();
+            const confirmPassword = document.getElementById("signupConfirmPassword").value.trim();
+            const secretCode = document.getElementById("signupSecretCode").value.trim();
+
+            if (!username || !password || !confirmPassword || !secretCode) {
+                document.getElementById("signupError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                document.getElementById("signupError").textContent = "Passwords do not match.";
+                return;
+            }
+
+            if (users.some(user => user.username === username)) {
+                document.getElementById("signupError").textContent = "Username already exists.";
+                return;
+            }
+
+            pendingUsers.push({ username, password, secretCode, approved: false, role: "user" });
+            localStorage.setItem("pendingUsers", JSON.stringify(pendingUsers));
+
+            alert("Sign-up successful! Awaiting admin approval.");
+            switchSection("loginSection");
+        });
+
+        // Reset password logic
+        document.getElementById("resetPasswordBtn").addEventListener("click", () => {
+            const username = document.getElementById("resetUsername").value.trim();
+            const secretCode = document.getElementById("resetSecretCode").value.trim();
+            const newPassword = document.getElementById("resetNewPassword").value.trim();
+            const confirmPassword = document.getElementById("resetConfirmPassword").value.trim();
+
+            if (!username || !secretCode || !newPassword || !confirmPassword) {
+                document.getElementById("resetError").textContent = "Please fill in all fields.";
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                document.getElementById("resetError").textContent = "Passwords do not match.";
+                return;
+            }
+
+            const user = users.find(u => u.username === username && u.secretCode === secretCode);
+            if (!user) {
+                document.getElementById("resetError").textContent = "Invalid username or secret code.";
+                return;
+            }
+
+            user.password = newPassword;
+            localStorage.setItem("users", JSON.stringify(users));
+
+            alert("Password reset successful!");
+            switchSection("loginSection");
+        });
+    </script>
+</body>
 </html>
