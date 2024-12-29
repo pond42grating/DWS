@@ -82,6 +82,20 @@
             width: 300px;
         }
 
+        .search-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background-color: #388E3C;
+        }
+
         .back-btn {
             background-color: #4CAF50;
             color: white;
@@ -124,8 +138,8 @@
     </div>
 
     <div class="manage-dws-container" id="manageDWS">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No."
-            oninput="searchDWS()" />
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No." />
+        <button class="search-btn" onclick="searchDWS()">Search</button>
         <div>
             <button class="export-btn" onclick="alert('Exporting as PDF...')">Export as PDF</button>
             <button class="export-btn" onclick="alert('Exporting as Excel...')">Export as Excel</button>
