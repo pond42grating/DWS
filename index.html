@@ -1,150 +1,165 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Work Schedule (DWS) Management</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f4f7;
-      margin: 0;
-      padding: 0;
-    }
-    header {
-      background-color: #333;
-      color: white;
-      padding: 15px 20px;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header h1 {
-      margin: 0;
-    }
-    .logout-btn {
-      background-color: #f44336;
-      color: white;
-      border: none;
-      padding: 8px 16px;
-      cursor: pointer;
-    }
-    .main-content {
-      margin-top: 80px;
-      padding: 40px;
-      text-align: center;
-    }
-    .card {
-      background-color: white;
-      border-radius: 8px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      margin: 20px;
-      padding: 20px;
-      display: inline-block;
-      width: 250px;
-      text-align: center;
-      cursor: pointer;
-      transition: transform 0.2s;
-    }
-    .card:hover {
-      transform: scale(1.05);
-    }
-    .card h2 {
-      margin-top: 10px;
-      color: #333;
-    }
-    .search-container {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    .search-input {
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-    }
-    .search-btn {
-      padding: 10px 20px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-    }
-    .export-btns {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-    }
-    .export-btn {
-      padding: 10px 20px;
-      background-color: #2196F3;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Work Details Export</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 20px;
+            color: #333;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        /* Table Styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+        th, td {
+            padding: 8px;
+            font-size: 14px;
+        }
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
+        /* Button Styles */
+        .btn-container {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+        .btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            margin: 5px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 4px;
+            text-decoration: none;
+        }
+        .btn:hover {
+            background-color: #45a049;
+        }
+        .btn i {
+            margin-right: 5px;
+        }
+    </style>
 </head>
 <body>
-
-<header>
-  <h1>DWS Management</h1>
-  <button class="logout-btn" onclick="alert('Logging out...')">Log Out</button>
-</header>
-
-<div class="main-content">
-  <div class="card" onclick="alert('Creating DWS...')">
-    <h2>Create DWS</h2>
-  </div>
-
-  <div class="card" onclick="alert('Managing DWS...')">
-    <h2>Manage DWS</h2>
-  </div>
-
-  <div class="card" onclick="alert('Exporting as PDF...')">
-    <h2>Export as PDF</h2>
-  </div>
-
-  <div class="card" onclick="alert('Exporting as Excel...')">
-    <h2>Export as Excel</h2>
-  </div>
-
-  <!-- Manage DWS Section -->
-  <div class="manage-dws-container" style="display: none;">
-    <div class="search-container">
-      <input type="text" class="search-input" placeholder="Search by Structure/ TQ/ SI No./ DWS No." id="searchInput">
-      <button class="search-btn" onclick="alert('Search function working...')">Search</button>
+    <h1>Work Details</h1>
+    <div class="btn-container">
+        <button class="btn" onclick="exportToExcel()"><i class="fas fa-file-excel"></i>Export to Excel</button>
+        <button class="btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i>Export to PDF</button>
     </div>
 
-    <div class="export-btns">
-      <button class="export-btn" onclick="alert('Exporting filtered data as PDF...')">Export as PDF</button>
-      <button class="export-btn" onclick="alert('Exporting filtered data as Excel...')">Export as Excel</button>
-    </div>
-  </div>
-</div>
+    <table id="workDetailsTable">
+        <thead>
+            <tr>
+                <th>Sl No</th>
+                <th>DWS No</th>
+                <th>Date</th>
+                <th>S/TQ No</th>
+                <th>Work</th>
+                <th>Location</th>
+                <th>Trade</th>
+                <th>Name</th>
+                <th>Badge No</th>
+                <th>NH</th>
+                <th>OT</th>
+                <th>Holiday</th>
+                <th>Equipment</th>
+                <th>Working Hours</th>
+                <th>Material</th>
+                <th>Qty</th>
+                <th>UOM</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>DWS-1142</td>
+                <td>6/1/2024</td>
+                <td>NFE-05A-002-SI-0317</td>
+                <td>LD-01 - Preparation, cutting...</td>
+                <td>Site</td>
+                <td>Trade Here</td>
+                <td>Name Here</td>
+                <td>196848</td>
+                <td>10</td>
+                <td>2</td>
+                <td>No</td>
+                <td>Welding Machine</td>
+                <td>12</td>
+                <td>Welding Rod - 3mm</td>
+                <td>16</td>
+                <td>Nos</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>DWS-1142</td>
+                <td>6/1/2024</td>
+                <td>NFE-05A-002-SI-0317</td>
+                <td>LD-01 - Preparation, cutting...</td>
+                <td>Site</td>
+                <td>Trade Here</td>
+                <td>Name Here</td>
+                <td>196848</td>
+                <td>10</td>
+                <td>2</td>
+                <td>No</td>
+                <td>Welding Machine</td>
+                <td>12</td>
+                <td>Welding Rod - 3mm</td>
+                <td>16</td>
+                <td>Nos</td>
+            </tr>
+        </tbody>
+    </table>
 
-<script>
-  // Toggle the visibility of Manage DWS
-  document.querySelector('.card:nth-child(2)').onclick = function() {
-    alert('Managing DWS...');
-    const manageDwsSection = document.querySelector('.manage-dws-container');
-    manageDwsSection.style.display = manageDwsSection.style.display === 'none' ? 'block' : 'none';
-  };
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        // Function to export table to Excel
+        function exportToExcel() {
+            const table = document.getElementById("workDetailsTable");
+            const workbook = XLSX.utils.table_to_book(table, { sheet: "Work Details" });
+            XLSX.writeFile(workbook, "work_details.xlsx");
+        }
 
-  // Handle the log-out button functionality
-  document.querySelector('.logout-btn').onclick = function() {
-    alert('Logging out...');
-    // Implement actual logout functionality here
-  };
-</script>
-
+        // Function to export table to PDF
+        async function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+            pdf.text("Work Details", 10, 10);
+            pdf.autoTable({
+                html: "#workDetailsTable",
+                startY: 20,
+                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                headStyles: { fillColor: [60, 141, 188], textColor: 255 },
+            });
+            pdf.save("work_details.pdf");
+        }
+    </script>
 </body>
 </html>
