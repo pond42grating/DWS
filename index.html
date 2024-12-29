@@ -3,12 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DWS Management System</title>
+  <title>DWS Management App</title>
   <style>
-    /* Styling */
+    /* General Styling */
     body {
       font-family: Arial, sans-serif;
-      margin: 20px;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #007BFF;
+      color: white;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    header button {
+      background-color: white;
+      color: #007BFF;
+      border: none;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+    header button:hover {
+      background-color: #e2e6ea;
+    }
+    .container {
+      padding: 20px;
+    }
+    .dashboard {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 50px;
+    }
+    .dashboard button {
+      padding: 20px 30px;
+      font-size: 18px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .dashboard button:hover {
+      background-color: #0056b3;
+    }
+    .form-container {
+      display: none;
     }
     table {
       width: 100%;
@@ -16,37 +64,18 @@
       margin-top: 20px;
     }
     table, th, td {
-      border: 1px solid #ccc;
+      border: 1px solid #ddd;
     }
     th, td {
-      padding: 8px;
-      text-align: center;
+      padding: 10px;
+      text-align: left;
     }
     th {
       background-color: #f4f4f4;
     }
-    .header-row {
-      background-color: #ddebf7;
-      font-weight: bold;
-    }
-    .form-container {
-      margin-bottom: 20px;
-    }
-    .form-container input, .form-container select, .form-container button {
-      padding: 10px;
-      margin: 5px;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-    }
-    .form-container button {
-      background-color: #4CAF50;
-      color: white;
-      cursor: pointer;
-    }
-    .form-container button:hover {
-      background-color: #45a049;
-    }
     .action-buttons {
+      display: flex;
+      gap: 10px;
       margin-top: 20px;
     }
     .action-buttons button {
@@ -55,7 +84,7 @@
       color: white;
       border: none;
       cursor: pointer;
-      margin-right: 10px;
+      border-radius: 5px;
     }
     .action-buttons button:hover {
       background-color: #0056b3;
@@ -63,113 +92,121 @@
   </style>
 </head>
 <body>
-  <h1>DWS Management System</h1>
+  <header>
+    <h1>DWS Management</h1>
+    <button onclick="logout()">Log Out</button>
+  </header>
 
-  <!-- Form to Add Data -->
-  <div class="form-container">
-    <input type="text" id="dwsNo" placeholder="DWS No">
-    <input type="date" id="date">
-    <input type="text" id="structure" placeholder="Structure">
-    <input type="text" id="siTq" placeholder="SI/TQ">
-    <input type="text" id="tqSiNo" placeholder="TQ/SI No">
-    <input type="text" id="work" placeholder="Work Description">
-    <input type="text" id="location" placeholder="Location">
-    <input type="text" id="trade" placeholder="Trade">
-    <input type="text" id="name" placeholder="Name">
-    <input type="text" id="badgeNo" placeholder="Badge No">
-    <input type="number" id="normalHours" placeholder="Normal Hours">
-    <input type="number" id="otHours" placeholder="OT Hours">
-    <input type="text" id="holiday" placeholder="Holiday Info">
-    <input type="text" id="equipment" placeholder="Equipment">
-    <input type="number" id="dh" placeholder="DH">
-    <input type="text" id="material" placeholder="Material">
-    <input type="number" id="quantity" placeholder="Quantity">
-    <input type="text" id="uom" placeholder="UoM">
-    <button onclick="addRow()">Add Row</button>
-  </div>
+  <div class="container">
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+      <button onclick="showCreateDWS()">Create DWS</button>
+      <button onclick="showManageDWS()">Manage DWS</button>
+    </div>
 
-  <!-- Table -->
-  <table>
-    <thead>
-      <tr class="header-row">
-        <th>Sl No</th>
-        <th>DWS No</th>
-        <th>Date</th>
-        <th>Structure</th>
-        <th>SI/TQ</th>
-        <th>TQ/SI No</th>
-        <th>Work</th>
-        <th>Location</th>
-        <th>Trade</th>
-        <th>Name</th>
-        <th>Badge No</th>
-        <th>Normal Hours</th>
-        <th>OT Hours</th>
-        <th>Holiday</th>
-        <th>Equipment</th>
-        <th>DH</th>
-        <th>Material</th>
-        <th>Qty</th>
-        <th>UoM</th>
-      </tr>
-    </thead>
-    <tbody id="dwsTableBody">
-      <!-- Rows will be dynamically added here -->
-    </tbody>
-  </table>
+    <!-- Create DWS Form -->
+    <div class="form-container" id="createDWSForm">
+      <h2>Create DWS</h2>
+      <form id="dwsForm">
+        <label for="structure">Structure:</label>
+        <input type="text" id="structure" placeholder="Enter structure name" required><br><br>
+        <label for="tqsiNo">TQ/SI No:</label>
+        <input type="text" id="tqsiNo" placeholder="Enter TQ/SI No" required><br><br>
+        <label for="work">Work:</label>
+        <textarea id="work" placeholder="Enter work description"></textarea><br><br>
+        <label for="location">Location:</label>
+        <input type="text" id="location" placeholder="Enter location"><br><br>
+        <h3>Manpower</h3>
+        <button type="button" onclick="addManpower()">Add Manpower</button>
+        <div id="manpowerList"></div>
+        <br>
+        <h3>Equipment</h3>
+        <button type="button" onclick="addEquipment()">Add Equipment</button>
+        <div id="equipmentList"></div>
+        <br>
+        <h3>Consumables/Material</h3>
+        <button type="button" onclick="addMaterial()">Add Material</button>
+        <div id="materialList"></div>
+        <br>
+        <div class="action-buttons">
+          <button type="button" onclick="saveDWS()">Save</button>
+          <button type="button" onclick="showDashboard()">Back</button>
+        </div>
+      </form>
+    </div>
 
-  <!-- Action Buttons -->
-  <div class="action-buttons">
-    <button onclick="saveDWS()">Save</button>
-    <button onclick="goBack()">Back</button>
+    <!-- Manage DWS -->
+    <div class="form-container" id="manageDWSForm">
+      <h2>Manage DWS</h2>
+      <input type="text" id="searchInput" placeholder="Search by Structure, TQ/SI No., or DWS No.">
+      <button onclick="searchDWS()">Search</button>
+      <button onclick="exportToExcel()">Export to Excel</button>
+      <button onclick="exportToPDF()">Export to PDF</button>
+      <table id="dwsTable">
+        <thead>
+          <tr>
+            <th>DWS No</th>
+            <th>Structure</th>
+            <th>TQ/SI No</th>
+            <th>Work</th>
+            <th>Location</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+      <button onclick="showDashboard()">Back</button>
+    </div>
   </div>
 
   <script>
-    let rowCount = 0;
-
-    // Function to Add Row
-    function addRow() {
-      const tableBody = document.getElementById('dwsTableBody');
-      const row = document.createElement('tr');
-      
-      rowCount++;
-      row.innerHTML = `
-        <td>${rowCount}</td>
-        <td>${document.getElementById('dwsNo').value}</td>
-        <td>${document.getElementById('date').value}</td>
-        <td>${document.getElementById('structure').value}</td>
-        <td>${document.getElementById('siTq').value}</td>
-        <td>${document.getElementById('tqSiNo').value}</td>
-        <td>${document.getElementById('work').value}</td>
-        <td>${document.getElementById('location').value}</td>
-        <td>${document.getElementById('trade').value}</td>
-        <td>${document.getElementById('name').value}</td>
-        <td>${document.getElementById('badgeNo').value}</td>
-        <td>${document.getElementById('normalHours').value}</td>
-        <td>${document.getElementById('otHours').value}</td>
-        <td>${document.getElementById('holiday').value}</td>
-        <td>${document.getElementById('equipment').value}</td>
-        <td>${document.getElementById('dh').value}</td>
-        <td>${document.getElementById('material').value}</td>
-        <td>${document.getElementById('quantity').value}</td>
-        <td>${document.getElementById('uom').value}</td>
-      `;
-
-      tableBody.appendChild(row);
-
-      // Clear form fields
-      document.querySelectorAll('.form-container input').forEach(input => input.value = '');
+    function logout() {
+      alert("Logged out successfully!");
     }
 
-    // Function to simulate saving the DWS data
+    function showCreateDWS() {
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('createDWSForm').style.display = 'block';
+      document.getElementById('manageDWSForm').style.display = 'none';
+    }
+
+    function showManageDWS() {
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('createDWSForm').style.display = 'none';
+      document.getElementById('manageDWSForm').style.display = 'block';
+    }
+
+    function showDashboard() {
+      document.getElementById('dashboard').style.display = 'block';
+      document.getElementById('createDWSForm').style.display = 'none';
+      document.getElementById('manageDWSForm').style.display = 'none';
+    }
+
     function saveDWS() {
-      alert('DWS data has been saved successfully!');
+      alert("DWS saved successfully!");
     }
 
-    // Function to navigate back
-    function goBack() {
-      alert('Going back to the previous page!');
-      window.history.back();
+    function addManpower() {
+      alert("Add manpower functionality coming soon.");
+    }
+
+    function addEquipment() {
+      alert("Add equipment functionality coming soon.");
+    }
+
+    function addMaterial() {
+      alert("Add material functionality coming soon.");
+    }
+
+    function searchDWS() {
+      alert("Search functionality coming soon.");
+    }
+
+    function exportToExcel() {
+      alert("Export to Excel functionality coming soon.");
+    }
+
+    function exportToPDF() {
+      alert("Export to PDF functionality coming soon.");
     }
   </script>
 </body>
