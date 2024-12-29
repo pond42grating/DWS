@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,6 +15,7 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      transition: background-color 0.3s;
     }
     .container {
       background-color: #fff;
@@ -78,6 +80,18 @@
     .strength-weak { background-color: red; }
     .strength-medium { background-color: yellow; }
     .strength-strong { background-color: green; }
+    /* Dark mode */
+    body.dark-mode {
+      background-color: #333;
+      color: #fff;
+    }
+    .container.dark-mode {
+      background-color: #444;
+      color: #fff;
+    }
+    .button.dark-mode {
+      background-color: #555;
+    }
   </style>
 </head>
 <body>
@@ -103,6 +117,12 @@
     <!-- Forgot Password Link -->
     <div class="forgot-password">
       <p><a href="#" onclick="showForgotPassword()">Forgot Password?</a></p>
+    </div>
+
+    <!-- Light/Dark Mode Toggle -->
+    <div class="dark-mode-toggle">
+      <label for="themeToggle">Dark Mode:</label>
+      <input type="checkbox" id="themeToggle" onclick="toggleTheme()">
     </div>
   </div>
 
@@ -207,7 +227,7 @@
       }
 
       const secretCode = Math.floor(1000 + Math.random() * 9000);
-      localStorage.setItem(username, JSON.stringify({ password, secretCode }));
+      localStorage.setItem(username, JSON.stringify({ password, secretCode, role: "normal" }));
       showMsg(`Account created! Your secret code is: ${secretCode}`);
       backToLogin();
     }
@@ -257,6 +277,13 @@
       localStorage.setItem(username, JSON.stringify(user));
       showMsg("Password reset successfully!");
       backToLogin();
+    }
+
+    // Toggle Dark Mode
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      document.querySelectorAll(".container").forEach(el => el.classList.toggle("dark-mode"));
+      document.querySelectorAll(".button").forEach(el => el.classList.toggle("dark-mode"));
     }
   </script>
 
