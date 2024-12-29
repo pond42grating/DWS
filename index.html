@@ -421,4 +421,15 @@
         }
 
         window.onpopstate = function (event) {
-            if (event.state && event.state
+                        if (event.state && event.state.page === "manageDWS") {
+                document.querySelector('.main-content').style.display = 'none';
+                document.getElementById('manageDWS').style.display = 'flex';
+            } else {
+                document.querySelector('.main-content').style.display = 'flex';
+                document.getElementById('manageDWS').style.display = 'none';
+            }
+        };
+
+    </script>
+</body>
+</html>
