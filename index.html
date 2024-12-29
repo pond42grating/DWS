@@ -148,24 +148,45 @@
     </div>
 
     <script>
+        // Function to show the Create DWS page
         function showCreateDWS() {
             alert("Create DWS functionality will be implemented here.");
         }
 
+        // Function to show the Manage DWS page
         function showManageDWS() {
             document.querySelector('.main-content').style.display = 'none';
             document.getElementById('manageDWS').style.display = 'flex';
+            
+            // Push state to the history to track this view
+            history.pushState({ page: "manageDWS" }, "Manage DWS", "#manageDWS");
         }
 
+        // Function to go back to the main page
         function backToMain() {
             document.querySelector('.main-content').style.display = 'flex';
             document.getElementById('manageDWS').style.display = 'none';
+
+            // Replace state in history to ensure back button works properly
+            history.replaceState({ page: "main" }, "Main Page", "#main");
         }
 
+        // Search DWS function
         function searchDWS() {
             var searchValue = document.getElementById('searchInput').value;
             alert('Searching for: ' + searchValue);
         }
+
+        // Handle the browser's back button event
+        window.onpopstate = function (event) {
+            if (event.state && event.state.page === "manageDWS") {
+                document.querySelector('.main-content').style.display = 'none';
+                document.getElementById('manageDWS').style.display = 'flex';
+            } else {
+                document.querySelector('.main-content').style.display = 'flex';
+                document.getElementById('manageDWS').style.display = 'none';
+            }
+        };
     </script>
 </body>
 
