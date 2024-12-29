@@ -489,30 +489,39 @@
     const row = consumableTable.insertRow();
     row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
   }
-  function loadSavedFiles() {
-      const savedFilesList = document.getElementById('savedFilesList');
-      savedFilesList.innerHTML = ''; // Clear the list before reloading
+  function displaySavedFiles() {
+  const savedFilesList = document.getElementById('savedFilesList');
+  savedFilesList.innerHTML = '';
 
-      // Loop through all items in localStorage
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        const dwsData = JSON.parse(localStorage.getItem(key));
+  // Display buttons for each saved DWS number
+  for (let i = 1; i < dwsCounter; i++) {
+    const dwsNo = `DWS-${String(i).padStart(4, '0')}`;
+    const button = document.createElement('button');
+    button.textContent = dwsNo;
+    button.onclick = () => loadSavedFile(dwsNo);
+    
+    // Create delete button for each DWS file
+    const deleteButton = document.createElement('button');
+    deleteButton.textContent = 'Delete';
+    deleteButton.style.backgroundColor = 'red';
+    deleteButton.style.color = 'white';
+    deleteButton.onclick = (event) => {
+      event.stopPropagation(); // Prevent the loadSavedFile function from firing
+      deleteDws(dwsNo);
+    };
 
-        const div = document.createElement('div');
-        div.innerHTML = `
-          <strong>${dwsData.dwsNo}</strong>
-          <button onclick="deleteDws('${dwsData.dwsNo}')">Delete</button>
-        `;
-        savedFilesList.appendChild(div);
-      }
-    }
+    const div = document.createElement('div');
+    div.appendChild(button);
+    div.appendChild(deleteButton);
+    savedFilesList.appendChild(div);
+  }
+}
 
-    // Function to delete a DWS entry from localStorage
-    function deleteDws(dwsNo) {
-      if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
-        localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
-        loadSavedFiles();  // Reload the saved files list after deletion
-      }
-    }
+function deleteDws(dwsNo) {
+  if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
+    localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
+    displaySavedFiles();  // Reload the saved files list after deletion
+  }
+}
 
 </script>
