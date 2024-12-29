@@ -17,7 +17,7 @@
       display: block;
       margin-bottom: 8px;
     }
-    input[type="text"], input[type="number"], input[type="date"] {
+    input[type="text"], input[type="number"] {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -64,17 +64,6 @@
     .back-button:hover {
       background-color: #da190b;
     }
-    .export-button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .export-button:hover {
-      background-color: #006F8E;
-    }
   </style>
 </head>
 <body>
@@ -87,7 +76,6 @@
     <input type="text" id="dwsNo" readonly>
   </div>
 
-  <!-- Date Field -->
   <div class="form-section">
     <label for="date">Date</label>
     <input type="date" id="date">
@@ -206,9 +194,6 @@
   </div>
 
   <button id="saveButton" onclick="saveData()">Save DWS</button>
-  <button class="export-button" onclick="exportToExcel()">Export to Excel</button>
-  <button class="export-button" onclick="exportToPDF()">Export to PDF</button>
-
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
@@ -348,62 +333,6 @@
       window.history.back();
     }
 
-    function exportToExcel() {
-      const table = document.createElement('table');
-      const date = document.getElementById('date').value;
-      const dwsNo = document.getElementById('dwsNo').value;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      let excelData = `
-        <table>
-          <tr>
-            <th>DWS No.</th><th>Date</th><th>Structure Name</th><th>SI No.</th><th>Work Description</th><th>Location</th>
-          </tr>
-          <tr>
-            <td>${dwsNo}</td><td>${date}</td><td>${structureName}</td><td>${siNo}</td><td>${workDescription}</td><td>${location}</td>
-          </tr>
-        </table>`;
-
-      let manpowerTable = document.getElementById('manpowerTable');
-      let equipmentTable = document.getElementById('equipmentTable');
-      let consumableTable = document.getElementById('consumableTable');
-
-      excelData += manpowerTable.outerHTML + equipmentTable.outerHTML + consumableTable.outerHTML;
-
-      const blob = new Blob([excelData], { type: 'application/vnd.ms-excel' });
-      const link = document.createElement('a');
-      link.href = URL.createObjectURL(blob);
-      link.download = 'DWS.xlsx';
-      link.click();
-    }
-
-    function exportToPDF() {
-      const doc = new jsPDF();
-
-      const date = document.getElementById('date').value;
-      const dwsNo = document.getElementById('dwsNo').value;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      doc.text(`DWS No.: ${dwsNo}`, 10, 10);
-      doc.text(`Date: ${date}`, 10, 20);
-      doc.text(`Structure Name: ${structureName}`, 10, 30);
-      doc.text(`SI No.: ${siNo}`, 10, 40);
-      doc.text(`Work Description: ${workDescription}`, 10, 50);
-      doc.text(`Location: ${location}`, 10, 60);
-
-      doc.autoTable({ html: '#manpowerTable' });
-      doc.autoTable({ html: '#equipmentTable' });
-      doc.autoTable({ html: '#consumableTable' });
-
-      doc.save('DWS.pdf');
-    }
-
     // Auto generate DWS No.
     function generateDwsNo() {
       const dwsNoField = document.getElementById('dwsNo');
@@ -415,11 +344,6 @@
       generateDwsNo();
     }
   </script>
-
-  <!-- jsPDF library for PDF export -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- jsPDF AutoTable plugin -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.17/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 </html>
