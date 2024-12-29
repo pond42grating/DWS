@@ -127,6 +127,9 @@
     <input type="password" id="new-password" class="input-field" placeholder="New Password" required>
     <input type="password" id="confirm-new-password" class="input-field" placeholder="Confirm New Password" required>
     <button class="button" onclick="resetPassword()">Reset Password</button>
+    <div class="forgot-password">
+      <p><a href="#" onclick="showLoginForm()">Back to Login</a></p>
+    </div>
   </div>
 
   <!-- Admin Panel -->
@@ -197,7 +200,7 @@
 
       localStorage.setItem(username, JSON.stringify(user));
       showMsg('Account created! Waiting for admin approval.');
-      setTimeout(showLoginForm, 2000); // Redirect to login page
+      setTimeout(showLoginForm, 2000); // Stay on the login page after account creation
     }
 
     // Function to generate a random secret code
@@ -237,22 +240,15 @@
       localStorage.setItem(username, JSON.stringify(user));
 
       showMsg('Password reset successful!');
-      setTimeout(showLoginForm, 2000); // Redirect to login page
+      setTimeout(showLoginForm, 2000); // Stay on the login page after password reset
     }
 
     // Login Function
     function login() {
       var username = document.getElementById('username').value;
-      var password = document.getElementById('password').value;
+            var password = document.getElementById('password').value;
 
-      // Check if admin login
-      if (username === 'admin' && password === 'admin123') {
-        document.getElementById('admin-panel').style.display = 'block';
-        document.getElementById('login-form').style.display = 'none';
-        loadPendingUsers();
-        return;
-      }
-
+      // Check if the user exists in localStorage
       var user = JSON.parse(localStorage.getItem(username));
 
       if (!user) {
@@ -260,62 +256,70 @@
         return;
       }
 
+      // Check if the password is correct
       if (user.password !== password) {
         showMsg('Incorrect password.');
         return;
       }
 
-      if (user.status !== 'Approved') {
+      // Check if the user is an admin
+      if (username === 'admin' && password === 'admin123') {
+        showAdminPanel();
+        return;
+      }
+
+      // Check if the user account is pending admin approval
+      if (user.status === 'Waiting for Admin Approval') {
         showMsg('Your account is waiting for admin approval.');
         return;
       }
 
+      // If login is successful
       showMsg('Login successful!');
-      setTimeout(function() {
-        window.location.href = 'home.html'; // Redirect to home page
-      }, 2000);
+      setTimeout(showLoginForm, 2000); // Stay on the login page after successful login
     }
 
-    // Load pending users in the admin panel
-    function loadPendingUsers() {
-      var users = [];
+    // Show Admin Panel
+    function showAdminPanel() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'block';
+
+      // Display pending users
+      var usersList = '';
       for (var i = 0; i < localStorage.length; i++) {
         var username = localStorage.key(i);
         var user = JSON.parse(localStorage.getItem(username));
+
         if (user.status === 'Waiting for Admin Approval') {
-          users.push(user);
+          usersList += `<div>
+                          <p>${user.username} - ${user.status}</p>
+                          <button onclick="approveUser('${username}')">Approve</button>
+                          <button onclick="rejectUser('${username}')">Reject</button>
+                        </div>`;
         }
       }
 
-      var userList = document.getElementById('pending-users');
-      userList.innerHTML = '';
-
-      if (users.length === 0) {
-        userList.innerHTML = '<p>No pending users.</p>';
-      } else {
-        users.forEach(function(user) {
-          var userDiv = document.createElement('div');
-          userDiv.innerHTML = `<p>${user.username} - ${user.status} <button onclick="approveUser('${user.username}')">Approve</button> <button onclick="rejectUser('${user.username}')">Reject</button></p>`;
-          userList.appendChild(userDiv);
-        });
-      }
+      document.getElementById('pending-users').innerHTML = usersList;
     }
 
-    // Approve user
+    // Approve User Function
     function approveUser(username) {
       var user = JSON.parse(localStorage.getItem(username));
       user.status = 'Approved';
       localStorage.setItem(username, JSON.stringify(user));
-      loadPendingUsers();
+
       showMsg(`${username} has been approved.`);
+      setTimeout(showAdminPanel, 2000); // Stay on the admin panel after approving
     }
 
-    // Reject user
+    // Reject User Function
     function rejectUser(username) {
-      localStorage.removeItem(username); // Remove rejected user
-      loadPendingUsers();
+      localStorage.removeItem(username);
+
       showMsg(`${username} has been rejected.`);
+      setTimeout(showAdminPanel, 2000); // Stay on the admin panel after rejecting
     }
+
   </script>
 
 </body>
