@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -37,6 +36,10 @@
       font-size: 0.9em;
     }
     .preview-section {
+      margin-top: 20px;
+    }
+    #manageDWSContainer {
+      display: none;
       margin-top: 20px;
     }
   </style>
@@ -171,12 +174,33 @@
     <button class="back-button" onclick="goBack()">Back to Home</button>
   </div>
 
+  <div id="manageDWSContainer">
+    <h1>Manage DWS</h1>
+    <table id="savedDWSList">
+      <tr>
+        <th>DWS No.</th>
+        <th>Structure Name</th>
+        <th>SI No.</th>
+        <th>Work Description</th>
+        <th>Location</th>
+      </tr>
+    </table>
+    <button class="back-button" onclick="goBackManage()">Back to Home</button>
+  </div>
+
   <script>
     let dwsCounter = 1;
 
     document.getElementById('createDWSBtn').onclick = function() {
       document.getElementById('createDWSForm').style.display = 'block';
+      document.getElementById('manageDWSContainer').style.display = 'none';
       document.getElementById('dwsNo').value = `DWS-${dwsCounter}`;
+    };
+
+    document.getElementById('manageDWSBtn').onclick = function() {
+      document.getElementById('manageDWSContainer').style.display = 'block';
+      document.getElementById('createDWSForm').style.display = 'none';
+      loadSavedDWS();
     };
 
     function showError(elementId, errorMessage) {
@@ -319,8 +343,29 @@
       </tr>`;
     }
 
+    function loadSavedDWS() {
+      const savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
+      const table = document.getElementById('savedDWSList');
+      // Clear existing rows except for the header
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+      savedData.forEach(dws => {
+        const row = table.insertRow();
+        row.innerHTML = `<td>${dws.dwsNo}</td>
+                         <td>${dws.structureName}</td>
+                         <td>${dws.siNo}</td>
+                         <td>${dws.workDescription}</td>
+                         <td>${dws.location}</td>`;
+      });
+    }
+
     function goBack() {
       document.getElementById('createDWSForm').style.display = 'none';
+    }
+
+    function goBackManage() {
+      document.getElementById('manageDWSContainer').style.display = 'none';
     }
   </script>
 </body>
