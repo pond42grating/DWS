@@ -499,7 +499,7 @@
     const button = document.createElement('button');
     button.textContent = dwsNo;
     button.onclick = () => loadSavedFile(dwsNo);
-    
+
     // Create delete button for each DWS file
     const deleteButton = document.createElement('button');
     deleteButton.textContent = 'Delete';
@@ -507,7 +507,7 @@
     deleteButton.style.color = 'white';
     deleteButton.onclick = (event) => {
       event.stopPropagation(); // Prevent the loadSavedFile function from firing
-      deleteDws(dwsNo);
+      deleteDws(dwsNo); // Call deleteDws to remove the file
     };
 
     const div = document.createElement('div');
@@ -519,8 +519,15 @@
 
 function deleteDws(dwsNo) {
   if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
-    localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
-    displaySavedFiles();  // Reload the saved files list after deletion
+    // Remove the DWS entry from localStorage
+    localStorage.removeItem(dwsNo);
+
+    // After deletion, reload the saved files list
+    displaySavedFiles();
+    
+    // Optionally, if you have other stored data related to that DWS, remove them too.
+    // For example, if the DWS also has related data in other keys, you can delete those:
+    // localStorage.removeItem(`relatedDataFor${dwsNo}`);
   }
 }
 
