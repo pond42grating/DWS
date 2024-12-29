@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login and Sign Up</title>
+  <title>Login</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
       height: 100vh;
     }
 
-    .container {
+    .login-container {
       background-color: #fff;
       padding: 30px;
       border-radius: 8px;
@@ -76,50 +76,22 @@
       text-decoration: underline;
     }
 
-    /* Sign-up Form Styles */
-    .sign-up-container {
-      display: none; /* Initially hidden */
-    }
-
-    /* Modal for displaying messages */
-    #msgModal {
+    .admin-panel {
       display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    #msgModal div {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      width: 300px;
-    }
-
-    #msgModal button {
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
 
-  <!-- Main Container -->
-  <div class="container" id="login-container">
+  <!-- Login Container -->
+  <div class="login-container" id="login-form">
     <h2>Login</h2>
     
     <!-- Username Input -->
-    <input type="text" id="login-username" class="input-field" placeholder="Username" required>
+    <input type="text" id="username" class="input-field" placeholder="Username" required>
     
     <!-- Password Input -->
-    <input type="password" id="login-password" class="input-field" placeholder="Password" required>
+    <input type="password" id="password" class="input-field" placeholder="Password" required>
     
     <!-- Sign In Button -->
     <button class="button" onclick="login()">Sign In</button>
@@ -135,148 +107,105 @@
     </div>
   </div>
 
-  <!-- Sign Up Form -->
-  <div class="sign-up-container" id="sign-up-container">
+  <!-- Sign Up Container -->
+  <div class="login-container" id="sign-up-form" style="display: none;">
     <h2>Sign Up</h2>
-    
-    <!-- Username Input -->
-    <input type="text" id="username" class="input-field" placeholder="Username" required>
-    
-    <!-- Password Input -->
-    <input type="password" id="password" class="input-field" placeholder="Password" required>
-    
-    <!-- Confirm Password Input -->
+    <input type="text" id="sign-up-username" class="input-field" placeholder="Username" required>
+    <input type="password" id="sign-up-password" class="input-field" placeholder="Password" required>
     <input type="password" id="confirm-password" class="input-field" placeholder="Confirm Password" required>
-    
-    <!-- Secret Code Input -->
-    <input type="text" id="secret-code" class="input-field" placeholder="Generated Secret Code" readonly>
-    
-    <!-- Create Account Button -->
     <button class="button" onclick="createAccount()">Create Account</button>
-    
-    <!-- Back to Login Link -->
-    <div class="forgot-password">
-      <p><a href="#" onclick="showLoginForm()">Back to Login</a></p>
+    <div class="sign-up-link">
+      <p>Already have an account? <a href="#" onclick="showLoginForm()">Login</a></p>
     </div>
   </div>
 
-  <!-- Forgot Password Form -->
-  <div class="forgot-password-container" id="forgot-password-container" style="display: none;">
+  <!-- Forgot Password Container -->
+  <div class="login-container" id="forgot-password-form" style="display: none;">
     <h2>Forgot Password</h2>
-    
-    <!-- Username Input -->
-    <input type="text" id="forgot-username" class="input-field" placeholder="Enter your Username" required>
-    
-    <!-- Secret Code Input -->
-    <input type="text" id="forgot-secret-code" class="input-field" placeholder="Enter Secret Code" required>
-    
-    <!-- New Password Input -->
+    <input type="text" id="forgot-username" class="input-field" placeholder="Enter your username" required>
+    <input type="text" id="forgot-secret-code" class="input-field" placeholder="Enter your secret code" required>
     <input type="password" id="new-password" class="input-field" placeholder="New Password" required>
-    
-    <!-- Confirm New Password Input -->
     <input type="password" id="confirm-new-password" class="input-field" placeholder="Confirm New Password" required>
-    
-    <!-- Reset Password Button -->
     <button class="button" onclick="resetPassword()">Reset Password</button>
-    
-    <!-- Back to Login Link -->
-    <div class="forgot-password">
-      <p><a href="#" onclick="showLoginForm()">Back to Login</a></p>
-    </div>
   </div>
 
-  <!-- Modal for displaying secret code -->
-  <div id="msgModal">
-    <div>
-      <h4 id="msgText">Message</h4>
-      <button onclick="closeModal()">Close</button>
+  <!-- Admin Panel -->
+  <div class="admin-panel" id="admin-panel">
+    <h2>Admin Panel</h2>
+    <div id="pending-users">
+      <!-- List of pending users will be displayed here -->
+    </div>
+    <button class="button" onclick="showLoginForm()">Log Out</button>
+  </div>
+
+  <!-- Modal for displaying messages -->
+  <div id="msgModal" style="display: none;">
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+      <div style="background-color: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px;">
+        <h4 id="msgText">Message</h4>
+        <button onclick="closeModal()">Close</button>
+      </div>
     </div>
   </div>
 
   <script>
-    // Function to show the message box
+    // Show the login form and hide others
+    function showLoginForm() {
+      document.getElementById('login-form').style.display = 'block';
+      document.getElementById('sign-up-form').style.display = 'none';
+      document.getElementById('forgot-password-form').style.display = 'none';
+      document.getElementById('admin-panel').style.display = 'none';
+      document.getElementById('msgModal').style.display = 'none';
+    }
+
+    // Show the signup form
+    function showSignUpForm() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('sign-up-form').style.display = 'block';
+    }
+
+    // Show the forgot password form
+    function showForgotPasswordForm() {
+      document.getElementById('login-form').style.display = 'none';
+      document.getElementById('forgot-password-form').style.display = 'block';
+    }
+
+    // Show message box
     function showMsg(message) {
-      document.getElementById('msgText').innerText = `${message} functionality is being developed.`;
+      document.getElementById('msgText').innerText = message;
       document.getElementById('msgModal').style.display = 'flex';
     }
 
-    // Function to close the modal
+    // Close message box
     function closeModal() {
       document.getElementById('msgModal').style.display = 'none';
     }
 
-    // Function to show the Sign-Up form and hide Login
-    function showSignUpForm() {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('sign-up-container').style.display = 'block';
-    }
-
-    // Function to show the Forgot Password form
-    function showForgotPasswordForm() {
-      document.getElementById('login-container').style.display = 'none';
-      document.getElementById('forgot-password-container').style.display = 'block';
-    }
-
-    // Function to show the Login form and hide Sign-Up and Forgot Password
-    function showLoginForm() {
-      document.getElementById('sign-up-container').style.display = 'none';
-      document.getElementById('forgot-password-container').style.display = 'none';
-      document.getElementById('login-container').style.display = 'block';
-    }
-
-    // Function to generate a secret code and show in modal
+    // Sign Up Function
     function createAccount() {
-      var username = document.getElementById('username').value;
-      var password = document.getElementById('password').value;
+      var username = document.getElementById('sign-up-username').value;
+      var password = document.getElementById('sign-up-password').value;
       var confirmPassword = document.getElementById('confirm-password').value;
-      
-      var secretCode = Math.random().toString(36).substr(2, 8); // Generate random code
 
-      // Validate fields
-      if (username === '' || password === '' || confirmPassword === '') {
-        showMsg('Please fill in all fields.');
-        return;
-      }
-      
       if (password !== confirmPassword) {
         showMsg('Passwords do not match.');
         return;
       }
 
-      // Store user data in localStorage
-      localStorage.setItem(username, JSON.stringify({password: password, secretCode: secretCode}));
+      var secretCode = generateSecretCode();
+      var user = { username: username, password: password, secretCode: secretCode, status: 'Waiting for Admin Approval' };
 
-      // Display secret code
-      document.getElementById('secret-code').value = secretCode;
-      showSecretCodeModal(secretCode);
-
-      // Automatically redirect to the login page after 2 seconds
-      setTimeout(function() {
-        showLoginForm();
-      }, 2000);
+      localStorage.setItem(username, JSON.stringify(user));
+      showMsg('Account created! Waiting for admin approval.');
+      setTimeout(showLoginForm, 2000); // Redirect to login page
     }
 
-    // Function to display the modal with the secret code
-    function showSecretCodeModal(secretCode) {
-      var modal = document.getElementById('msgModal');
-      var msgText = document.getElementById('msgText');
-
-      msgText.innerHTML = `Your Secret Code: <strong>${secretCode}</strong><br><button onclick="copyToClipboard('${secretCode}')">Copy</button>`;
-      modal.style.display = 'flex';
+    // Function to generate a random secret code
+    function generateSecretCode() {
+      return Math.floor(Math.random() * 1000000).toString(); // Generate a 6-digit number
     }
 
-    // Function to copy the secret code to clipboard
-    function copyToClipboard(secretCode) {
-      var textArea = document.createElement('textarea');
-      textArea.value = secretCode;
-            document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      showMsg('Secret Code copied to clipboard!');
-    }
-
-    // Function to handle the reset password process
+    // Reset Password Function
     function resetPassword() {
       var username = document.getElementById('forgot-username').value;
       var secretCode = document.getElementById('forgot-secret-code').value;
@@ -291,35 +220,39 @@
         return;
       }
 
-      // Validate the secret code
+      // Validate secret code
       if (user.secretCode !== secretCode) {
-        showMsg('Invalid Secret Code.');
+        showMsg('Invalid secret code.');
         return;
       }
 
-      // Check if new passwords match
+      // Validate password match
       if (newPassword !== confirmNewPassword) {
-        showMsg('New passwords do not match.');
+        showMsg('Passwords do not match.');
         return;
       }
 
-      // Update the password in localStorage
+      // Update password in localStorage
       user.password = newPassword;
       localStorage.setItem(username, JSON.stringify(user));
 
-      // Inform the user and redirect to the login page
-      showMsg('Password has been successfully reset!');
-      setTimeout(function() {
-        showLoginForm();
-      }, 2000);
+      showMsg('Password reset successful!');
+      setTimeout(showLoginForm, 2000); // Redirect to login page
     }
 
-    // Function to handle login process
+    // Login Function
     function login() {
-      var username = document.getElementById('login-username').value;
-      var password = document.getElementById('login-password').value;
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
 
-      // Check if user exists in localStorage
+      // Check if admin login
+      if (username === 'admin' && password === 'admin123') {
+        document.getElementById('admin-panel').style.display = 'block';
+        document.getElementById('login-form').style.display = 'none';
+        loadPendingUsers();
+        return;
+      }
+
       var user = JSON.parse(localStorage.getItem(username));
 
       if (!user) {
@@ -327,17 +260,61 @@
         return;
       }
 
-      // Validate the password
       if (user.password !== password) {
-        showMsg('Invalid password.');
+        showMsg('Incorrect password.');
         return;
       }
 
-      // Successfully logged in
+      if (user.status !== 'Approved') {
+        showMsg('Your account is waiting for admin approval.');
+        return;
+      }
+
       showMsg('Login successful!');
       setTimeout(function() {
-        window.location.href = "home.html"; // Redirect to home page
+        window.location.href = 'home.html'; // Redirect to home page
       }, 2000);
+    }
+
+    // Load pending users in the admin panel
+    function loadPendingUsers() {
+      var users = [];
+      for (var i = 0; i < localStorage.length; i++) {
+        var username = localStorage.key(i);
+        var user = JSON.parse(localStorage.getItem(username));
+        if (user.status === 'Waiting for Admin Approval') {
+          users.push(user);
+        }
+      }
+
+      var userList = document.getElementById('pending-users');
+      userList.innerHTML = '';
+
+      if (users.length === 0) {
+        userList.innerHTML = '<p>No pending users.</p>';
+      } else {
+        users.forEach(function(user) {
+          var userDiv = document.createElement('div');
+          userDiv.innerHTML = `<p>${user.username} - ${user.status} <button onclick="approveUser('${user.username}')">Approve</button> <button onclick="rejectUser('${user.username}')">Reject</button></p>`;
+          userList.appendChild(userDiv);
+        });
+      }
+    }
+
+    // Approve user
+    function approveUser(username) {
+      var user = JSON.parse(localStorage.getItem(username));
+      user.status = 'Approved';
+      localStorage.setItem(username, JSON.stringify(user));
+      loadPendingUsers();
+      showMsg(`${username} has been approved.`);
+    }
+
+    // Reject user
+    function rejectUser(username) {
+      localStorage.removeItem(username); // Remove rejected user
+      loadPendingUsers();
+      showMsg(`${username} has been rejected.`);
     }
   </script>
 
