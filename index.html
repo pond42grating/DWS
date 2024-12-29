@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DWS Management App</title>
   <style>
-    /* General Styling */
     body {
       font-family: Arial, sans-serif;
     }
@@ -14,9 +13,6 @@
       color: white;
       padding: 10px 20px;
       text-align: center;
-    }
-    header h1 {
-      margin: 0;
     }
     .container {
       padding: 20px;
@@ -53,7 +49,7 @@
 
 <div class="container">
   <!-- Dashboard -->
-  <div id="dashboard" class="dashboard">
+  <div id="dashboard" class="dashboard" style="display: block;">
     <button onclick="showCreateDWS()">Create DWS</button>
     <button onclick="showManageDWS()">Manage DWS</button>
   </div>
@@ -206,6 +202,11 @@
         </tr>`;
     });
   }
+
+  // Initialize the app by showing the dashboard
+  window.onload = function () {
+    showDashboard();
+  };
 </script>
 
 </body>
