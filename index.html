@@ -14,10 +14,9 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      flex-direction: column;
     }
 
-    .container {
+    .login-container {
       background-color: #fff;
       padding: 30px;
       border-radius: 8px;
@@ -63,240 +62,164 @@
       background-color: #0056b3;
     }
 
-    .forgot-password, .sign-up-link, .back-link {
+    .forgot-password, .sign-up-link {
       text-align: center;
       margin-top: 15px;
     }
 
-    .forgot-password a, .sign-up-link a, .back-link a {
+    .forgot-password a, .sign-up-link a {
       color: #007BFF;
       text-decoration: none;
     }
 
-    .forgot-password a:hover, .sign-up-link a:hover, .back-link a:hover {
+    .forgot-password a:hover, .sign-up-link a:hover {
       text-decoration: underline;
     }
 
-    .password-strength {
-      width: 100%;
-      height: 8px;
+    /* Password strength bar */
+    .strength-bar {
+      height: 5px;
+      margin-top: 10px;
       background-color: #ddd;
-      margin-top: 5px;
-    }
-
-    .password-strength-bar {
-      height: 100%;
-      background-color: #f00;
-      width: 0%;
-    }
-
-    .password-strength-strong {
-      background-color: #28a745;
-    }
-
-    .password-strength-medium {
-      background-color: #ffc107;
-    }
-
-    .password-strength-weak {
-      background-color: #dc3545;
-    }
-
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-
-    .modal-content {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      text-align: center;
-      width: 300px;
-    }
-
-    .modal-content button {
-      background-color: #007BFF;
-      color: #fff;
-      padding: 10px;
-      border: none;
       border-radius: 5px;
-      cursor: pointer;
+      overflow: hidden;
+      width: 100%;
     }
 
-    .modal-content button:hover {
-      background-color: #0056b3;
+    .strength-bar span {
+      display: block;
+      height: 100%;
     }
+
+    /* Limit height of password strength indicator to prevent overlap */
+    .password-strength-indicator {
+      margin-bottom: 20px;
+      height: 20px; /* Adjust height to prevent overlap */
+    }
+
   </style>
 </head>
 <body>
 
-<!-- Login Page -->
-<div id="login-page" class="container">
-  <h2>Login</h2>
-  <input type="text" id="username" class="input-field" placeholder="Username" required>
-  <input type="password" id="password" class="input-field" placeholder="Password" required>
-  <button class="button" onclick="login()">Login</button>
-  <div class="sign-up-link">
-    <p>Don't have an account? <a href="#" onclick="showSignUp()">Sign Up</a></p>
+  <!-- Login Container -->
+  <div class="login-container">
+    <h2>Login</h2>
+    
+    <!-- Username Input -->
+    <input type="text" id="username" class="input-field" placeholder="Username" required>
+    
+    <!-- Password Input -->
+    <input type="password" id="password" class="input-field" placeholder="Password" required>
+    
+    <!-- Password Strength Indicator -->
+    <div class="password-strength-indicator" id="passwordStrengthIndicator"></div>
+    
+    <!-- Sign In Button -->
+    <button class="button" onclick="login()">Sign In</button>
+    
+    <!-- Sign Up Link -->
+    <div class="sign-up-link">
+      <p>Don't have an account? <a href="#" onclick="showMsg('Sign Up')">Sign Up</a></p>
+    </div>
+    
+    <!-- Forgot Password Link -->
+    <div class="forgot-password">
+      <p><a href="#" onclick="showMsg('Forgot Password')">Forgot Password?</a></p>
+    </div>
   </div>
-  <div class="forgot-password">
-    <p><a href="#" onclick="showForgotPassword()">Forgot Password?</a></p>
-  </div>
-</div>
 
-<!-- Sign Up Page -->
-<div id="sign-up-page" class="container" style="display: none;">
-  <h2>Sign Up</h2>
-  <input type="text" id="sign-up-username" class="input-field" placeholder="Username" required>
-  <input type="password" id="sign-up-password" class="input-field" placeholder="Password" required>
-  <input type="password" id="confirm-password" class="input-field" placeholder="Confirm Password" required>
-  <input type="text" id="secret-code" class="input-field" placeholder="Secret Code" required>
-  <div id="password-strength" class="password-strength">
-    <div id="password-strength-bar" class="password-strength-bar"></div>
+  <!-- Modal for displaying messages -->
+  <div id="msgModal" style="display: none;">
+    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
+      <div style="background-color: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px;">
+        <h4 id="msgText">Message</h4>
+        <button onclick="closeModal()">Close</button>
+      </div>
+    </div>
   </div>
-  <button class="button" onclick="signUp()">Sign Up</button>
-  <div class="back-link">
-    <p><a href="#" onclick="goBackToLogin()">Back to Login</a></p>
-  </div>
-</div>
 
-<!-- Forgot Password Page -->
-<div id="forgot-password-page" class="container" style="display: none;">
-  <h2>Forgot Password</h2>
-  <input type="text" id="forgot-username" class="input-field" placeholder="Username" required>
-  <input type="text" id="forgot-secret-code" class="input-field" placeholder="Secret Code" required>
-  <input type="password" id="new-password" class="input-field" placeholder="New Password" required>
-  <input type="password" id="confirm-new-password" class="input-field" placeholder="Confirm New Password" required>
-  <button class="button" onclick="resetPassword()">Reset Password</button>
-  <div class="back-link">
-    <p><a href="#" onclick="goBackToLogin()">Back to Login</a></p>
-  </div>
-</div>
-
-<!-- Modal for Messages -->
-<div id="msgModal" class="modal">
-  <div class="modal-content">
-    <h4 id="msgText">Message</h4>
-    <button onclick="closeModal()">Close</button>
-  </div>
-</div>
-
-<script>
-  // Handle user login
-  function login() {
-    var username = document.getElementById("username").value;
-    var password = document.getElementById("password").value;
-
-    if (username === "admin" && password === "admin123") {
-      localStorage.setItem("role", "admin");
-      showMessage("Admin logged in successfully.");
-    } else {
-      showMessage("Login functionality is being developed.");
+  <script>
+    // Function to show the message box
+    function showMsg(message) {
+      document.getElementById('msgText').innerText = `${message} functionality is being developed.`;
+      document.getElementById('msgModal').style.display = 'flex';
     }
-  }
 
-  // Show sign-up page
-  function showSignUp() {
-    document.getElementById("login-page").style.display = "none";
-    document.getElementById("sign-up-page").style.display = "block";
-  }
-
-  // Go back to login page from sign-up page
-  function goBackToLogin() {
-    document.getElementById("sign-up-page").style.display = "none";
-    document.getElementById("forgot-password-page").style.display = "none";
-    document.getElementById("login-page").style.display = "block";
-  }
-
-  // Handle user sign-up
-  function signUp() {
-    var username = document.getElementById("sign-up-username").value;
-    var password = document.getElementById("sign-up-password").value;
-    var confirmPassword = document.getElementById("confirm-password").value;
-    var secretCode = document.getElementById("secret-code").value;
-
-    if (password === confirmPassword) {
-      localStorage.setItem(username, JSON.stringify({ password: password, secretCode: secretCode, role: "normal", status: "pending" }));
-      showMessage("Account created successfully. Waiting for admin approval.");
-    } else {
-      showMessage("Passwords do not match.");
+    // Function to close the modal
+    function closeModal() {
+      document.getElementById('msgModal').style.display = 'none';
     }
-  }
 
-  // Handle forgot password
-  function showForgotPassword() {
-    document.getElementById("login-page").style.display = "none";
-    document.getElementById("forgot-password-page").style.display = "block";
-  }
+    // Handle user login
+    function login() {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
 
-  // Reset password
-  function resetPassword() {
-    var username = document.getElementById("forgot-username").value;
-    var secretCode = document.getElementById("forgot-secret-code").value;
-    var newPassword = document.getElementById("new-password").value;
-    var confirmNewPassword = document.getElementById("confirm-new-password").value;
-
-    var user = JSON.parse(localStorage.getItem(username));
-
-    if (user && user.secretCode === secretCode) {
-      if (newPassword === confirmNewPassword) {
-        user.password = newPassword;
-        localStorage.setItem(username, JSON.stringify(user));
-        showMessage("Password reset successfully.");
-        goBackToLogin();
-      } else {
-        showMessage("New passwords do not match.");
+      // Admin credentials check
+      if (username === "admin" && password === "admin123") {
+        localStorage.setItem("role", "admin");
+        window.location.href = "admin-dashboard.html"; // Redirect to admin dashboard
+        return; // Stop further checks if admin login successful
       }
-    } else {
-      showMessage("Invalid username or secret code.");
+
+      // Check if user exists in localStorage
+      var user = JSON.parse(localStorage.getItem(username));
+
+      if (user && user.password === password) {
+        localStorage.setItem("role", "user");
+        window.location.href = "user-dashboard.html"; // Redirect to user dashboard
+      } else {
+        showMessage("Invalid username or password.");
+      }
     }
-  }
 
-  // Show message in modal
-  function showMessage(message) {
-    document.getElementById("msgText").innerText = message;
-    document.getElementById("msgModal").style.display = "flex";
-  }
-
-  // Close modal
-  function closeModal() {
-    document.getElementById("msgModal").style.display = "none";
-  }
-
-  // Show password strength
-  document.getElementById("sign-up-password").addEventListener("input", function () {
-    var password = document.getElementById("sign-up-password").value;
-    var strengthBar = document.getElementById("password-strength-bar");
-    var strength = getPasswordStrength(password);
-
-    if (strength === "weak") {
-      strengthBar.style.width = "33%";
-      strengthBar.className = "password-strength-bar password-strength-weak";
-    } else if (strength === "medium") {
-      strengthBar.style.width = "66%";
-      strengthBar.className = "password-strength-bar password-strength-medium";
-    } else {
-      strengthBar.style.width = "100%";
-      strengthBar.className = "password-strength-bar password-strength-strong";
+    // Function to display a message
+    function showMessage(message) {
+      document.getElementById('msgText').innerText = message;
+      document.getElementById('msgModal').style.display = 'flex';
     }
-  });
 
-  // Password strength function
-  function getPasswordStrength(password) {
-    if (password.length < 6) return "weak";
-    if (password.length >= 6 && password.length < 10) return "medium";
-    return "strong";
-  }
-</script>
+    // Password Strength Indicator (for sign up)
+    function updatePasswordStrength(password) {
+      var strength = 0;
+      if (password.length >= 8) strength += 1;
+      if (password.match(/[a-z]/)) strength += 1;
+      if (password.match(/[A-Z]/)) strength += 1;
+      if (password.match(/[0-9]/)) strength += 1;
+      if (password.match(/[\W_]/)) strength += 1;
+
+      var strengthBar = document.getElementById('passwordStrengthIndicator');
+      var strengthLevel = "";
+
+      if (strength === 1) {
+        strengthLevel = "Weak";
+        strengthBar.innerHTML = `<div style="width: 20%; background-color: red;"></div>`;
+      } else if (strength === 2) {
+        strengthLevel = "Medium";
+        strengthBar.innerHTML = `<div style="width: 40%; background-color: orange;"></div>`;
+      } else if (strength === 3) {
+        strengthLevel = "Strong";
+        strengthBar.innerHTML = `<div style="width: 60%; background-color: yellow;"></div>`;
+      } else if (strength === 4) {
+        strengthLevel = "Very Strong";
+        strengthBar.innerHTML = `<div style="width: 80%; background-color: lightgreen;"></div>`;
+      } else if (strength === 5) {
+        strengthLevel = "Excellent";
+        strengthBar.innerHTML = `<div style="width: 100%; background-color: green;"></div>`;
+      } else {
+        strengthLevel = "Very Weak";
+        strengthBar.innerHTML = `<div style="width: 0%; background-color: red;"></div>`;
+      }
+
+      return strengthLevel;
+    }
+
+    // Call the password strength function when typing password (for signup)
+    document.getElementById('password').addEventListener('input', function() {
+      updatePasswordStrength(this.value);
+    });
+
+  </script>
 
 </body>
 </html>
