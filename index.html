@@ -3,210 +3,263 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DWS Management App</title>
+  <title>Create DWS</title>
   <style>
-    /* General Styling */
+    /* General Reset */
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
       padding: 0;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(120deg, #f6d365, #fda085);
+      color: #333;
     }
-    header {
-      background-color: #007BFF;
+
+    /* Container Styling */
+    .container {
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Heading */
+    h1 {
+      text-align: center;
+      color: #444;
+      margin-bottom: 20px;
+    }
+
+    /* Section Titles */
+    h3 {
+      color: #555;
+      margin-bottom: 10px;
+    }
+
+    /* Buttons */
+    button {
+      background-color: #4CAF50;
       color: white;
       padding: 10px 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    header h1 {
-      margin: 0;
-    }
-    header button {
-      background-color: white;
-      color: #007BFF;
+      margin: 5px 0;
       border: none;
-      padding: 10px 15px;
-      cursor: pointer;
-      font-weight: bold;
       border-radius: 5px;
-    }
-    header button:hover {
-      background-color: #e2e6ea;
-    }
-    .container {
-      padding: 20px;
-    }
-    .dashboard {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 50px;
-    }
-    .dashboard button {
-      padding: 20px 30px;
-      font-size: 18px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
       cursor: pointer;
-      border-radius: 5px;
+      font-size: 16px;
+      transition: background 0.3s;
     }
-    .dashboard button:hover {
-      background-color: #0056b3;
+
+    button:hover {
+      background-color: #45a049;
     }
-    .form-container {
-      display: none;
+
+    .delete-btn {
+      background-color: #e74c3c;
+      font-size: 14px;
     }
-    table {
+
+    .delete-btn:hover {
+      background-color: #c0392b;
+    }
+
+    /* Input Fields */
+    input {
       width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
-    }
-    table, th, td {
-      border: 1px solid #ddd;
-    }
-    th, td {
-      padding: 10px;
-      text-align: left;
-    }
-    th {
-      background-color: #f4f4f4;
-    }
-    .action-buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .action-buttons button {
-      padding: 10px 15px;
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      cursor: pointer;
+      padding: 8px;
+      margin: 5px 0 15px;
+      border: 1px solid #ccc;
       border-radius: 5px;
+      font-size: 16px;
     }
-    .action-buttons button:hover {
-      background-color: #0056b3;
+
+    /* Section Dividers */
+    .section {
+      margin-bottom: 20px;
+    }
+
+    /* Preview Areas */
+    .preview-area {
+      background-color: #f9f9f9;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    /* Footer Buttons */
+    .footer {
+      text-align: center;
+    }
+
+    .footer button {
+      width: 48%;
+      margin: 0 1%;
     }
   </style>
 </head>
 <body>
-  <header>
-    <h1>DWS Management</h1>
-    <button onclick="logout()">Log Out</button>
-  </header>
-
   <div class="container">
-    <!-- Dashboard -->
-    <div class="dashboard" id="dashboard">
-      <button onclick="showCreateDWS()">Create DWS</button>
-      <button onclick="showManageDWS()">Manage DWS</button>
+    <h1>Create DWS</h1>
+
+    <!-- Manpower Section -->
+    <div class="section">
+      <h3>Manpower</h3>
+      <button onclick="addManpower()">Add Manpower</button>
+      <div id="manpowerList" class="preview-area">
+        <!-- Preview Added Manpower Entries -->
+      </div>
     </div>
 
-    <!-- Create DWS Form -->
-    <div class="form-container" id="createDWSForm">
-      <h2>Create DWS</h2>
-      <form id="dwsForm">
-        <label for="structure">Structure:</label>
-        <input type="text" id="structure" placeholder="Enter structure name" required><br><br>
-        <label for="tqsiNo">TQ/SI No:</label>
-        <input type="text" id="tqsiNo" placeholder="Enter TQ/SI No" required><br><br>
-        <label for="work">Work:</label>
-        <textarea id="work" placeholder="Enter work description"></textarea><br><br>
-        <label for="location">Location:</label>
-        <input type="text" id="location" placeholder="Enter location"><br><br>
-        <h3>Manpower</h3>
-        <button type="button" onclick="addManpower()">Add Manpower</button>
-        <div id="manpowerList"></div>
-        <br>
-        <h3>Equipment</h3>
-        <button type="button" onclick="addEquipment()">Add Equipment</button>
-        <div id="equipmentList"></div>
-        <br>
-        <h3>Consumables/Material</h3>
-        <button type="button" onclick="addMaterial()">Add Material</button>
-        <div id="materialList"></div>
-        <br>
-        <div class="action-buttons">
-          <button type="button" onclick="saveDWS()">Save</button>
-          <button type="button" onclick="showDashboard()">Back</button>
-        </div>
-      </form>
+    <!-- Equipment Section -->
+    <div class="section">
+      <h3>Equipment</h3>
+      <button onclick="addEquipment()">Add Equipment</button>
+      <div id="equipmentList" class="preview-area">
+        <!-- Preview Added Equipment Entries -->
+      </div>
     </div>
 
-    <!-- Manage DWS -->
-    <div class="form-container" id="manageDWSForm">
-      <h2>Manage DWS</h2>
-      <input type="text" id="searchInput" placeholder="Search by Structure, TQ/SI No., or DWS No.">
-      <button onclick="searchDWS()">Search</button>
-      <button onclick="exportToExcel()">Export to Excel</button>
-      <button onclick="exportToPDF()">Export to PDF</button>
-      <table id="dwsTable">
-        <thead>
-          <tr>
-            <th>DWS No</th>
-            <th>Structure</th>
-            <th>TQ/SI No</th>
-            <th>Work</th>
-            <th>Location</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-      <button onclick="showDashboard()">Back</button>
+    <!-- Materials Section -->
+    <div class="section">
+      <h3>Consumables/Materials</h3>
+      <button onclick="addMaterial()">Add Material</button>
+      <div id="materialList" class="preview-area">
+        <!-- Preview Added Material Entries -->
+      </div>
+    </div>
+
+    <!-- Footer Buttons -->
+    <div class="footer">
+      <button onclick="saveDWS()">Save</button>
+      <button onclick="window.location.reload()">Back</button>
     </div>
   </div>
 
   <script>
-    function logout() {
-      alert("Logged out successfully!");
-    }
+    // Arrays to hold added entries
+    let manpowerList = [];
+    let equipmentList = [];
+    let materialList = [];
 
-    function showCreateDWS() {
-      document.getElementById('dashboard').style.display = 'none';
-      document.getElementById('createDWSForm').style.display = 'block';
-      document.getElementById('manageDWSForm').style.display = 'none';
-    }
-
-    function showManageDWS() {
-      document.getElementById('dashboard').style.display = 'none';
-      document.getElementById('createDWSForm').style.display = 'none';
-      document.getElementById('manageDWSForm').style.display = 'block';
-    }
-
-    function showDashboard() {
-      document.getElementById('dashboard').style.display = 'block';
-      document.getElementById('createDWSForm').style.display = 'none';
-      document.getElementById('manageDWSForm').style.display = 'none';
-    }
-
-    function saveDWS() {
-      alert("DWS saved successfully!");
-    }
-
+    // Function to add manpower
     function addManpower() {
-      alert("Add manpower functionality coming soon.");
+      const trade = prompt("Enter Trade:");
+      const name = prompt("Enter Name:");
+      const badgeNo = prompt("Enter Badge No:");
+      const nh = prompt("Enter NH:");
+      const ot = prompt("Enter OT:");
+      const holiday = prompt("Enter Holiday:");
+
+      if (trade && name && badgeNo && nh && ot && holiday) {
+        const manpower = { trade, name, badgeNo, nh, ot, holiday };
+        manpowerList.push(manpower);
+        renderManpowerList();
+      } else {
+        alert("Please fill all fields!");
+      }
     }
 
+    // Function to render manpower list
+    function renderManpowerList() {
+      const manpowerDiv = document.getElementById("manpowerList");
+      manpowerDiv.innerHTML = "";
+      manpowerList.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p>Trade: ${item.trade}, Name: ${item.name}, Badge No: ${item.badgeNo}, NH: ${item.nh}, OT: ${item.ot}, Holiday: ${item.holiday}
+          <button class="delete-btn" onclick="deleteManpower(${index})">Delete</button>
+          </p>`;
+        manpowerDiv.appendChild(div);
+      });
+    }
+
+    // Function to delete manpower
+    function deleteManpower(index) {
+      manpowerList.splice(index, 1);
+      renderManpowerList();
+    }
+
+    // Function to add equipment
     function addEquipment() {
-      alert("Add equipment functionality coming soon.");
+      const equipmentName = prompt("Enter Equipment Name:");
+      const workingHours = prompt("Enter Working Hours:");
+
+      if (equipmentName && workingHours) {
+        const equipment = { equipmentName, workingHours };
+        equipmentList.push(equipment);
+        renderEquipmentList();
+      } else {
+        alert("Please fill all fields!");
+      }
     }
 
+    // Function to render equipment list
+    function renderEquipmentList() {
+      const equipmentDiv = document.getElementById("equipmentList");
+      equipmentDiv.innerHTML = "";
+      equipmentList.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p>Equipment: ${item.equipmentName}, Working Hours: ${item.workingHours}
+          <button class="delete-btn" onclick="deleteEquipment(${index})">Delete</button>
+          </p>`;
+        equipmentDiv.appendChild(div);
+      });
+    }
+
+    // Function to delete equipment
+    function deleteEquipment(index) {
+      equipmentList.splice(index, 1);
+      renderEquipmentList();
+    }
+
+    // Function to add material
     function addMaterial() {
-      alert("Add material functionality coming soon.");
+      const materialName = prompt("Enter Material Name:");
+      const quantity = prompt("Enter Quantity:");
+      const uom = prompt("Enter UOM:");
+
+      if (materialName && quantity && uom) {
+        const material = { materialName, quantity, uom };
+        materialList.push(material);
+        renderMaterialList();
+      } else {
+        alert("Please fill all fields!");
+      }
     }
 
-    function searchDWS() {
-      alert("Search functionality coming soon.");
+    // Function to render material list
+    function renderMaterialList() {
+      const materialDiv = document.getElementById("materialList");
+      materialDiv.innerHTML = "";
+      materialList.forEach((item, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `
+          <p>Material: ${item.materialName}, Quantity: ${item.quantity}, UOM: ${item.uom}
+          <button class="delete-btn" onclick="deleteMaterial(${index})">Delete</button>
+          </p>`;
+        materialDiv.appendChild(div);
+      });
     }
 
-    function exportToExcel() {
-      alert("Export to Excel functionality coming soon.");
+    // Function to delete material
+    function deleteMaterial(index) {
+      materialList.splice(index, 1);
+      renderMaterialList();
     }
 
-    function exportToPDF() {
-      alert("Export to PDF functionality coming soon.");
+    // Save Function
+    function saveDWS() {
+      const dwsNumber = "DWS-" + (Math.floor(Math.random() * 9000) + 1000);
+      const dwsData = {
+        dwsNumber,
+        manpowerList,
+        equipmentList,
+        materialList,
+      };
+      console.log("DWS Saved:", dwsData);
+      alert(`DWS saved successfully with DWS No: ${dwsNumber}`);
     }
   </script>
 </body>
