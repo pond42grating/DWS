@@ -3,538 +3,148 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create DWS</title>
+  <title>Daily Work Schedule (DWS) Management</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f0f4f7;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #333;
+      color: white;
+      padding: 15px 20px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 {
+      margin: 0;
+    }
+    .logout-btn {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      padding: 8px 16px;
+      cursor: pointer;
+    }
+    .main-content {
+      margin-top: 80px;
+      padding: 40px;
+      text-align: center;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       margin: 20px;
-      background-color: #f4f7f6;
+      padding: 20px;
+      display: inline-block;
+      width: 250px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: scale(1.05);
+    }
+    .card h2 {
+      margin-top: 10px;
       color: #333;
     }
-    .form-section {
-      margin-bottom: 20px;
+    .search-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
     }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
-    }
-    input[type="text"], input[type="number"], input[type="date"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
+    .search-input {
+      padding: 10px;
+      font-size: 16px;
       border-radius: 4px;
-    }
-    .preview-section {
-      margin-top: 10px;
-    }
-    .preview-section table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-    .preview-section table, th, td {
       border: 1px solid #ccc;
     }
-    th, td {
-      padding: 8px;
-      text-align: left;
-    }
-    .error {
-      color: red;
-      font-size: 12px;
-    }
-    button {
-      padding: 10px 15px;
+    .search-btn {
+      padding: 10px 20px;
       background-color: #4CAF50;
       color: white;
       border: none;
       cursor: pointer;
-      margin-top: 10px;
+      border-radius: 4px;
     }
-    button:hover {
-      background-color: #45a049;
-    }
-    .back-button {
+    .export-btns {
       margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #f44336;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .export-btn {
+      padding: 10px 20px;
+      background-color: #2196F3;
       color: white;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
-    }
-    .back-button:hover {
-      background-color: #da190b;
-    }
-    #savedFiles {
-      margin-top: 20px;
-    }
-    #savedFiles button {
-      margin-top: 5px;
-      background-color: #2196F3;
-    }
-    #savedFilesView {
-      display: none;
-    }
-    .dialog {
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 20px;
-      background: white;
-      border: 1px solid #ccc;
-      width: 80%;
-      max-width: 600px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .dialog button {
-      background-color: #f44336;
-      color: white;
     }
   </style>
 </head>
 <body>
 
-  <h1>Create DWS</h1>
-  <div id="formView">
-  <!-- DWS Number (Auto Assigned) -->
-  <div class="form-section">
-    <label for="dwsNo">DWS No.</label>
-    <input type="text" id="dwsNo" readonly>
+<header>
+  <h1>DWS Management</h1>
+  <button class="logout-btn" onclick="alert('Logging out...')">Log Out</button>
+</header>
+
+<div class="main-content">
+  <div class="card" onclick="alert('Creating DWS...')">
+    <h2>Create DWS</h2>
   </div>
 
-  <div class="form-section">
-    <label for="dwsDate">DWS Date</label>
-    <input type="date" id="dwsDate">
-    <div class="error" id="dwsDateError"></div>
+  <div class="card" onclick="alert('Managing DWS...')">
+    <h2>Manage DWS</h2>
   </div>
 
-  <div class="form-section">
-    <label for="structureName">Structure Name</label>
-    <input type="text" id="structureName">
-    <div class="error" id="structureNameError"></div>
+  <div class="card" onclick="alert('Exporting as PDF...')">
+    <h2>Export as PDF</h2>
   </div>
 
-  <div class="form-section">
-    <label for="siNo">SI No.</label>
-    <input type="text" id="siNo">
-    <div class="error" id="siNoError"></div>
+  <div class="card" onclick="alert('Exporting as Excel...')">
+    <h2>Export as Excel</h2>
   </div>
 
-  <div class="form-section">
-    <label for="workDescription">Work Description</label>
-    <input type="text" id="workDescription">
-    <div class="error" id="workDescriptionError"></div>
-  </div>
+  <!-- Manage DWS Section -->
+  <div class="manage-dws-container" style="display: none;">
+    <div class="search-container">
+      <input type="text" class="search-input" placeholder="Search by Structure/ TQ/ SI No./ DWS No." id="searchInput">
+      <button class="search-btn" onclick="alert('Search function working...')">Search</button>
+    </div>
 
-  <div class="form-section">
-    <label for="location">Location</label>
-    <input type="text" id="location">
-    <div class="error" id="locationError"></div>
-  </div>
-
-  <!-- Manpower -->
-  <div class="form-section">
-    <h3>Manpower</h3>
-    <label for="badgeNo">Badge No.</label>
-    <input type="text" id="badgeNo">
-    <div class="error" id="badgeNoError"></div>
-
-    <label for="manpowerName">Name</label>
-    <input type="text" id="manpowerName">
-    <div class="error" id="manpowerNameError"></div>
-
-    <label for="normalHour">Normal Hour</label>
-    <input type="number" id="normalHour">
-    <div class="error" id="normalHourError"></div>
-
-    <label for="otHour">OT Hour</label>
-    <input type="number" id="otHour">
-    <div class="error" id="otHourError"></div>
-
-    <label for="holiday">Holiday</label>
-    <input type="text" id="holiday">
-    <div class="error" id="holidayError"></div>
-
-    <button type="button" onclick="addManpower()">Add Manpower</button>
-
-    <div class="preview-section" id="manpowerPreview">
-      <h4>Manpower Preview:</h4>
-      <table id="manpowerTable">
-        <tr>
-          <th>Badge No.</th>
-          <th>Name</th>
-          <th>Normal Hour</th>
-          <th>OT Hour</th>
-          <th>Holiday</th>
-        </tr>
-      </table>
+    <div class="export-btns">
+      <button class="export-btn" onclick="alert('Exporting filtered data as PDF...')">Export as PDF</button>
+      <button class="export-btn" onclick="alert('Exporting filtered data as Excel...')">Export as Excel</button>
     </div>
   </div>
-
-  <!-- Equipment -->
-  <div class="form-section">
-    <h3>Equipment</h3>
-    <label for="equipmentName">Equipment Name</label>
-    <input type="text" id="equipmentName">
-    <div class="error" id="equipmentNameError"></div>
-
-    <label for="workingHours">Working Hours</label>
-    <input type="number" id="workingHours">
-    <div class="error" id="workingHoursError"></div>
-
-    <button type="button" onclick="addEquipment()">Add Equipment</button>
-
-    <div class="preview-section" id="equipmentPreview">
-      <h4>Equipment Preview:</h4>
-      <table id="equipmentTable">
-        <tr>
-          <th>Equipment Name</th>
-          <th>Working Hours</th>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <!-- Consumable -->
-  <div class="form-section">
-    <h3>Consumables</h3>
-    <label for="consumableName">Consumable Name</label>
-    <input type="text" id="consumableName">
-    <div class="error" id="consumableNameError"></div>
-
-    <label for="quantity">Quantity (Nos/ML)</label>
-    <input type="number" id="quantity">
-    <div class="error" id="quantityError"></div>
-
-    <button type="button" onclick="addConsumable()">Add Consumable</button>
-
-    <div class="preview-section" id="consumablePreview">
-      <h4>Consumable Preview:</h4>
-      <table id="consumableTable">
-        <tr>
-          <th>Consumable Name</th>
-          <th>Quantity</th>
-        </tr>
-      </table>
-    </div>
-  </div>
-
-  <button class="back-button" onclick="goBack()">Back to Home</button>
-  <button onclick="saveData()">Save</button>
-  <button onclick="toggleView('saved')">View Saved Files</button>
-</div>
-
-<div id="savedFilesView" style="display:none;">
-  <h3>Saved Files</h3>
-  <div id="savedFilesList"></div>
-  <button onclick="toggleView('main')">Back</button>
-</div>
-
-<div id="dialogBox" class="dialog">
-  <h3>Saved DWS Data</h3>
-  <div id="dialogContent"></div>
-  <button onclick="closeDialog()">Close</button>
 </div>
 
 <script>
-    let dwsCounter = parseInt(localStorage.getItem('dwsCounter')) || 1; // Initialize a counter for DWS numbers
+  // Toggle the visibility of Manage DWS
+  document.querySelector('.card:nth-child(2)').onclick = function() {
+    alert('Managing DWS...');
+    const manageDwsSection = document.querySelector('.manage-dws-container');
+    manageDwsSection.style.display = manageDwsSection.style.display === 'none' ? 'block' : 'none';
+  };
 
-  function generateDwsNo() {
-    const dwsNo = `DWS-${String(dwsCounter).padStart(4, '0')}`;
-    document.getElementById('dwsNo').value = dwsNo;
-      // Increment the counter after each DWS
-  }
-
-  function saveData() {
-    const dwsNo = document.getElementById('dwsNo').value;
-    const dwsDate = document.getElementById('dwsDate').value;
-    const structureName = document.getElementById('structureName').value;
-    const siNo = document.getElementById('siNo').value;
-    const workDescription = document.getElementById('workDescription').value;
-    const location = document.getElementById('location').value;
-
-    // Check if any necessary fields are empty
-    if (!dwsDate || !structureName || !siNo || !workDescription || !location) {
-      alert('Please fill in all required fields before saving!');
-      return;  // Prevent saving if fields are empty
-    }
-
-    const manpowerData = [];
-    const manpowerTable = document.getElementById('manpowerTable');
-    for (let i = 1; i < manpowerTable.rows.length; i++) {
-      const row = manpowerTable.rows[i];
-      const manpower = {
-        badgeNo: row.cells[0].textContent,
-        name: row.cells[1].textContent,
-        normalHour: row.cells[2].textContent,
-        otHour: row.cells[3].textContent,
-        holiday: row.cells[4].textContent
-      };
-      manpowerData.push(manpower);
-    }
-
-    const equipmentData = [];
-    const equipmentTable = document.getElementById('equipmentTable');
-    for (let i = 1; i < equipmentTable.rows.length; i++) {
-      const row = equipmentTable.rows[i];
-      const equipment = {
-        name: row.cells[0].textContent,
-        workingHours: row.cells[1].textContent
-      };
-      equipmentData.push(equipment);
-    }
-
-    const consumableData = [];
-    const consumableTable = document.getElementById('consumableTable');
-    for (let i = 1; i < consumableTable.rows.length; i++) {
-      const row = consumableTable.rows[i];
-      const consumable = {
-        name: row.cells[0].textContent,
-        quantity: row.cells[1].textContent
-      };
-      consumableData.push(consumable);
-    }
-
-    const dwsData = {
-      dwsNo: dwsNo,
-      dwsDate: dwsDate,
-      structureName: structureName,
-      siNo: siNo,
-      workDescription: workDescription,
-      location: location,
-      manpower: manpowerData,
-      equipment: equipmentData,
-      consumables: consumableData
-    };
-
-    // Save the data in localStorage
-    localStorage.setItem(dwsNo, JSON.stringify(dwsData));
-    
-     // Increment DWS number counter and store it
-      dwsCounter++;
-      localStorage.setItem('dwsCounter', dwsCounter);
-    
-    // Clear fields and generate next DWS number
-    clearForm();
-    generateDwsNo();
-
-    alert('DWS Saved Successfully!');
-  }
-
-  function clearForm() {
-    document.getElementById('dwsDate').value = '';
-    document.getElementById('structureName').value = '';
-    document.getElementById('siNo').value = '';
-    document.getElementById('workDescription').value = '';
-    document.getElementById('location').value = '';
-
-    // Clear Manpower table
-    const manpowerTable = document.getElementById('manpowerTable');
-    for (let i = manpowerTable.rows.length - 1; i > 0; i--) {
-      manpowerTable.deleteRow(i);
-    }
-
-    // Clear Equipment table
-    const equipmentTable = document.getElementById('equipmentTable');
-    for (let i = equipmentTable.rows.length - 1; i > 0; i--) {
-      equipmentTable.deleteRow(i);
-    }
-
-    // Clear Consumable table
-    const consumableTable = document.getElementById('consumableTable');
-    for (let i = consumableTable.rows.length - 1; i > 0; i--) {
-      consumableTable.deleteRow(i);
-    }
-  }
-
-  function displaySavedFiles() {
-    const savedFilesList = document.getElementById('savedFilesList');
-    savedFilesList.innerHTML = '';
-
-    // Display buttons for each saved DWS number
-    for (let i = 1; i < dwsCounter; i++) {
-      const dwsNo = `DWS-${String(i).padStart(4, '0')}`;
-      const button = document.createElement('button');
-      button.textContent = dwsNo;
-      button.onclick = () => loadSavedFile(dwsNo);
-      savedFilesList.appendChild(button);
-    }
-  }
-
-  function loadSavedFile(dwsNo) {
-    const savedData = localStorage.getItem(dwsNo);
-    if (savedData) {
-      const dwsData = JSON.parse(savedData);
-      document.getElementById('dwsNo').value = dwsData.dwsNo;
-      document.getElementById('dwsDate').value = dwsData.dwsDate;
-      document.getElementById('structureName').value = dwsData.structureName;
-      document.getElementById('siNo').value = dwsData.siNo;
-      document.getElementById('workDescription').value = dwsData.workDescription;
-      document.getElementById('location').value = dwsData.location;
-
-      // Manpower table
-      const manpowerTable = document.getElementById('manpowerTable');
-      dwsData.manpower.forEach((manpower) => {
-        const row = manpowerTable.insertRow();
-        row.innerHTML = `<td>${manpower.badgeNo}</td><td>${manpower.name}</td><td>${manpower.normalHour}</td><td>${manpower.otHour}</td><td>${manpower.holiday}</td>`;
-      });
-
-      // Equipment table
-      const equipmentTable = document.getElementById('equipmentTable');
-      dwsData.equipment.forEach((equipment) => {
-        const row = equipmentTable.insertRow();
-        row.innerHTML = `<td>${equipment.name}</td><td>${equipment.workingHours}</td>`;
-      });
-
-      // Consumable table
-      const consumableTable = document.getElementById('consumableTable');
-      dwsData.consumables.forEach((consumable) => {
-        const row = consumableTable.insertRow();
-        row.innerHTML = `<td>${consumable.name}</td><td>${consumable.quantity}</td>`;
-      });
-
-      // Open the data in a modal-like view or dialog box
-      openDialog(dwsData);
-    
-    }
-  }
-  
-
-  function openDialog(dwsData) {
-    const dialog = document.createElement('div');
-    dialog.style.position = 'fixed';
-    dialog.style.top = '50%';
-    dialog.style.left = '50%';
-    dialog.style.transform = 'translate(-50%, -50%)';
-    dialog.style.backgroundColor = '#fff';
-    dialog.style.padding = '20px';
-    dialog.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-    dialog.style.zIndex = 1000;
-    dialog.innerHTML = `
-      <h3>Saved DWS Details: ${dwsData.dwsNo}</h3>
-      <p><strong>Date:</strong> ${dwsData.dwsDate}</p>
-      <p><strong>Structure Name:</strong> ${dwsData.structureName}</p>
-      <p><strong>SI No:</strong> ${dwsData.siNo}</p>
-      <p><strong>Work Description:</strong> ${dwsData.workDescription}</p>
-      <p><strong>Location:</strong> ${dwsData.location}</p>
-      <h4>Manpower:</h4>
-      <ul>
-        ${dwsData.manpower.map(manpower => `<li>${manpower.badgeNo} - ${manpower.name} (Normal: ${manpower.normalHour}hrs, OT: ${manpower.otHour}hrs)</li>`).join('')}
-      </ul>
-      <h4>Equipment:</h4>
-      <ul>
-        ${dwsData.equipment.map(equipment => `<li>${equipment.name} - ${equipment.workingHours}hrs</li>`).join('')}
-      </ul>
-      <h4>Consumables:</h4>
-      <ul>
-        ${dwsData.consumables.map(consumable => `<li>${consumable.name} - ${consumable.quantity}</li>`).join('')}
-      </ul>
-      <button onclick="closeDialog()">Close</button>
-    `;
-
-    document.body.appendChild(dialog);
-  }
-
-  function closeDialog() {
-  const dialog = document.querySelector('div[style*="position: fixed"]');
-  if (dialog) {
-    document.body.removeChild(dialog);
-  }
-}
-
-  // Initialize page by generating a DWS number and displaying saved files
-  generateDwsNo();
-  displaySavedFiles();
-
-  function toggleView(view) {
-    if (view === 'main') {
-      document.getElementById('formView').style.display = 'block';
-      document.getElementById('savedFilesView').style.display = 'none';
-    } else if (view === 'saved') {
-      document.getElementById('formView').style.display = 'none';
-      document.getElementById('savedFilesView').style.display = 'block';
-    }
-  }
-
-  // Add data preview for Manpower, Equipment, and Consumable
-  function addManpower() {
-    const badgeNo = document.getElementById('badgeNo').value;
-    const name = document.getElementById('manpowerName').value;
-    const normalHour = document.getElementById('normalHour').value;
-    const otHour = document.getElementById('otHour').value;
-    const holiday = document.getElementById('holiday').value;
-
-    const manpowerTable = document.getElementById('manpowerTable');
-    const row = manpowerTable.insertRow();
-    row.innerHTML = `<td>${badgeNo}</td><td>${name}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
-  }
-
-  function addEquipment() {
-    const equipmentName = document.getElementById('equipmentName').value;
-    const workingHours = document.getElementById('workingHours').value;
-
-    const equipmentTable = document.getElementById('equipmentTable');
-    const row = equipmentTable.insertRow();
-    row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
-  }
-
-  function addConsumable() {
-    const consumableName = document.getElementById('consumableName').value;
-    const quantity = document.getElementById('quantity').value;
-
-    const consumableTable = document.getElementById('consumableTable');
-    const row = consumableTable.insertRow();
-    row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
-  }
-  
-  function displaySavedFiles() {
-  const savedFilesList = document.getElementById('savedFilesList');
-  savedFilesList.innerHTML = '';  // Clear the saved files list
-
-  // Display buttons for each saved DWS number
-  for (let i = 1; i < dwsCounter; i++) {
-    const dwsNo = `DWS-${String(i).padStart(4, '0')}`;
-    const button = document.createElement('button');
-    button.textContent = dwsNo;
-    button.onclick = () => loadSavedFile(dwsNo);
-
-    // Create delete button for each DWS file
-    const deleteButton = document.createElement('button');
-    deleteButton.textContent = 'Delete';
-    deleteButton.style.backgroundColor = 'red';
-    deleteButton.style.color = 'white';
-    deleteButton.onclick = (event) => {
-      event.stopPropagation(); // Prevent the loadSavedFile function from firing
-      deleteDws(dwsNo); // Call deleteDws to remove the file
-    };
-
-    const div = document.createElement('div');
-    div.appendChild(button);
-    div.appendChild(deleteButton);
-    savedFilesList.appendChild(div);
-  }
-}
-
-function deleteDws(dwsNo) {
-  if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
-    // Remove the DWS entry from localStorage
-    localStorage.removeItem(dwsNo);
-
-    // Remove the DWS from the display list
-    const savedFilesList = document.getElementById('savedFilesList');
-    const fileButtons = savedFilesList.querySelectorAll('div'); // Get all the file buttons
-    fileButtons.forEach(buttonDiv => {
-      const fileButton = buttonDiv.querySelector('button');
-      if (fileButton.textContent === dwsNo) {
-        savedFilesList.removeChild(buttonDiv); // Remove the div containing the DWS button and delete button
-      }
-    });
-
-    alert(`${dwsNo} has been deleted.`);
-  }
-}
-
+  // Handle the log-out button functionality
+  document.querySelector('.logout-btn').onclick = function() {
+    alert('Logging out...');
+    // Implement actual logout functionality here
+  };
 </script>
+
+</body>
+</html>
