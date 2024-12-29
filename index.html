@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Management</title>
+    <title>DWS Management - UI Design</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f0f4f7;
+            background-color: #f9fafb;
             margin: 0;
             padding: 0;
         }
@@ -96,20 +95,6 @@
             background-color: #388E3C;
         }
 
-        .back-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .back-btn:hover {
-            background-color: #388E3C;
-        }
-
         .export-btn {
             background-color: #FF9800;
             color: white;
@@ -123,61 +108,191 @@
         .export-btn:hover {
             background-color: #FB8C00;
         }
+
+        /* New Option Styles */
+        .dashboard-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 200px;
+        }
+
+        .dashboard-card h3 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .dashboard-card p {
+            font-size: 16px;
+            color: #888;
+        }
+
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .help-btn {
+            background-color: #9C27B0;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .help-btn:hover {
+            background-color: #8E24AA;
+        }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 10px 0;
+        }
     </style>
 </head>
-
 <body>
     <header>
         <h1>DWS Management</h1>
-        <button class="logout-btn" onclick="alert('Logging out...')">Logout</button>
+        <button class="logout-btn" onclick="showModal('logoutModal')">Logout</button>
     </header>
 
     <div class="main-content">
         <button class="button" onclick="showCreateDWS()">Create DWS</button>
         <button class="button" onclick="showManageDWS()">Manage DWS</button>
+        <button class="help-btn" onclick="showModal('helpModal')">Help</button>
     </div>
 
     <div class="manage-dws-container" id="manageDWS">
         <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No." />
         <button class="search-btn" onclick="searchDWS()">Search</button>
         <div>
-            <button class="export-btn" onclick="alert('Exporting as PDF...')">Export as PDF</button>
-            <button class="export-btn" onclick="alert('Exporting as Excel...')">Export as Excel</button>
+            <button class="export-btn" onclick="showModal('exportPdfModal')">Export as PDF</button>
+            <button class="export-btn" onclick="showModal('exportExcelModal')">Export as Excel</button>
         </div>
-        <button class="back-btn" onclick="backToMain()">Back</button>
+        <button class="button" onclick="backToMain()">Back</button>
+    </div>
+
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h3>10</h3>
+            <p>Total DWS Created</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>3</h3>
+            <p>Pending DWS</p>
+        </div>
+    </div>
+
+    <!-- Modal for Logout -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('logoutModal')">&times;</span>
+            <div class="modal-header">Logout</div>
+            <div class="modal-body">You have logged out successfully!</div>
+        </div>
+    </div>
+
+    <!-- Modal for Help -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('helpModal')">&times;</span>
+            <div class="modal-header">Help Section</div>
+            <div class="modal-body">Help functionality will be added here.</div>
+        </div>
+    </div>
+
+    <!-- Modal for Export as PDF -->
+    <div id="exportPdfModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('exportPdfModal')">&times;</span>
+            <div class="modal-header">Export as PDF</div>
+            <div class="modal-body">Exporting as PDF functionality will be implemented here.</div>
+        </div>
+    </div>
+
+    <!-- Modal for Export as Excel -->
+    <div id="exportExcelModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('exportExcelModal')">&times;</span>
+            <div class="modal-header">Export as Excel</div>
+            <div class="modal-body">Exporting as Excel functionality will be implemented here.</div>
+        </div>
     </div>
 
     <script>
-        // Function to show the Create DWS page
         function showCreateDWS() {
             alert("Create DWS functionality will be implemented here.");
         }
 
-        // Function to show the Manage DWS page
         function showManageDWS() {
             document.querySelector('.main-content').style.display = 'none';
             document.getElementById('manageDWS').style.display = 'flex';
-            
-            // Push state to the history to track this view
             history.pushState({ page: "manageDWS" }, "Manage DWS", "#manageDWS");
         }
 
-        // Function to go back to the main page
         function backToMain() {
             document.querySelector('.main-content').style.display = 'flex';
             document.getElementById('manageDWS').style.display = 'none';
-
-            // Replace state in history to ensure back button works properly
             history.replaceState({ page: "main" }, "Main Page", "#main");
         }
 
-        // Search DWS function
         function searchDWS() {
             var searchValue = document.getElementById('searchInput').value;
             alert('Searching for: ' + searchValue);
         }
 
-        // Handle the browser's back button event
+        // Modal functionality
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
         window.onpopstate = function (event) {
             if (event.state && event.state.page === "manageDWS") {
                 document.querySelector('.main-content').style.display = 'none';
@@ -189,5 +304,4 @@
         };
     </script>
 </body>
-
 </html>
