@@ -407,27 +407,89 @@
           '', consumable.consumableName, consumable.quantity
         ]);
       });
-
-      // Create worksheet and add data
+            // Add rows to Excel sheet
       const ws = XLSX.utils.aoa_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, "DWS Data");
+      XLSX.utils.book_append_sheet(wb, ws, 'DWS Data');
+      
+      // Generate the Excel file and trigger download
+      const excelFileName = `DWS_${dwsNo}.xlsx`;
+      XLSX.writeFile(wb, excelFileName);
 
-      // Save the Excel file
-      XLSX.writeFile(wb, 'DWS_Data.xlsx');
+      // Optionally, trigger the PDF export (you can use jsPDF to generate the PDF)
+      const doc = new jsPDF();
+
+      // Add content to the PDF (You can customize the layout further)
+      doc.text(`DWS No: ${dwsNo}`, 10, 10);
+      doc.text(`Structure Name: ${structureName}`, 10, 20);
+      doc.text(`SI No: ${siNo}`, 10, 30);
+      doc.text(`Work Description: ${workDescription}`, 10, 40);
+      doc.text(`Location: ${location}`, 10, 50);
+
+      doc.text('Manpower:', 10, 60);
+      manpowerData.forEach((manpower, index) => {
+        const y = 70 + (index * 10);
+        doc.text(`${manpower.badgeNo} - ${manpower.name} - ${manpower.normalHour} hours`, 10, y);
+      });
+
+      doc.text('Equipment:', 10, 80);
+      equipmentData.forEach((equipment, index) => {
+        const y = 90 + (index * 10);
+        doc.text(`${equipment.equipmentName} - ${equipment.workingHours} hours`, 10, y);
+      });
+
+      doc.text('Consumables:', 10, 110);
+      consumableData.forEach((consumable, index) => {
+        const y = 120 + (index * 10);
+        doc.text(`${consumable.consumableName} - ${consumable.quantity}`, 10, y);
+      });
+
+      // Save the PDF
+      const pdfFileName = `DWS_${dwsNo}.pdf`;
+      doc.save(pdfFileName);
+
+      alert('DWS saved successfully!');
+
+      // Reset form after saving
+      resetForm();
+    }
+
+    function resetForm() {
+      // Clear all form inputs and reset the DWS counter
+      document.getElementById('structureName').value = '';
+      document.getElementById('siNo').value = '';
+      document.getElementById('workDescription').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('badgeNo').value = '';
+      document.getElementById('manpowerName').value = '';
+      document.getElementById('normalHour').value = '';
+      document.getElementById('otHour').value = '';
+      document.getElementById('holiday').value = '';
+      document.getElementById('equipmentName').value = '';
+      document.getElementById('workingHours').value = '';
+      document.getElementById('consumableName').value = '';
+      document.getElementById('quantity').value = '';
+      
+      // Clear the tables
+      document.getElementById('manpowerTable').innerHTML = `<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>`;
+      document.getElementById('equipmentTable').innerHTML = `<tr><th>Equipment Name</th><th>Working Hours</th></tr>`;
+      document.getElementById('consumableTable').innerHTML = `<tr><th>Consumable Name</th><th>Quantity</th></tr>`;
+      
+      // Reset DWS number
+      document.getElementById('dwsNo').value = dwsCounter;
     }
 
     function goBack() {
-      window.history.back();
+      window.location.href = 'home.html';  // Replace 'home.html' with the actual path to the home page
     }
 
-    // Auto-assign DWS No.
-    window.onload = function () {
-      document.getElementById('dwsNo').value = dwsCounter++;
-    };
+    // Initialize the DWS No.
+    document.getElementById('dwsNo').value = dwsCounter;
+
   </script>
 
-  <!-- Include the XLSX library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  <!-- Include the necessary libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </body>
 </html>
