@@ -433,11 +433,11 @@
   }
 
   function closeDialog() {
-    const dialog = document.querySelector('div');
-    if (dialog) {
-      document.body.removeChild(dialog);
-    }
+  const dialog = document.querySelector('div[style*="position: fixed"]');
+  if (dialog) {
+    document.body.removeChild(dialog);
   }
+}
 
   // Initialize page by generating a DWS number and displaying saved files
   generateDwsNo();
