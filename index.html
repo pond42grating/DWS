@@ -3,223 +3,158 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Create DWS</title>
+  <title>DWS Management System</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    .form-section {
+    .error { color: red; font-size: 12px; }
+    .input-section, .preview-section {
       margin-bottom: 20px;
     }
-    label {
-      font-weight: bold;
-      display: block;
-      margin-bottom: 8px;
+    .table-container {
+      margin-top: 20px;
     }
-    input[type="text"], input[type="number"] {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    .preview-section {
-      margin-top: 10px;
-    }
-    .preview-section table {
-      width: 100%;
+    table, th, td {
+      border: 1px solid black;
       border-collapse: collapse;
-    }
-    .preview-section table, th, td {
-      border: 1px solid #ccc;
     }
     th, td {
       padding: 8px;
       text-align: left;
     }
-    .error {
-      color: red;
-      font-size: 12px;
-    }
     button {
-      padding: 10px 15px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
+      padding: 10px 20px;
+      margin: 5px;
       cursor: pointer;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .back-button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #f44336;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .back-button:hover {
-      background-color: #da190b;
-    }
-    .export-button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .export-button:hover {
-      background-color: #006F8E;
     }
   </style>
 </head>
 <body>
 
-  <h1>Create DWS</h1>
-  
-  <!-- DWS Number (Auto Assigned) -->
-  <div class="form-section">
+  <h1>DWS Management System</h1>
+
+  <div class="input-section">
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
-  </div>
+    <br><br>
 
-  <div class="form-section">
+    <label for="date">Date</label>
+    <input type="date" id="date">
+    <br><br>
+
     <label for="structureName">Structure Name</label>
     <input type="text" id="structureName">
-    <div class="error" id="structureNameError"></div>
-  </div>
+    <br><br>
 
-  <div class="form-section">
     <label for="siNo">SI No.</label>
     <input type="text" id="siNo">
-    <div class="error" id="siNoError"></div>
-  </div>
+    <br><br>
 
-  <div class="form-section">
     <label for="workDescription">Work Description</label>
     <input type="text" id="workDescription">
-    <div class="error" id="workDescriptionError"></div>
-  </div>
+    <br><br>
 
-  <div class="form-section">
     <label for="location">Location</label>
     <input type="text" id="location">
-    <div class="error" id="locationError"></div>
+    <br><br>
   </div>
 
-  <!-- Manpower -->
-  <div class="form-section">
+  <div class="manpower-section">
     <h3>Manpower</h3>
-    <label for="badgeNo">Badge No.</label>
-    <input type="text" id="badgeNo">
-    <div class="error" id="badgeNoError"></div>
+    <label for="manpowerBadgeNo">Badge No.</label>
+    <input type="text" id="manpowerBadgeNo">
+    <br><br>
 
     <label for="manpowerName">Name</label>
     <input type="text" id="manpowerName">
-    <div class="error" id="manpowerNameError"></div>
+    <br><br>
+
+    <label for="jobTitle">Job Title</label>
+    <input type="text" id="jobTitle">
+    <br><br>
 
     <label for="normalHour">Normal Hour</label>
-    <input type="number" id="normalHour">
-    <div class="error" id="normalHourError"></div>
+    <input type="text" id="normalHour">
+    <br><br>
 
     <label for="otHour">OT Hour</label>
-    <input type="number" id="otHour">
-    <div class="error" id="otHourError"></div>
+    <input type="text" id="otHour">
+    <br><br>
 
     <label for="holiday">Holiday</label>
     <input type="text" id="holiday">
-    <div class="error" id="holidayError"></div>
+    <br><br>
 
-    <button type="button" onclick="addManpower()">Add Manpower</button>
-
-    <div class="preview-section" id="manpowerPreview">
-      <h4>Manpower Preview:</h4>
-      <table id="manpowerTable">
-        <tr>
-          <th>Badge No.</th>
-          <th>Name</th>
-          <th>Normal Hour</th>
-          <th>OT Hour</th>
-          <th>Holiday</th>
-        </tr>
-      </table>
-    </div>
+    <button onclick="addManpower()">Add Manpower</button>
   </div>
 
-  <!-- Equipment -->
-  <div class="form-section">
+  <div class="equipment-section">
     <h3>Equipment</h3>
     <label for="equipmentName">Equipment Name</label>
     <input type="text" id="equipmentName">
-    <div class="error" id="equipmentNameError"></div>
+    <br><br>
 
     <label for="workingHours">Working Hours</label>
-    <input type="number" id="workingHours">
-    <div class="error" id="workingHoursError"></div>
+    <input type="text" id="workingHours">
+    <br><br>
 
-    <button type="button" onclick="addEquipment()">Add Equipment</button>
-
-    <div class="preview-section" id="equipmentPreview">
-      <h4>Equipment Preview:</h4>
-      <table id="equipmentTable">
-        <tr>
-          <th>Equipment Name</th>
-          <th>Working Hours</th>
-        </tr>
-      </table>
-    </div>
+    <button onclick="addEquipment()">Add Equipment</button>
   </div>
 
-  <!-- Consumable -->
-  <div class="form-section">
+  <div class="consumable-section">
     <h3>Consumables</h3>
     <label for="consumableName">Consumable Name</label>
     <input type="text" id="consumableName">
-    <div class="error" id="consumableNameError"></div>
+    <br><br>
 
-    <label for="quantity">Quantity (Nos/ML)</label>
-    <input type="number" id="quantity">
-    <div class="error" id="quantityError"></div>
+    <label for="quantity">Quantity</label>
+    <input type="text" id="quantity">
+    <br><br>
 
-    <button type="button" onclick="addConsumable()">Add Consumable</button>
-
-    <div class="preview-section" id="consumablePreview">
-      <h4>Consumable Preview:</h4>
-      <table id="consumableTable">
-        <tr>
-          <th>Consumable Name</th>
-          <th>Quantity</th>
-        </tr>
-      </table>
-    </div>
+    <button onclick="addConsumable()">Add Consumable</button>
   </div>
 
-  <button id="saveButton" onclick="saveData()">Save DWS</button>
-  <button class="export-button" onclick="exportToExcel()">Export to Excel</button>
-  <button class="export-button" onclick="exportToPDF()">Export to PDF</button>
-
-  <button class="back-button" onclick="goBack()">Back to Home</button>
+  <div class="table-container">
+    <h3>Preview</h3>
+    <div class="preview-section">
+      <table id="previewTable">
+        <thead>
+          <tr>
+            <th>DWS No.</th>
+            <th>Date</th>
+            <th>Structure Name</th>
+            <th>SI No.</th>
+            <th>Work Description</th>
+            <th>Location</th>
+            <th>Manpower</th>
+            <th>Equipment</th>
+            <th>Consumables</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Preview data will appear here -->
+        </tbody>
+      </table>
+    </div>
+    <button onclick="saveData()">Save</button>
+    <button onclick="goBack()">Back</button>
+    <button onclick="exportToExcel()">Export to Excel</button>
+    <button onclick="exportToPDF()">Export to PDF</button>
+  </div>
 
   <script>
-    let dwsCounter = 1; // Initial DWS number
+    let dwsCounter = 1;
 
-    function showError(elementId, errorMessage) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.innerText = errorMessage;
+    function showError(fieldId, message) {
+      document.getElementById(fieldId).innerHTML = message;
     }
 
-    function clearError(elementId) {
-      const errorElement = document.getElementById(elementId);
-      errorElement.innerText = '';
+    function clearError(fieldId) {
+      document.getElementById(fieldId).innerHTML = '';
     }
 
     function addManpower() {
-      const badgeNo = document.getElementById('badgeNo').value;
-      const manpowerName = document.getElementById('manpowerName').value;
+      const badgeNo = document.getElementById('manpowerBadgeNo').value;
+      const name = document.getElementById('manpowerName').value;
+      const jobTitle = document.getElementById('jobTitle').value;
       const normalHour = document.getElementById('normalHour').value;
       const otHour = document.getElementById('otHour').value;
       const holiday = document.getElementById('holiday').value;
@@ -232,11 +167,17 @@
       } else {
         clearError('badgeNoError');
       }
-      if (!manpowerName) {
-        showError('manpowerNameError', 'Name is required');
+      if (!name) {
+        showError('nameError', 'Name is required');
         isValid = false;
       } else {
-        clearError('manpowerNameError');
+        clearError('nameError');
+      }
+      if (!jobTitle) {
+        showError('jobTitleError', 'Job Title is required');
+        isValid = false;
+      } else {
+        clearError('jobTitleError');
       }
       if (!normalHour) {
         showError('normalHourError', 'Normal Hour is required');
@@ -260,11 +201,12 @@
       if (isValid) {
         const table = document.getElementById('manpowerTable');
         const row = table.insertRow();
-        row.innerHTML = `<td>${badgeNo}</td><td>${manpowerName}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
+        row.innerHTML = `<td>${badgeNo}</td><td>${name}</td><td>${jobTitle}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
 
         // Clear input fields
-        document.getElementById('badgeNo').value = '';
-                document.getElementById('manpowerName').value = '';
+        document.getElementById('manpowerBadgeNo').value = '';
+        document.getElementById('manpowerName').value = '';
+        document.getElementById('jobTitle').value = '';
         document.getElementById('normalHour').value = '';
         document.getElementById('otHour').value = '';
         document.getElementById('holiday').value = '';
@@ -342,22 +284,38 @@
     }
 
     function exportToExcel() {
-      let table = document.createElement('table');
-      table.innerHTML = document.querySelector('.preview-section').innerHTML;
-      const filename = 'DWS.xlsx';
+      const table = document.createElement('table');
+      const headerRow = document.createElement('tr');
+      headerRow.innerHTML = `
+        <th>DWS No.</th>
+        <th>Date</th>
+        <th>Structure Name</th>
+        <th>SI No.</th>
+        <th>Work Description</th>
+        <th>Location</th>
+        <th>Manpower</th>
+        <th>Equipment</th>
+        <th>Consumables</th>
+      `;
+      table.appendChild(headerRow);
 
-      let excelData = table.outerHTML;
-      const blob = new Blob([excelData], { type: 'application/vnd.ms-excel' });
+      const previewRows = document.querySelectorAll('#previewTable tbody tr');
+      previewRows.forEach(row => {
+        const rowCopy = row.cloneNode(true);
+        table.appendChild(rowCopy);
+      });
+
+      const blob = new Blob([table.outerHTML], { type: 'application/vnd.ms-excel' });
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
-      link.download = filename;
+      link.download = 'DWS.xlsx';
       link.click();
     }
 
     function exportToPDF() {
       const doc = new jsPDF();
 
-      doc.autoTable({ html: '.preview-section' });
+      doc.autoTable({ html: '#previewTable' });
       const filename = 'DWS.pdf';
       doc.save(filename);
     }
