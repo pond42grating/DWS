@@ -6,98 +6,63 @@
   <title>Create DWS</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
-      background-color: #f4f7fc;
-      color: #333;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      text-align: center;
-      color: #444;
-      font-size: 2.5rem;
-      margin-top: 20px;
+      font-family: Arial, sans-serif;
+      margin: 20px;
     }
     .form-section {
-      background-color: #ffffff;
-      padding: 20px;
-      border-radius: 8px;
       margin-bottom: 20px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 800px;
-      margin-left: auto;
-      margin-right: auto;
     }
     label {
-      font-weight: 600;
-      color: #555;
-      margin-bottom: 8px;
+      font-weight: bold;
       display: block;
+      margin-bottom: 8px;
     }
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], input[type="date"] {
       width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
+      padding: 8px;
+      margin-bottom: 10px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 1rem;
-      background-color: #f9f9f9;
-      transition: all 0.3s ease;
-    }
-    input[type="text"]:focus, input[type="number"]:focus {
-      border-color: #4CAF50;
-      background-color: #ffffff;
     }
     .preview-section {
-      margin-top: 20px;
+      margin-top: 10px;
     }
     .preview-section table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
     }
     .preview-section table, th, td {
-      border: 1px solid #ddd;
+      border: 1px solid #ccc;
     }
     th, td {
-      padding: 12px;
+      padding: 8px;
       text-align: left;
-      font-size: 1rem;
-    }
-    th {
-      background-color: #f5f5f5;
     }
     .error {
-      color: #e74c3c;
-      font-size: 0.9rem;
+      color: red;
+      font-size: 12px;
     }
     button {
-      padding: 12px 20px;
+      padding: 10px 15px;
       background-color: #4CAF50;
       color: white;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
       margin-top: 10px;
     }
     button:hover {
       background-color: #45a049;
     }
     .back-button {
-      padding: 12px 20px;
-      background-color: #e74c3c;
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #f44336;
       color: white;
       border: none;
-      border-radius: 4px;
       cursor: pointer;
-      font-size: 1rem;
-      transition: background-color 0.3s ease;
-      margin-top: 20px;
     }
     .back-button:hover {
-      background-color: #c0392b;
+      background-color: #da190b;
     }
   </style>
 </head>
@@ -109,6 +74,13 @@
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
+  </div>
+
+  <!-- Date field added here -->
+  <div class="form-section">
+    <label for="dwsDate">Date</label>
+    <input type="date" id="dwsDate">
+    <div class="error" id="dwsDateError"></div>
   </div>
 
   <div class="form-section">
@@ -314,7 +286,7 @@
 
       if (isValid) {
         const table = document.getElementById('equipmentTable');
-                const row = table.insertRow();
+        const row = table.insertRow();
         row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
@@ -353,103 +325,116 @@
       }
     }
 
-        function saveData() {
-      const dwsNo = `DWS-${dwsCounter++}`;
+    function saveData() {
+            const dwsNo = `DWS-${dwsCounter++}`;
+      const dwsDate = document.getElementById('dwsDate').value;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
       const workDescription = document.getElementById('workDescription').value;
       const location = document.getElementById('location').value;
 
-      // Check if all required fields are filled
-      if (!structureName || !siNo || !workDescription || !location) {
-        alert('Please fill in all required fields.');
-        return;
-      }
-
-      // Create a data object to store the DWS
-      const dwsData = {
-        dwsNo,
-        structureName,
-        siNo,
-        workDescription,
-        location,
-        manpower: [],
-        equipment: [],
-        consumables: []
-      };
-
-      // Collect all manpower data
-      const manpowerTable = document.getElementById('manpowerTable');
-      for (let i = 1; i < manpowerTable.rows.length; i++) {
-        const row = manpowerTable.rows[i];
-        const manpower = {
+      // Manpower Data
+      const manpowerRows = document.getElementById('manpowerTable').rows;
+      const manpowerData = [];
+      for (let i = 1; i < manpowerRows.length; i++) {
+        const row = manpowerRows[i];
+        manpowerData.push({
           badgeNo: row.cells[0].innerText,
           name: row.cells[1].innerText,
           normalHour: row.cells[2].innerText,
           otHour: row.cells[3].innerText,
-          holiday: row.cells[4].innerText
-        };
-        dwsData.manpower.push(manpower);
+          holiday: row.cells[4].innerText,
+        });
       }
 
-      // Collect all equipment data
-      const equipmentTable = document.getElementById('equipmentTable');
-      for (let i = 1; i < equipmentTable.rows.length; i++) {
-        const row = equipmentTable.rows[i];
-        const equipment = {
+      // Equipment Data
+      const equipmentRows = document.getElementById('equipmentTable').rows;
+      const equipmentData = [];
+      for (let i = 1; i < equipmentRows.length; i++) {
+        const row = equipmentRows[i];
+        equipmentData.push({
           equipmentName: row.cells[0].innerText,
-          workingHours: row.cells[1].innerText
-        };
-        dwsData.equipment.push(equipment);
+          workingHours: row.cells[1].innerText,
+        });
       }
 
-      // Collect all consumable data
-      const consumableTable = document.getElementById('consumableTable');
-      for (let i = 1; i < consumableTable.rows.length; i++) {
-        const row = consumableTable.rows[i];
-        const consumable = {
+      // Consumable Data
+      const consumableRows = document.getElementById('consumableTable').rows;
+      const consumableData = [];
+      for (let i = 1; i < consumableRows.length; i++) {
+        const row = consumableRows[i];
+        consumableData.push({
           consumableName: row.cells[0].innerText,
-          quantity: row.cells[1].innerText
-        };
-        dwsData.consumables.push(consumable);
+          quantity: row.cells[1].innerText,
+        });
       }
 
-      // Here you can save the data (in localStorage, send to a server, etc.)
-      console.log('DWS Data:', dwsData);
+      // Check for required fields
+      let isValid = true;
+      if (!dwsDate) {
+        showError('dwsDateError', 'Date is required');
+        isValid = false;
+      } else {
+        clearError('dwsDateError');
+      }
+      if (!structureName) {
+        showError('structureNameError', 'Structure Name is required');
+        isValid = false;
+      } else {
+        clearError('structureNameError');
+      }
+      if (!siNo) {
+        showError('siNoError', 'SI No. is required');
+        isValid = false;
+      } else {
+        clearError('siNoError');
+      }
+      if (!workDescription) {
+        showError('workDescriptionError', 'Work Description is required');
+        isValid = false;
+      } else {
+        clearError('workDescriptionError');
+      }
+      if (!location) {
+        showError('locationError', 'Location is required');
+        isValid = false;
+      } else {
+        clearError('locationError');
+      }
 
-      // Optionally, reset form fields
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('manpowerTable').innerHTML = `
-        <tr>
-          <th>Badge No.</th>
-          <th>Name</th>
-          <th>Normal Hour</th>
-          <th>OT Hour</th>
-          <th>Holiday</th>
-        </tr>
-      `;
-      document.getElementById('equipmentTable').innerHTML = `
-        <tr>
-          <th>Equipment Name</th>
-          <th>Working Hours</th>
-        </tr>
-      `;
-      document.getElementById('consumableTable').innerHTML = `
-        <tr>
-          <th>Consumable Name</th>
-          <th>Quantity</th>
-        </tr>
-      `;
+      if (isValid) {
+        // Data to save (for now, just log it)
+        console.log({
+          dwsNo,
+          dwsDate,
+          structureName,
+          siNo,
+          workDescription,
+          location,
+          manpowerData,
+          equipmentData,
+          consumableData,
+        });
 
-      alert('DWS saved successfully!');
+        // Reset fields
+        document.getElementById('dwsDate').value = '';
+        document.getElementById('structureName').value = '';
+        document.getElementById('siNo').value = '';
+        document.getElementById('workDescription').value = '';
+        document.getElementById('location').value = '';
+        document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
+        document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
+        document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
+      }
     }
 
     function goBack() {
-      window.location.href = '/'; // Redirect back to home page or main dashboard
+      // Go back to the home page (replace with actual URL if needed)
+      window.history.back();
     }
+
+    // Auto-generate the DWS number when the page loads
+    document.getElementById('dwsNo').value = `DWS-${dwsCounter}`;
   </script>
 
 </body>
