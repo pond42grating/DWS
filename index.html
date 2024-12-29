@@ -64,6 +64,17 @@
     .back-button:hover {
       background-color: #da190b;
     }
+    .export-button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .export-button:hover {
+      background-color: #006F8E;
+    }
   </style>
 </head>
 <body>
@@ -74,12 +85,6 @@
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
-  </div>
-
-  <div class="form-section">
-    <label for="date">Date</label>
-    <input type="date" id="date">
-    <div class="error" id="dateError"></div>
   </div>
 
   <div class="form-section">
@@ -117,6 +122,10 @@
     <input type="text" id="manpowerName">
     <div class="error" id="manpowerNameError"></div>
 
+    <label for="jobTitle">Job Title/Qualifications</label>
+    <input type="text" id="jobTitle">
+    <div class="error" id="jobTitleError"></div>
+
     <label for="normalHour">Normal Hour</label>
     <input type="number" id="normalHour">
     <div class="error" id="normalHourError"></div>
@@ -137,6 +146,7 @@
         <tr>
           <th>Badge No.</th>
           <th>Name</th>
+          <th>Job Title/Qualifications</th>
           <th>Normal Hour</th>
           <th>OT Hour</th>
           <th>Holiday</th>
@@ -194,6 +204,9 @@
   </div>
 
   <button id="saveButton" onclick="saveData()">Save DWS</button>
+  <button class="export-button" onclick="exportToExcel()">Export to Excel</button>
+  <button class="export-button" onclick="exportToPDF()">Export to PDF</button>
+
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
@@ -212,6 +225,7 @@
     function addManpower() {
       const badgeNo = document.getElementById('badgeNo').value;
       const manpowerName = document.getElementById('manpowerName').value;
+      const jobTitle = document.getElementById('jobTitle').value;
       const normalHour = document.getElementById('normalHour').value;
       const otHour = document.getElementById('otHour').value;
       const holiday = document.getElementById('holiday').value;
@@ -229,6 +243,12 @@
         isValid = false;
       } else {
         clearError('manpowerNameError');
+      }
+      if (!jobTitle) {
+        showError('jobTitleError', 'Job Title/Qualifications is required');
+        isValid = false;
+      } else {
+        clearError('jobTitleError');
       }
       if (!normalHour) {
         showError('normalHourError', 'Normal Hour is required');
@@ -252,11 +272,12 @@
       if (isValid) {
         const table = document.getElementById('manpowerTable');
         const row = table.insertRow();
-        row.innerHTML = `<td>${badgeNo}</td><td>${manpowerName}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
+        row.innerHTML = `<td>${badgeNo}</td><td>${manpowerName}</td><td>${jobTitle}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
 
         // Clear input fields
         document.getElementById('badgeNo').value = '';
         document.getElementById('manpowerName').value = '';
+        document.getElementById('jobTitle').value = '';
         document.getElementById('normalHour').value = '';
         document.getElementById('otHour').value = '';
         document.getElementById('holiday').value = '';
@@ -285,7 +306,7 @@
       if (isValid) {
         const table = document.getElementById('equipmentTable');
         const row = table.insertRow();
-        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
+                row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
         document.getElementById('equipmentName').value = '';
@@ -324,25 +345,66 @@
     }
 
     function saveData() {
-      // You can implement the saving functionality here
-      alert('DWS saved successfully');
+      const dwsNo = document.getElementById('dwsNo').value || `DWS-${dwsCounter++}`;
+      const structureName = document.getElementById('structureName').value;
+      const siNo = document.getElementById('siNo').value;
+      const workDescription = document.getElementById('workDescription').value;
+      const location = document.getElementById('location').value;
+
+      // Validation
+      let isValid = true;
+      if (!structureName) {
+        showError('structureNameError', 'Structure Name is required');
+        isValid = false;
+      } else {
+        clearError('structureNameError');
+      }
+      if (!siNo) {
+        showError('siNoError', 'SI No. is required');
+        isValid = false;
+      } else {
+        clearError('siNoError');
+      }
+      if (!workDescription) {
+        showError('workDescriptionError', 'Work Description is required');
+        isValid = false;
+      } else {
+        clearError('workDescriptionError');
+      }
+      if (!location) {
+        showError('locationError', 'Location is required');
+        isValid = false;
+      } else {
+        clearError('locationError');
+      }
+
+      if (isValid) {
+        alert(`DWS data saved for ${structureName} (DWS No. ${dwsNo})`);
+        // Reset the form for new entry
+        document.getElementById('structureName').value = '';
+        document.getElementById('siNo').value = '';
+        document.getElementById('workDescription').value = '';
+        document.getElementById('location').value = '';
+      }
+    }
+
+    function exportToExcel() {
+      // Export data to Excel logic (not implemented in this example)
+      alert('Export to Excel feature is not implemented yet.');
+    }
+
+    function exportToPDF() {
+      // Export data to PDF logic (not implemented in this example)
+      alert('Export to PDF feature is not implemented yet.');
     }
 
     function goBack() {
-      // Go back to the homepage or previous page
-      window.history.back();
+      // Redirect to the homepage or another page
+      window.location.href = 'index.html'; // Adjust the URL as necessary
     }
 
-    // Auto generate DWS No.
-    function generateDwsNo() {
-      const dwsNoField = document.getElementById('dwsNo');
-      dwsNoField.value = `DWS-${dwsCounter++}`;
-    }
-
-    // Call the generateDwsNo function when the page loads
-    window.onload = function () {
-      generateDwsNo();
-    }
+    // Automatically assign DWS No.
+    document.getElementById('dwsNo').value = `DWS-${dwsCounter}`;
   </script>
 
 </body>
