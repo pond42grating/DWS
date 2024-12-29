@@ -78,7 +78,7 @@
 <body>
 
   <h1>Create DWS</h1>
-  
+  <div id="formView">
   <!-- DWS Number (Auto Assigned) -->
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
@@ -202,16 +202,24 @@
     </div>
   </div>
 
-  <button id="saveButton" onclick="saveData()" disabled>Save DWS</button>
+ 
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
+  
+  <button onclick="saveData()">Save</button>
+  <button onclick="toggleView('saved')">View Saved Files</button>
+</div>
+
+<div id="savedFilesView" style="display:none;">
+  <h3>Saved Files</h3>
+  <div id="savedFilesList"></div>
+  <button onclick="toggleView('main')">Back</button>
+</div>
 
   <!-- Saved DWS Files -->
-  <div id="savedFiles">
-    <h3>Saved DWS Files:</h3>
-    <div id="savedFilesList"></div>
-  </div>
+  
 
+  
  <script>
   let dwsCounter = 1;  // Initialize a counter for DWS numbers
 
