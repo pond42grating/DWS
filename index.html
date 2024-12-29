@@ -212,7 +212,7 @@
     <div id="savedFilesList"></div>
   </div>
 
-  <script>
+ <script>
   let dwsCounter = 1;  // Initialize a counter for DWS numbers
 
   function generateDwsNo() {
@@ -228,6 +228,12 @@
     const siNo = document.getElementById('siNo').value;
     const workDescription = document.getElementById('workDescription').value;
     const location = document.getElementById('location').value;
+
+    // Check if any necessary fields are empty
+    if (!dwsDate || !structureName || !siNo || !workDescription || !location) {
+      alert('Please fill in all required fields before saving!');
+      return;  // Prevent saving if fields are empty
+    }
 
     const manpowerData = [];
     const manpowerTable = document.getElementById('manpowerTable');
@@ -363,6 +369,16 @@
   // Initialize page by generating a DWS number
   generateDwsNo();
   displaySavedFiles();
+  
+  function toggleView(view) {
+    if (view === 'main') {
+      document.getElementById('formView').style.display = 'block';
+      document.getElementById('savedFilesView').style.display = 'none';
+    } else if (view === 'saved') {
+      document.getElementById('formView').style.display = 'none';
+      document.getElementById('savedFilesView').style.display = 'block';
+    }
+  }
 </script>
 
 </body>
