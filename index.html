@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Details Export</title>
+    <title>Work Details Input</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         /* General Styles */
@@ -16,6 +16,34 @@
         h1 {
             text-align: center;
             margin-bottom: 20px;
+        }
+
+        /* Form Styles */
+        .form-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .form-container label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        .form-container input, .form-container select, .form-container button {
+            width: calc(100% - 20px);
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .form-container button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+        }
+        .form-container button:hover {
+            background-color: #45a049;
         }
 
         /* Table Styles */
@@ -55,7 +83,6 @@
             font-size: 14px;
             cursor: pointer;
             border-radius: 4px;
-            text-decoration: none;
         }
         .btn:hover {
             background-color: #45a049;
@@ -66,12 +93,74 @@
     </style>
 </head>
 <body>
-    <h1>Work Details</h1>
+    <h1>Work Details Input and Export</h1>
+
+    <!-- Input Form -->
+    <div class="form-container">
+        <label for="dwsNo">DWS No:</label>
+        <input type="text" id="dwsNo" placeholder="Enter DWS No">
+
+        <label for="date">Date:</label>
+        <input type="date" id="date">
+
+        <label for="sNo">S/TQ No:</label>
+        <input type="text" id="sNo" placeholder="Enter S/TQ No">
+
+        <label for="work">Work:</label>
+        <input type="text" id="work" placeholder="Enter Work Description">
+
+        <label for="location">Location:</label>
+        <select id="location">
+            <option value="Site">Site</option>
+            <option value="Office">Office</option>
+        </select>
+
+        <label for="trade">Trade:</label>
+        <input type="text" id="trade" placeholder="Enter Trade">
+
+        <label for="name">Name:</label>
+        <input type="text" id="name" placeholder="Enter Name">
+
+        <label for="badgeNo">Badge No:</label>
+        <input type="text" id="badgeNo" placeholder="Enter Badge No">
+
+        <label for="nh">NH:</label>
+        <input type="number" id="nh" placeholder="Enter NH">
+
+        <label for="ot">OT:</label>
+        <input type="number" id="ot" placeholder="Enter OT">
+
+        <label for="holiday">Holiday:</label>
+        <select id="holiday">
+            <option value="Yes">Yes</option>
+            <option value="No">No</option>
+        </select>
+
+        <label for="equipment">Equipment:</label>
+        <input type="text" id="equipment" placeholder="Enter Equipment">
+
+        <label for="workingHours">Working Hours:</label>
+        <input type="number" id="workingHours" placeholder="Enter Working Hours">
+
+        <label for="material">Material:</label>
+        <input type="text" id="material" placeholder="Enter Material">
+
+        <label for="qty">Qty:</label>
+        <input type="number" id="qty" placeholder="Enter Qty">
+
+        <label for="uom">UOM:</label>
+        <input type="text" id="uom" placeholder="Enter UOM">
+
+        <button onclick="addEntry()">Add Entry</button>
+    </div>
+
+    <!-- Buttons -->
     <div class="btn-container">
         <button class="btn" onclick="exportToExcel()"><i class="fas fa-file-excel"></i>Export to Excel</button>
         <button class="btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i>Export to PDF</button>
     </div>
 
+    <!-- Table -->
     <table id="workDetailsTable">
         <thead>
             <tr>
@@ -94,60 +183,77 @@
                 <th>UOM</th>
             </tr>
         </thead>
-        <tbody>
-            <tr>
-                <td>1</td>
-                <td>DWS-1142</td>
-                <td>6/1/2024</td>
-                <td>NFE-05A-002-SI-0317</td>
-                <td>LD-01 - Preparation, cutting...</td>
-                <td>Site</td>
-                <td>Trade Here</td>
-                <td>Name Here</td>
-                <td>196848</td>
-                <td>10</td>
-                <td>2</td>
-                <td>No</td>
-                <td>Welding Machine</td>
-                <td>12</td>
-                <td>Welding Rod - 3mm</td>
-                <td>16</td>
-                <td>Nos</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>DWS-1142</td>
-                <td>6/1/2024</td>
-                <td>NFE-05A-002-SI-0317</td>
-                <td>LD-01 - Preparation, cutting...</td>
-                <td>Site</td>
-                <td>Trade Here</td>
-                <td>Name Here</td>
-                <td>196848</td>
-                <td>10</td>
-                <td>2</td>
-                <td>No</td>
-                <td>Welding Machine</td>
-                <td>12</td>
-                <td>Welding Rod - 3mm</td>
-                <td>16</td>
-                <td>Nos</td>
-            </tr>
-        </tbody>
+        <tbody></tbody>
     </table>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script>
-        // Function to export table to Excel
+        const tableBody = document.querySelector("#workDetailsTable tbody");
+        let data = JSON.parse(localStorage.getItem("workDetails")) || [];
+
+        // Function to add entry
+        function addEntry() {
+            const entry = {
+                dwsNo: document.getElementById("dwsNo").value,
+                date: document.getElementById("date").value,
+                sNo: document.getElementById("sNo").value,
+                work: document.getElementById("work").value,
+                location: document.getElementById("location").value,
+                trade: document.getElementById("trade").value,
+                name: document.getElementById("name").value,
+                badgeNo: document.getElementById("badgeNo").value,
+                nh: document.getElementById("nh").value,
+                ot: document.getElementById("ot").value,
+                holiday: document.getElementById("holiday").value,
+                equipment: document.getElementById("equipment").value,
+                workingHours: document.getElementById("workingHours").value,
+                material: document.getElementById("material").value,
+                qty: document.getElementById("qty").value,
+                uom: document.getElementById("uom").value,
+            };
+            data.push(entry);
+            localStorage.setItem("workDetails", JSON.stringify(data));
+            renderTable();
+        }
+
+        // Render table from localStorage
+        function renderTable() {
+            tableBody.innerHTML = "";
+            data.forEach((entry, index) => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td>${index + 1}</td>
+                    <td>${entry.dwsNo}</td>
+                    <td>${entry.date}</td>
+                    <td>${entry.sNo}</td>
+                    <td>${entry.work}</td>
+                    <td>${entry.location}</td>
+                    <td>${entry.trade}</td>
+                    <td>${entry.name}</td>
+                    <td>${entry.badgeNo}</td>
+                    <td>${entry.nh}</td>
+                    <td>${entry.ot}</td>
+                    <td>${entry.holiday}</td>
+                    <td>${entry.equipment}</td>
+                    <td>${entry.workingHours}</td>
+                    <td>${entry.material}</td>
+                    <td>${entry.qty}</td>
+                    <td>${entry.uom}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Export to Excel
         function exportToExcel() {
             const table = document.getElementById("workDetailsTable");
             const workbook = XLSX.utils.table_to_book(table, { sheet: "Work Details" });
             XLSX.writeFile(workbook, "work_details.xlsx");
         }
 
-        // Function to export table to PDF
+        // Export to PDF
         async function exportToPDF() {
             const { jsPDF } = window.jspdf;
             const pdf = new jsPDF();
@@ -155,11 +261,14 @@
             pdf.autoTable({
                 html: "#workDetailsTable",
                 startY: 20,
-                styles: { fontSize: 8, cellPadding: 2, halign: 'center' },
+                styles: { fontSize: 8, cellPadding: 2, halign: "center" },
                 headStyles: { fillColor: [60, 141, 188], textColor: 255 },
             });
             pdf.save("work_details.pdf");
         }
+
+        // Initial render
+        renderTable();
     </script>
 </body>
 </html>
