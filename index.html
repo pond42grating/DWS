@@ -64,52 +64,6 @@
             background-color: #1976D2;
         }
 
-        .manage-dws-container {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 20px;
-            padding-top: 100px;
-        }
-
-        .search-input {
-            padding: 10px;
-            font-size: 16px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            width: 300px;
-        }
-
-        .search-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .search-btn:hover {
-            background-color: #388E3C;
-        }
-
-        .export-btn {
-            background-color: #FF9800;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            font-size: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-
-        .export-btn:hover {
-            background-color: #FB8C00;
-        }
-
-        /* New Option Styles */
         .dashboard-card {
             background-color: #fff;
             padding: 20px;
@@ -148,7 +102,65 @@
             background-color: #8E24AA;
         }
 
-        /* Modal styles */
+        .manage-dws-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding-top: 100px;
+        }
+
+        .search-input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 300px;
+        }
+
+        .search-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background-color: #388E3C;
+        }
+
+        .filter-btn {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background-color: #FB8C00;
+        }
+
+        .export-btn {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .export-btn:hover {
+            background-color: #FB8C00;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -191,12 +203,78 @@
         .modal-body {
             padding: 10px 0;
         }
+
+        /* New Option Styles */
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .filter-container select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tab:hover {
+            background-color: #bbb;
+        }
+
+        .team-table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .team-table th, .team-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .team-table th {
+            background-color: #f4f4f4;
+        }
+
+        /* Notification Bell */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-bell::after {
+            content: "⚡";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            color: red;
+        }
     </style>
 </head>
 <body>
     <header>
         <h1>DWS Management</h1>
-        <button class="logout-btn" onclick="showModal('logoutModal')">Logout</button>
+        <div>
+            <button class="logout-btn" onclick="showModal('logoutModal')">Logout</button>
+            <span class="notification-bell" onclick="showModal('notificationModal')"></span>
+        </div>
     </header>
 
     <div class="main-content">
@@ -205,16 +283,7 @@
         <button class="help-btn" onclick="showModal('helpModal')">Help</button>
     </div>
 
-    <div class="manage-dws-container" id="manageDWS">
-        <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No." />
-        <button class="search-btn" onclick="searchDWS()">Search</button>
-        <div>
-            <button class="export-btn" onclick="showModal('exportPdfModal')">Export as PDF</button>
-            <button class="export-btn" onclick="showModal('exportExcelModal')">Export as Excel</button>
-        </div>
-        <button class="button" onclick="backToMain()">Back</button>
-    </div>
-
+    <!-- Dashboard Overview -->
     <div class="dashboard-container">
         <div class="dashboard-card">
             <h3>10</h3>
@@ -224,6 +293,55 @@
             <h3>3</h3>
             <p>Pending DWS</p>
         </div>
+        <div class="dashboard-card">
+            <h3>5</h3>
+            <p>Upcoming Tasks</p>
+        </div>
+    </div>
+
+    <!-- Manage DWS Section -->
+    <div class="manage-dws-container" id="manageDWS">
+        <div class="filter-container">
+            <select>
+                <option value="date-range">Date Range</option>
+                <option value="status">Status</option>
+            </select>
+            <select>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="in-progress">In Progress</option>
+            </select>
+        </div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No." />
+        <button class="search-btn" onclick="searchDWS()">Search</button>
+        <div>
+            <button class="export-btn" onclick="showModal('exportPdfModal')">Export as PDF</button>
+            <button class="export-btn" onclick="showModal('exportExcelModal')">Export as Excel</button>
+        </div>
+        <button class="button" onclick="backToMain()">Back</button>
+    </div>
+
+    <!-- Team Management Section -->
+    <div class="team-table">
+        <h3>Team Members</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <td>John Doe</td>
+                <td>Admin</td>
+                <td>Active</td>
+                <td>
+                    <button onclick="alert('Edit User')">Edit</button>
+                    <button onclick="alert('Delete User')">Delete</button>
+                </td>
+            </tr>
+        </table>
+        <button class="button" onclick="alert('Add New User')">Add User</button>
     </div>
 
     <!-- Modal for Logout -->
@@ -262,6 +380,15 @@
         </div>
     </div>
 
+    <!-- Modal for Notification -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('notificationModal')">&times;</span>
+            <div class="modal-header">Notifications</div>
+            <div class="modal-body">You have new notifications!</div>
+        </div>
+    </div>
+
     <script>
         function showCreateDWS() {
             alert("Create DWS functionality will be implemented here.");
@@ -294,14 +421,4 @@
         }
 
         window.onpopstate = function (event) {
-            if (event.state && event.state.page === "manageDWS") {
-                document.querySelector('.main-content').style.display = 'none';
-                document.getElementById('manageDWS').style.display = 'flex';
-            } else {
-                document.querySelector('.main-content').style.display = 'flex';
-                document.getElementById('manageDWS').style.display = 'none';
-            }
-        };
-    </script>
-</body>
-</html>
+            if (event.state && event.state
