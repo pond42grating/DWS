@@ -264,16 +264,7 @@
       document.getElementById(sectionId).classList.add('active');
     }
     
-    // Variable to track the DWS number (you can store it in local storage or database for persistence)
-let dwsCounter = 1; // Start from DWS-001
-
-// Function to generate DWS number
-function generateDwsNo() {
-  // Format the DWS number to DWS-001, DWS-002, etc.
-  const dwsNo = `DWS-${String(dwsCounter).padStart(3, '0')}`;
-  dwsCounter++; // Increment the counter for the next DWS number
-  return dwsNo;
-}
+    
 
     // Add manpower to the table
     function addManpower() {
@@ -340,6 +331,17 @@ function generateDwsNo() {
         alert('Please fill in all fields.');
       }
     }
+    
+    // Variable to track the DWS number (you can store it in local storage or database for persistence)
+let dwsCounter = 1; // Start from DWS-001
+
+// Function to generate DWS number
+function generateDwsNo() {
+  // Format the DWS number to DWS-001, DWS-002, etc.
+  const dwsNo = `DWS-${String(dwsCounter).padStart(3, '0')}`;
+  dwsCounter++; // Increment the counter for the next DWS number
+  return dwsNo;
+}
 
     // Save DWS data
     function saveData() {
