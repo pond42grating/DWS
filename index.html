@@ -236,6 +236,7 @@
 <div id="dialogBox" class="dialog">
   <h3>Saved DWS Data</h3>
   <div id="dialogContent"></div>
+  
   <button onclick="closeDialog()">Close</button>
 </div>
 
@@ -366,6 +367,20 @@
 
   function loadSavedFile(dwsNo) {
     const savedData = localStorage.getItem(dwsNo);
+    const savedFilesList = document.getElementById('savedFilesList');
+      savedFilesList.innerHTML = ''; // Clear the list before reloading
+
+      // Loop through all items in localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const dwsData = JSON.parse(localStorage.getItem(key));
+
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <strong>${dwsData.dwsNo}</strong>
+          <button onclick="deleteDws('${dwsData.dwsNo}')">Delete</button>
+        `;
+        savedFilesList.appendChild(div);
     if (savedData) {
       const dwsData = JSON.parse(savedData);
       document.getElementById('dwsNo').value = dwsData.dwsNo;
@@ -400,6 +415,11 @@
       openDialog(dwsData);
     }
   }
+  
+  function deleteDws(dwsNo) {
+      if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
+        localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
+        loadSavedFiles();  // Reload the saved files list after deletion
 
   function openDialog(dwsData) {
     const dialog = document.createElement('div');
