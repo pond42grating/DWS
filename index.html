@@ -81,16 +81,6 @@
       display: none; /* Initially hidden */
     }
 
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-
     /* Modal for displaying messages */
     #msgModal {
       display: none;
@@ -132,7 +122,7 @@
     <input type="password" id="login-password" class="input-field" placeholder="Password" required>
     
     <!-- Sign In Button -->
-    <button class="button" onclick="showMsg('Sign In')">Sign In</button>
+    <button class="button" onclick="login()">Sign In</button>
     
     <!-- Sign Up Link -->
     <div class="sign-up-link">
@@ -141,7 +131,7 @@
     
     <!-- Forgot Password Link -->
     <div class="forgot-password">
-      <p><a href="#" onclick="showMsg('Forgot Password')">Forgot Password?</a></p>
+      <p><a href="#" onclick="showForgotPasswordForm()">Forgot Password?</a></p>
     </div>
   </div>
 
@@ -162,7 +152,32 @@
     <input type="text" id="secret-code" class="input-field" placeholder="Generated Secret Code" readonly>
     
     <!-- Create Account Button -->
-    <button class="button" onclick="generateSecretCode()">Create Account</button>
+    <button class="button" onclick="createAccount()">Create Account</button>
+    
+    <!-- Back to Login Link -->
+    <div class="forgot-password">
+      <p><a href="#" onclick="showLoginForm()">Back to Login</a></p>
+    </div>
+  </div>
+
+  <!-- Forgot Password Form -->
+  <div class="forgot-password-container" id="forgot-password-container" style="display: none;">
+    <h2>Forgot Password</h2>
+    
+    <!-- Username Input -->
+    <input type="text" id="forgot-username" class="input-field" placeholder="Enter your Username" required>
+    
+    <!-- Secret Code Input -->
+    <input type="text" id="forgot-secret-code" class="input-field" placeholder="Enter Secret Code" required>
+    
+    <!-- New Password Input -->
+    <input type="password" id="new-password" class="input-field" placeholder="New Password" required>
+    
+    <!-- Confirm New Password Input -->
+    <input type="password" id="confirm-new-password" class="input-field" placeholder="Confirm New Password" required>
+    
+    <!-- Reset Password Button -->
+    <button class="button" onclick="resetPassword()">Reset Password</button>
     
     <!-- Back to Login Link -->
     <div class="forgot-password">
@@ -196,14 +211,21 @@
       document.getElementById('sign-up-container').style.display = 'block';
     }
 
-    // Function to show the Login form and hide Sign-Up
+    // Function to show the Forgot Password form
+    function showForgotPasswordForm() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('forgot-password-container').style.display = 'block';
+    }
+
+    // Function to show the Login form and hide Sign-Up and Forgot Password
     function showLoginForm() {
       document.getElementById('sign-up-container').style.display = 'none';
+      document.getElementById('forgot-password-container').style.display = 'none';
       document.getElementById('login-container').style.display = 'block';
     }
 
     // Function to generate a secret code and show in modal
-    function generateSecretCode() {
+    function createAccount() {
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
       var confirmPassword = document.getElementById('confirm-password').value;
@@ -221,7 +243,10 @@
         return;
       }
 
-      // If validation passes, show success message and secret code
+      // Store user data in localStorage
+      localStorage.setItem(username, JSON.stringify({password: password, secretCode: secretCode}));
+
+      // Display secret code
       document.getElementById('secret-code').value = secretCode;
       showSecretCodeModal(secretCode);
 
@@ -244,12 +269,75 @@
     function copyToClipboard(secretCode) {
       var textArea = document.createElement('textarea');
       textArea.value = secretCode;
-      document.body.appendChild(textArea);
+            document.body.appendChild(textArea);
       textArea.select();
       document.execCommand('copy');
       document.body.removeChild(textArea);
+      showMsg('Secret Code copied to clipboard!');
+    }
 
-      showMsg('Secret code copied to clipboard!');
+    // Function to handle the reset password process
+    function resetPassword() {
+      var username = document.getElementById('forgot-username').value;
+      var secretCode = document.getElementById('forgot-secret-code').value;
+      var newPassword = document.getElementById('new-password').value;
+      var confirmNewPassword = document.getElementById('confirm-new-password').value;
+
+      // Check if user exists in localStorage
+      var user = JSON.parse(localStorage.getItem(username));
+
+      if (!user) {
+        showMsg('Username not found.');
+        return;
+      }
+
+      // Validate the secret code
+      if (user.secretCode !== secretCode) {
+        showMsg('Invalid Secret Code.');
+        return;
+      }
+
+      // Check if new passwords match
+      if (newPassword !== confirmNewPassword) {
+        showMsg('New passwords do not match.');
+        return;
+      }
+
+      // Update the password in localStorage
+      user.password = newPassword;
+      localStorage.setItem(username, JSON.stringify(user));
+
+      // Inform the user and redirect to the login page
+      showMsg('Password has been successfully reset!');
+      setTimeout(function() {
+        showLoginForm();
+      }, 2000);
+    }
+
+    // Function to handle login process
+    function login() {
+      var username = document.getElementById('login-username').value;
+      var password = document.getElementById('login-password').value;
+
+      // Check if user exists in localStorage
+      var user = JSON.parse(localStorage.getItem(username));
+
+      if (!user) {
+        showMsg('Username not found.');
+        return;
+      }
+
+      // Validate the password
+      if (user.password !== password) {
+        showMsg('Invalid password.');
+        return;
+      }
+
+      // Successfully logged in
+      showMsg('Login successful!');
+      setTimeout(function() {
+        window.location.href = "home.html"; // Redirect to home page
+      }, 2000);
     }
   </script>
 
