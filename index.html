@@ -5,10 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create DWS</title>
   <style>
-    /* Styles remain the same as before */
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
+      background-color: #f4f7f6;
+      color: #333;
     }
     .form-section {
       margin-bottom: 20px;
@@ -65,6 +66,13 @@
     .back-button:hover {
       background-color: #da190b;
     }
+    #savedFiles {
+      margin-top: 20px;
+    }
+    #savedFiles button {
+      margin-top: 5px;
+      background-color: #2196F3;
+    }
   </style>
 </head>
 <body>
@@ -77,9 +85,8 @@
     <input type="text" id="dwsNo" readonly>
   </div>
 
-  <!-- Date Field -->
   <div class="form-section">
-    <label for="dwsDate">Date</label>
+    <label for="dwsDate">DWS Date</label>
     <input type="date" id="dwsDate">
     <div class="error" id="dwsDateError"></div>
   </div>
@@ -195,9 +202,15 @@
     </div>
   </div>
 
-  <button id="saveButton" onclick="saveData()">Save DWS</button>
+  <button id="saveButton" onclick="saveData()" disabled>Save DWS</button>
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
+
+  <!-- Saved DWS Files -->
+  <div id="savedFiles">
+    <h3>Saved DWS Files:</h3>
+    <div id="savedFilesList"></div>
+  </div>
 
   <script>
     let dwsCounter = 1; // Initial DWS number
@@ -262,7 +275,7 @@
         document.getElementById('manpowerName').value = '';
         document.getElementById('normalHour').value = '';
         document.getElementById('otHour').value = '';
-        document.getElementById('holiday').value = '';
+               document.getElementById('holiday').value = '';
       }
     }
 
@@ -304,7 +317,7 @@
       let isValid = true;
       if (!consumableName) {
         showError('consumableNameError', 'Consumable Name is required');
-                isValid = false;
+        isValid = false;
       } else {
         clearError('consumableNameError');
       }
@@ -326,12 +339,6 @@
       }
     }
 
-    function generateDwsNumber() {
-      const formattedNumber = String(dwsCounter).padStart(4, '0');
-      document.getElementById('dwsNo').value = formattedNumber;
-      dwsCounter++;
-    }
-
     function saveData() {
       const dwsNo = document.getElementById('dwsNo').value;
       const dwsDate = document.getElementById('dwsDate').value;
@@ -345,11 +352,11 @@
       for (let i = 1; i < manpowerTable.rows.length; i++) {
         const row = manpowerTable.rows[i];
         const manpower = {
-          badgeNo: row.cells[0].innerText,
-          name: row.cells[1].innerText,
-          normalHour: row.cells[2].innerText,
-          otHour: row.cells[3].innerText,
-          holiday: row.cells[4].innerText
+          badgeNo: row.cells[0].textContent,
+          name: row.cells[1].textContent,
+          normalHour: row.cells[2].textContent,
+          otHour: row.cells[3].textContent,
+          holiday: row.cells[4].textContent
         };
         manpowerData.push(manpower);
       }
@@ -359,8 +366,8 @@
       for (let i = 1; i < equipmentTable.rows.length; i++) {
         const row = equipmentTable.rows[i];
         const equipment = {
-          equipmentName: row.cells[0].innerText,
-          workingHours: row.cells[1].innerText
+          name: row.cells[0].textContent,
+          workingHours: row.cells[1].textContent
         };
         equipmentData.push(equipment);
       }
@@ -370,51 +377,93 @@
       for (let i = 1; i < consumableTable.rows.length; i++) {
         const row = consumableTable.rows[i];
         const consumable = {
-          consumableName: row.cells[0].innerText,
-          quantity: row.cells[1].innerText
+          name: row.cells[0].textContent,
+          quantity: row.cells[1].textContent
         };
         consumableData.push(consumable);
       }
 
       const dwsData = {
-        dwsNo,
-        dwsDate,
-        structureName,
-        siNo,
-        workDescription,
-        location,
-        manpowerData,
-        equipmentData,
-        consumableData
+        dwsNo: dwsNo,
+        dwsDate: dwsDate,
+        structureName: structureName,
+        siNo: siNo,
+        workDescription: workDescription,
+        location: location,
+        manpower: manpowerData,
+        equipment: equipmentData,
+        consumables: consumableData
       };
 
       localStorage.setItem(dwsNo, JSON.stringify(dwsData));
-      alert("DWS data saved successfully!");
 
-      // Optionally, reset the form and counters after saving
-      resetForm();
-      generateDwsNumber();
+      // Display saved files
+      displaySavedFiles();
+
+      alert('DWS Saved Successfully!');
     }
 
-    function resetForm() {
-      document.getElementById('dwsDate').value = '';
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
-      document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
-      document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
+    function displaySavedFiles() {
+      const savedFilesList = document.getElementById('savedFilesList');
+      savedFilesList.innerHTML = '';
+
+      for (let i = 1; i <= dwsCounter; i++) {
+        const dwsNo = `DWS-${String(i).padStart(4, '0')}`;
+        const button = document.createElement('button');
+        button.textContent = dwsNo;
+        button.onclick = () => loadSavedFile(dwsNo);
+        savedFilesList.appendChild(button);
+      }
+    }
+
+    function loadSavedFile(dwsNo) {
+      const savedData = localStorage.getItem(dwsNo);
+      if (savedData) {
+        const dwsData = JSON.parse(savedData);
+        document.getElementById('dwsNo').value = dwsData.dwsNo;
+        document.getElementById('dwsDate').value = dwsData.dwsDate;
+        document.getElementById('structureName').value = dwsData.structureName;
+        document.getElementById('siNo').value = dwsData.siNo;
+        document.getElementById('workDescription').value = dwsData.workDescription;
+        document.getElementById('location').value = dwsData.location;
+
+        // Manpower table
+        const manpowerTable = document.getElementById('manpowerTable');
+        dwsData.manpower.forEach((manpower) => {
+          const row = manpowerTable.insertRow();
+          row.innerHTML = `<td>${manpower.badgeNo}</td><td>${manpower.name}</td><td>${manpower.normalHour}</td><td>${manpower.otHour}</td><td>${manpower.holiday}</td>`;
+        });
+
+        // Equipment table
+        const equipmentTable = document.getElementById('equipmentTable');
+        dwsData.equipment.forEach((equipment) => {
+          const row = equipmentTable.insertRow();
+          row.innerHTML = `<td>${equipment.name}</td><td>${equipment.workingHours}</td>`;
+        });
+
+        // Consumable table
+        const consumableTable = document.getElementById('consumableTable');
+        dwsData.consumables.forEach((consumable) => {
+          const row = consumableTable.insertRow();
+          row.innerHTML = `<td>${consumable.name}</td><td>${consumable.quantity}</td>`;
+        });
+      }
     }
 
     function goBack() {
-      window.history.back();
+      // Redirect to the home page or another page
+      window.location.href = '/';
     }
 
-    // Initialize DWS Number when the page loads
-    window.onload = function() {
-      generateDwsNumber();
-    };
+    function generateDwsNo() {
+      const dwsNo = `DWS-${String(dwsCounter).padStart(4, '0')}`;
+      document.getElementById('dwsNo').value = dwsNo;
+    }
+
+    // Initialize page by generating a DWS number
+    generateDwsNo();
+    displaySavedFiles();
   </script>
+
 </body>
 </html>
