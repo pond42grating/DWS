@@ -489,9 +489,10 @@
     const row = consumableTable.insertRow();
     row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
   }
+  
   function displaySavedFiles() {
   const savedFilesList = document.getElementById('savedFilesList');
-  savedFilesList.innerHTML = '';
+  savedFilesList.innerHTML = '';  // Clear the saved files list
 
   // Display buttons for each saved DWS number
   for (let i = 1; i < dwsCounter; i++) {
@@ -522,12 +523,17 @@ function deleteDws(dwsNo) {
     // Remove the DWS entry from localStorage
     localStorage.removeItem(dwsNo);
 
-    // After deletion, reload the saved files list
-    displaySavedFiles();
-    
-    // Optionally, if you have other stored data related to that DWS, remove them too.
-    // For example, if the DWS also has related data in other keys, you can delete those:
-    // localStorage.removeItem(`relatedDataFor${dwsNo}`);
+    // Remove the DWS from the display list
+    const savedFilesList = document.getElementById('savedFilesList');
+    const fileButtons = savedFilesList.querySelectorAll('div'); // Get all the file buttons
+    fileButtons.forEach(buttonDiv => {
+      const fileButton = buttonDiv.querySelector('button');
+      if (fileButton.textContent === dwsNo) {
+        savedFilesList.removeChild(buttonDiv); // Remove the div containing the DWS button and delete button
+      }
+    });
+
+    alert(`${dwsNo} has been deleted.`);
   }
 }
 
