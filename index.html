@@ -199,7 +199,7 @@
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
-    let dwsCounter = 1; // Initial DWS number
+    let dwsCounter = 0001; // Initial DWS number
 
     function showError(elementId, errorMessage) {
       const errorElement = document.getElementById(elementId);
@@ -326,7 +326,7 @@
     }
 
     function saveData() {
-            const dwsNo = `DWS-000${dwsCounter++}`;
+            const dwsNo = `DWS-${dwsCounter++}`;
       const dwsDate = document.getElementById('dwsDate').value;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
