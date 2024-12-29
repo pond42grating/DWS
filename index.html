@@ -64,6 +64,17 @@
     .back-button:hover {
       background-color: #da190b;
     }
+    .export-button {
+      margin-top: 20px;
+      padding: 10px 15px;
+      background-color: #008CBA;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .export-button:hover {
+      background-color: #006F8E;
+    }
   </style>
 </head>
 <body>
@@ -188,6 +199,8 @@
   </div>
 
   <button id="saveButton" onclick="saveData()">Save DWS</button>
+  <button class="export-button" onclick="exportToExcel()">Export to Excel</button>
+  <button class="export-button" onclick="exportToPDF()">Export to PDF</button>
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
@@ -251,7 +264,7 @@
 
         // Clear input fields
         document.getElementById('badgeNo').value = '';
-        document.getElementById('manpowerName').value = '';
+                document.getElementById('manpowerName').value = '';
         document.getElementById('normalHour').value = '';
         document.getElementById('otHour').value = '';
         document.getElementById('holiday').value = '';
@@ -271,7 +284,7 @@
         clearError('equipmentNameError');
       }
       if (!workingHours) {
-        showError('workingHoursError', 'Working Hours are required');
+        showError('workingHoursError', 'Working Hours is required');
         isValid = false;
       } else {
         clearError('workingHoursError');
@@ -280,7 +293,7 @@
       if (isValid) {
         const table = document.getElementById('equipmentTable');
         const row = table.insertRow();
-                row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
+        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
         document.getElementById('equipmentName').value = '';
@@ -319,177 +332,52 @@
     }
 
     function saveData() {
-      const dwsNo = document.getElementById('dwsNo').value || dwsCounter++;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      // Validation for required fields
-      if (!structureName || !siNo || !workDescription || !location) {
-        alert('Please fill all required fields.');
-        return;
-      }
-
-      const manpowerData = [];
-      const manpowerTable = document.getElementById('manpowerTable');
-      for (let i = 1; i < manpowerTable.rows.length; i++) {
-        const cells = manpowerTable.rows[i].cells;
-        manpowerData.push({
-          badgeNo: cells[0].innerText,
-          name: cells[1].innerText,
-          normalHour: cells[2].innerText,
-          otHour: cells[3].innerText,
-          holiday: cells[4].innerText
-        });
-      }
-
-      const equipmentData = [];
-      const equipmentTable = document.getElementById('equipmentTable');
-      for (let i = 1; i < equipmentTable.rows.length; i++) {
-        const cells = equipmentTable.rows[i].cells;
-        equipmentData.push({
-          equipmentName: cells[0].innerText,
-          workingHours: cells[1].innerText
-        });
-      }
-
-      const consumableData = [];
-      const consumableTable = document.getElementById('consumableTable');
-      for (let i = 1; i < consumableTable.rows.length; i++) {
-        const cells = consumableTable.rows[i].cells;
-        consumableData.push({
-          consumableName: cells[0].innerText,
-          quantity: cells[1].innerText
-        });
-      }
-
-      // Creating the Excel file with a single sheet
-      const wb = XLSX.utils.book_new();
-      const wsData = [];
-
-      // Header Row
-      const header = [
-        'DWS No.', 'Date', 'Structure Name', 'SI No.', 'Work Description', 'Location',
-        'Manpower - Badge No.', 'Manpower - Name', 'Manpower - Normal Hour', 'Manpower - OT Hour', 'Manpower - Holiday',
-        'Equipment - Name', 'Equipment - Working Hours',
-        'Consumables - Name', 'Consumables - Quantity'
-      ];
-      wsData.push(header);
-
-      // Data Row
-      const rowData = [];
-      rowData.push(dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location);
-
-      // Add Manpower Data
-      manpowerData.forEach((manpower) => {
-        wsData.push([
-          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
-          manpower.badgeNo, manpower.name, manpower.normalHour, manpower.otHour, manpower.holiday,
-          '', ''
-        ]);
-      });
-
-      // Add Equipment Data
-      equipmentData.forEach((equipment) => {
-        wsData.push([
-          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
-          '', '', '', '', '',
-          equipment.equipmentName, equipment.workingHours
-        ]);
-      });
-
-      // Add Consumable Data
-      consumableData.forEach((consumable) => {
-        wsData.push([
-          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
-          '', '', '', '', '',
-          '', consumable.consumableName, consumable.quantity
-        ]);
-      });
-            // Add rows to Excel sheet
-      const ws = XLSX.utils.aoa_to_sheet(wsData);
-      XLSX.utils.book_append_sheet(wb, ws, 'DWS Data');
-      
-      // Generate the Excel file and trigger download
-      const excelFileName = `DWS_${dwsNo}.xlsx`;
-      XLSX.writeFile(wb, excelFileName);
-
-      // Optionally, trigger the PDF export (you can use jsPDF to generate the PDF)
-      const doc = new jsPDF();
-
-      // Add content to the PDF (You can customize the layout further)
-      doc.text(`DWS No: ${dwsNo}`, 10, 10);
-      doc.text(`Structure Name: ${structureName}`, 10, 20);
-      doc.text(`SI No: ${siNo}`, 10, 30);
-      doc.text(`Work Description: ${workDescription}`, 10, 40);
-      doc.text(`Location: ${location}`, 10, 50);
-
-      doc.text('Manpower:', 10, 60);
-      manpowerData.forEach((manpower, index) => {
-        const y = 70 + (index * 10);
-        doc.text(`${manpower.badgeNo} - ${manpower.name} - ${manpower.normalHour} hours`, 10, y);
-      });
-
-      doc.text('Equipment:', 10, 80);
-      equipmentData.forEach((equipment, index) => {
-        const y = 90 + (index * 10);
-        doc.text(`${equipment.equipmentName} - ${equipment.workingHours} hours`, 10, y);
-      });
-
-      doc.text('Consumables:', 10, 110);
-      consumableData.forEach((consumable, index) => {
-        const y = 120 + (index * 10);
-        doc.text(`${consumable.consumableName} - ${consumable.quantity}`, 10, y);
-      });
-
-      // Save the PDF
-      const pdfFileName = `DWS_${dwsNo}.pdf`;
-      doc.save(pdfFileName);
-
-      alert('DWS saved successfully!');
-
-      // Reset form after saving
-      resetForm();
-    }
-
-    function resetForm() {
-      // Clear all form inputs and reset the DWS counter
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('badgeNo').value = '';
-      document.getElementById('manpowerName').value = '';
-      document.getElementById('normalHour').value = '';
-      document.getElementById('otHour').value = '';
-      document.getElementById('holiday').value = '';
-      document.getElementById('equipmentName').value = '';
-      document.getElementById('workingHours').value = '';
-      document.getElementById('consumableName').value = '';
-      document.getElementById('quantity').value = '';
-      
-      // Clear the tables
-      document.getElementById('manpowerTable').innerHTML = `<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>`;
-      document.getElementById('equipmentTable').innerHTML = `<tr><th>Equipment Name</th><th>Working Hours</th></tr>`;
-      document.getElementById('consumableTable').innerHTML = `<tr><th>Consumable Name</th><th>Quantity</th></tr>`;
-      
-      // Reset DWS number
-      document.getElementById('dwsNo').value = dwsCounter;
+      // You can implement the saving functionality here
+      alert('DWS saved successfully');
     }
 
     function goBack() {
-      window.location.href = 'home.html';  // Replace 'home.html' with the actual path to the home page
+      // Go back to the homepage or previous page
+      window.history.back();
     }
 
-    // Initialize the DWS No.
-    document.getElementById('dwsNo').value = dwsCounter;
+    function exportToExcel() {
+      let table = document.createElement('table');
+      table.innerHTML = document.querySelector('.preview-section').innerHTML;
+      const filename = 'DWS.xlsx';
 
+      let excelData = table.outerHTML;
+      const blob = new Blob([excelData], { type: 'application/vnd.ms-excel' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      link.click();
+    }
+
+    function exportToPDF() {
+      const doc = new jsPDF();
+
+      doc.autoTable({ html: '.preview-section' });
+      const filename = 'DWS.pdf';
+      doc.save(filename);
+    }
+
+    // Auto generate DWS No.
+    function generateDwsNo() {
+      const dwsNoField = document.getElementById('dwsNo');
+      dwsNoField.value = `DWS-${dwsCounter++}`;
+    }
+
+    // Call the generateDwsNo function when the page loads
+    window.onload = function () {
+      generateDwsNo();
+    }
   </script>
 
-  <!-- Include the necessary libraries -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+  <!-- jsPDF library for PDF export -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- jsPDF AutoTable plugin -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.17/jspdf.plugin.autotable.min.js"></script>
 
 </body>
 </html>
