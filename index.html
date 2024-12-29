@@ -240,12 +240,12 @@
 </div>
 
 <script>
-  let dwsCounter = 1;  // Initialize a counter for DWS numbers
+    let dwsCounter = parseInt(localStorage.getItem('dwsCounter')) || 1; // Initialize a counter for DWS numbers
 
   function generateDwsNo() {
     const dwsNo = `DWS-${String(dwsCounter).padStart(4, '0')}`;
     document.getElementById('dwsNo').value = dwsNo;
-    dwsCounter++;  // Increment the counter after each DWS
+      // Increment the counter after each DWS
   }
 
   function saveData() {
@@ -312,7 +312,11 @@
 
     // Save the data in localStorage
     localStorage.setItem(dwsNo, JSON.stringify(dwsData));
-
+    
+     // Increment DWS number counter and store it
+      dwsCounter++;
+      localStorage.setItem('dwsCounter', dwsCounter);
+    
     // Clear fields and generate next DWS number
     clearForm();
     generateDwsNo();
