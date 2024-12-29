@@ -73,6 +73,26 @@
       margin-top: 5px;
       background-color: #2196F3;
     }
+    #savedFilesView {
+      display: none;
+    }
+    .dialog {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      padding: 20px;
+      background: white;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 600px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .dialog button {
+      background-color: #f44336;
+      color: white;
+    }
   </style>
 </head>
 <body>
@@ -202,10 +222,7 @@
     </div>
   </div>
 
- 
-
   <button class="back-button" onclick="goBack()">Back to Home</button>
-  
   <button onclick="saveData()">Save</button>
   <button onclick="toggleView('saved')">View Saved Files</button>
 </div>
@@ -216,11 +233,13 @@
   <button onclick="toggleView('main')">Back</button>
 </div>
 
-  <!-- Saved DWS Files -->
-  
+<div id="dialogBox" class="dialog">
+  <h3>Saved DWS Data</h3>
+  <div id="dialogContent"></div>
+  <button onclick="closeDialog()">Close</button>
+</div>
 
-  
- <script>
+<script>
   let dwsCounter = 1;  // Initialize a counter for DWS numbers
 
   function generateDwsNo() {
@@ -331,7 +350,8 @@
     const savedFilesList = document.getElementById('savedFilesList');
     savedFilesList.innerHTML = '';
 
-    for (let i = 1; i <= dwsCounter; i++) {
+    // Display buttons for each saved DWS number
+    for (let i = 1; i < dwsCounter; i++) {
       const dwsNo = `DWS-${String(i).padStart(4, '0')}`;
       const button = document.createElement('button');
       button.textContent = dwsNo;
@@ -371,13 +391,58 @@
         const row = consumableTable.insertRow();
         row.innerHTML = `<td>${consumable.name}</td><td>${consumable.quantity}</td>`;
       });
+
+      // Open the data in a modal-like view or dialog box
+      openDialog(dwsData);
     }
   }
 
-  // Initialize page by generating a DWS number
+  function openDialog(dwsData) {
+    const dialog = document.createElement('div');
+    dialog.style.position = 'fixed';
+    dialog.style.top = '50%';
+    dialog.style.left = '50%';
+    dialog.style.transform = 'translate(-50%, -50%)';
+    dialog.style.backgroundColor = '#fff';
+    dialog.style.padding = '20px';
+    dialog.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    dialog.style.zIndex = 1000;
+    dialog.innerHTML = `
+      <h3>Saved DWS Details: ${dwsData.dwsNo}</h3>
+      <p><strong>Date:</strong> ${dwsData.dwsDate}</p>
+      <p><strong>Structure Name:</strong> ${dwsData.structureName}</p>
+      <p><strong>SI No:</strong> ${dwsData.siNo}</p>
+      <p><strong>Work Description:</strong> ${dwsData.workDescription}</p>
+      <p><strong>Location:</strong> ${dwsData.location}</p>
+      <h4>Manpower:</h4>
+      <ul>
+        ${dwsData.manpower.map(manpower => `<li>${manpower.badgeNo} - ${manpower.name} (Normal: ${manpower.normalHour}hrs, OT: ${manpower.otHour}hrs)</li>`).join('')}
+      </ul>
+      <h4>Equipment:</h4>
+      <ul>
+        ${dwsData.equipment.map(equipment => `<li>${equipment.name} - ${equipment.workingHours}hrs</li>`).join('')}
+      </ul>
+      <h4>Consumables:</h4>
+      <ul>
+        ${dwsData.consumables.map(consumable => `<li>${consumable.name} - ${consumable.quantity}</li>`).join('')}
+      </ul>
+      <button onclick="closeDialog()">Close</button>
+    `;
+
+    document.body.appendChild(dialog);
+  }
+
+  function closeDialog() {
+    const dialog = document.querySelector('div');
+    if (dialog) {
+      document.body.removeChild(dialog);
+    }
+  }
+
+  // Initialize page by generating a DWS number and displaying saved files
   generateDwsNo();
   displaySavedFiles();
-  
+
   function toggleView(view) {
     if (view === 'main') {
       document.getElementById('formView').style.display = 'block';
@@ -387,7 +452,36 @@
       document.getElementById('savedFilesView').style.display = 'block';
     }
   }
-</script>
 
-</body>
-</html>
+  // Add data preview for Manpower, Equipment, and Consumable
+  function addManpower() {
+    const badgeNo = document.getElementById('badgeNo').value;
+    const name = document.getElementById('manpowerName').value;
+    const normalHour = document.getElementById('normalHour').value;
+    const otHour = document.getElementById('otHour').value;
+    const holiday = document.getElementById('holiday').value;
+
+    const manpowerTable = document.getElementById('manpowerTable');
+    const row = manpowerTable.insertRow();
+    row.innerHTML = `<td>${badgeNo}</td><td>${name}</td><td>${normalHour}</td><td>${otHour}</td><td>${holiday}</td>`;
+  }
+
+  function addEquipment() {
+    const equipmentName = document.getElementById('equipmentName').value;
+    const workingHours = document.getElementById('workingHours').value;
+
+    const equipmentTable = document.getElementById('equipmentTable');
+    const row = equipmentTable.insertRow();
+    row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
+  }
+
+  function addConsumable() {
+    const consumableName = document.getElementById('consumableName').value;
+    const quantity = document.getElementById('quantity').value;
+
+    const consumableTable = document.getElementById('consumableTable');
+    const row = consumableTable.insertRow();
+    row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
+  }
+
+</script>
