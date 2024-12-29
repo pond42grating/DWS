@@ -1,274 +1,103 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Work Details Input</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        /* General Styles */
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 20px;
-            color: #333;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        /* Form Styles */
-        .form-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-bottom: 20px;
-        }
-        .form-container label {
-            display: block;
-            margin: 10px 0 5px;
-        }
-        .form-container input, .form-container select, .form-container button {
-            width: calc(100% - 20px);
-            padding: 8px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        .form-container button {
-            background-color: #4CAF50;
-            color: white;
-            cursor: pointer;
-        }
-        .form-container button:hover {
-            background-color: #45a049;
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-            text-align: center;
-        }
-        th, td {
-            padding: 8px;
-            font-size: 14px;
-        }
-        th {
-            background-color: #f2f2f2;
-            font-weight: bold;
-        }
-        tbody tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-
-        /* Button Styles */
-        .btn-container {
-            text-align: right;
-            margin-bottom: 20px;
-        }
-        .btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 15px;
-            margin: 5px;
-            font-size: 14px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        .btn:hover {
-            background-color: #45a049;
-        }
-        .btn i {
-            margin-right: 5px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Excel File Upload</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-    <h1>Work Details Input and Export</h1>
-
-    <!-- Input Form -->
-    <div class="form-container">
-        <label for="dwsNo">DWS No:</label>
-        <input type="text" id="dwsNo" placeholder="Enter DWS No">
-
-        <label for="date">Date:</label>
-        <input type="date" id="date">
-
-        <label for="sNo">S/TQ No:</label>
-        <input type="text" id="sNo" placeholder="Enter S/TQ No">
-
-        <label for="work">Work:</label>
-        <input type="text" id="work" placeholder="Enter Work Description">
-
-        <label for="location">Location:</label>
-        <select id="location">
-            <option value="Site">Site</option>
-            <option value="Office">Office</option>
-        </select>
-
-        <label for="trade">Trade:</label>
-        <input type="text" id="trade" placeholder="Enter Trade">
-
-        <label for="name">Name:</label>
-        <input type="text" id="name" placeholder="Enter Name">
-
-        <label for="badgeNo">Badge No:</label>
-        <input type="text" id="badgeNo" placeholder="Enter Badge No">
-
-        <label for="nh">NH:</label>
-        <input type="number" id="nh" placeholder="Enter NH">
-
-        <label for="ot">OT:</label>
-        <input type="number" id="ot" placeholder="Enter OT">
-
-        <label for="holiday">Holiday:</label>
-        <select id="holiday">
-            <option value="Yes">Yes</option>
-            <option value="No">No</option>
-        </select>
-
-        <label for="equipment">Equipment:</label>
-        <input type="text" id="equipment" placeholder="Enter Equipment">
-
-        <label for="workingHours">Working Hours:</label>
-        <input type="number" id="workingHours" placeholder="Enter Working Hours">
-
-        <label for="material">Material:</label>
-        <input type="text" id="material" placeholder="Enter Material">
-
-        <label for="qty">Qty:</label>
-        <input type="number" id="qty" placeholder="Enter Qty">
-
-        <label for="uom">UOM:</label>
-        <input type="text" id="uom" placeholder="Enter UOM">
-
-        <button onclick="addEntry()">Add Entry</button>
-    </div>
-
-    <!-- Buttons -->
-    <div class="btn-container">
-        <button class="btn" onclick="exportToExcel()"><i class="fas fa-file-excel"></i>Export to Excel</button>
-        <button class="btn" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i>Export to PDF</button>
-    </div>
-
-    <!-- Table -->
-    <table id="workDetailsTable">
-        <thead>
-            <tr>
-                <th>Sl No</th>
-                <th>DWS No</th>
-                <th>Date</th>
-                <th>S/TQ No</th>
-                <th>Work</th>
-                <th>Location</th>
-                <th>Trade</th>
-                <th>Name</th>
-                <th>Badge No</th>
-                <th>NH</th>
-                <th>OT</th>
-                <th>Holiday</th>
-                <th>Equipment</th>
-                <th>Working Hours</th>
-                <th>Material</th>
-                <th>Qty</th>
-                <th>UOM</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.4.0/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
-    <script>
-        const tableBody = document.querySelector("#workDetailsTable tbody");
-        let data = JSON.parse(localStorage.getItem("workDetails")) || [];
-
-        // Function to add entry
-        function addEntry() {
-            const entry = {
-                dwsNo: document.getElementById("dwsNo").value,
-                date: document.getElementById("date").value,
-                sNo: document.getElementById("sNo").value,
-                work: document.getElementById("work").value,
-                location: document.getElementById("location").value,
-                trade: document.getElementById("trade").value,
-                name: document.getElementById("name").value,
-                badgeNo: document.getElementById("badgeNo").value,
-                nh: document.getElementById("nh").value,
-                ot: document.getElementById("ot").value,
-                holiday: document.getElementById("holiday").value,
-                equipment: document.getElementById("equipment").value,
-                workingHours: document.getElementById("workingHours").value,
-                material: document.getElementById("material").value,
-                qty: document.getElementById("qty").value,
-                uom: document.getElementById("uom").value,
-            };
-            data.push(entry);
-            localStorage.setItem("workDetails", JSON.stringify(data));
-            renderTable();
-        }
-
-        // Render table from localStorage
-        function renderTable() {
-            tableBody.innerHTML = "";
-            data.forEach((entry, index) => {
-                const row = document.createElement("tr");
-                row.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td>${entry.dwsNo}</td>
-                    <td>${entry.date}</td>
-                    <td>${entry.sNo}</td>
-                    <td>${entry.work}</td>
-                    <td>${entry.location}</td>
-                    <td>${entry.trade}</td>
-                    <td>${entry.name}</td>
-                    <td>${entry.badgeNo}</td>
-                    <td>${entry.nh}</td>
-                    <td>${entry.ot}</td>
-                    <td>${entry.holiday}</td>
-                    <td>${entry.equipment}</td>
-                    <td>${entry.workingHours}</td>
-                    <td>${entry.material}</td>
-                    <td>${entry.qty}</td>
-                    <td>${entry.uom}</td>
-                `;
-                tableBody.appendChild(row);
-            });
-        }
-
-        // Export to Excel
-        function exportToExcel() {
-            const table = document.getElementById("workDetailsTable");
-            const workbook = XLSX.utils.table_to_book(table, { sheet: "Work Details" });
-            XLSX.writeFile(workbook, "work_details.xlsx");
-        }
-
-        // Export to PDF
-        async function exportToPDF() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-            pdf.text("Work Details", 10, 10);
-            pdf.autoTable({
-                html: "#workDetailsTable",
-                startY: 20,
-                styles: { fontSize: 8, cellPadding: 2, halign: "center" },
-                headStyles: { fillColor: [60, 141, 188], textColor: 255 },
-            });
-            pdf.save("work_details.pdf");
-        }
-
-        // Initial render
-        renderTable();
-    </script>
+  <h1>Upload and Process Excel File</h1>
+  
+  <!-- File Input -->
+  <input type="file" id="excelFileInput" accept=".xlsx, .xls" />
+  <button onclick="processExcel()">Upload and Process</button>
+  
+  <!-- Table to Show Data -->
+  <h2>Processed Data:</h2>
+  <table id="dataTable" border="1">
+    <thead>
+      <tr>
+        <!-- Dynamically populated -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Dynamically populated -->
+    </tbody>
+  </table>
 </body>
+
+<script>
+  function processExcel() {
+    const input = document.getElementById("excelFileInput");
+    const file = input.files[0];
+    
+    if (!file) {
+      alert("Please select an Excel file.");
+      return;
+    }
+
+    const reader = new FileReader();
+    
+    reader.onload = function (event) {
+      const data = new Uint8Array(event.target.result);
+      const workbook = XLSX.read(data, { type: "array" });
+      
+      // Assuming first sheet is the template
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+
+      // Parse sheet into JSON format
+      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      console.log("Excel Data:", jsonData);
+
+      if (jsonData.length > 0) {
+        // Extract headers and data
+        const headers = jsonData[0];
+        const rows = jsonData.slice(1);
+
+        // Sort data by the first column (for example)
+        rows.sort((a, b) => (a[0] > b[0] ? 1 : -1)); // Adjust column index for sorting as needed
+
+        // Display data in the table
+        displayData(headers, rows);
+      } else {
+        alert("The Excel file is empty or not formatted correctly.");
+      }
+    };
+
+    reader.onerror = function () {
+      alert("An error occurred while reading the Excel file.");
+    };
+
+    reader.readAsArrayBuffer(file);
+  }
+
+  function displayData(headers, rows) {
+    const tableHead = document.querySelector("#dataTable thead tr");
+    const tableBody = document.querySelector("#dataTable tbody");
+
+    // Clear existing table content
+    tableHead.innerHTML = "";
+    tableBody.innerHTML = "";
+
+    // Populate headers
+    headers.forEach((header) => {
+      const th = document.createElement("th");
+      th.textContent = header;
+      tableHead.appendChild(th);
+    });
+
+    // Populate rows
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      row.forEach((cell) => {
+        const td = document.createElement("td");
+        td.textContent = cell;
+        tr.appendChild(td);
+      });
+      tableBody.appendChild(tr);
+    });
+  }
+</script>
 </html>
