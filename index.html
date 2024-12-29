@@ -402,10 +402,6 @@
     }
   }
   
-  function deleteDws(dwsNo) {
-      if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
-        localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
-        loadSavedFiles();  // Reload the saved files list after deletion
 
   function openDialog(dwsData) {
     const dialog = document.createElement('div');
@@ -493,5 +489,30 @@
     const row = consumableTable.insertRow();
     row.innerHTML = `<td>${consumableName}</td><td>${quantity}</td>`;
   }
+  function loadSavedFiles() {
+      const savedFilesList = document.getElementById('savedFilesList');
+      savedFilesList.innerHTML = ''; // Clear the list before reloading
+
+      // Loop through all items in localStorage
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        const dwsData = JSON.parse(localStorage.getItem(key));
+
+        const div = document.createElement('div');
+        div.innerHTML = `
+          <strong>${dwsData.dwsNo}</strong>
+          <button onclick="deleteDws('${dwsData.dwsNo}')">Delete</button>
+        `;
+        savedFilesList.appendChild(div);
+      }
+    }
+
+    // Function to delete a DWS entry from localStorage
+    function deleteDws(dwsNo) {
+      if (confirm(`Are you sure you want to delete ${dwsNo}?`)) {
+        localStorage.removeItem(dwsNo);  // Remove the DWS entry from localStorage
+        loadSavedFiles();  // Reload the saved files list after deletion
+      }
+    }
 
 </script>
