@@ -3,101 +3,192 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Excel File Upload</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-</head>
-<body>
-  <h1>Upload and Process Excel File</h1>
-  
-  <!-- File Input -->
-  <input type="file" id="excelFileInput" accept=".xlsx, .xls" />
-  <button onclick="processExcel()">Upload and Process</button>
-  
-  <!-- Table to Show Data -->
-  <h2>Processed Data:</h2>
-  <table id="dataTable" border="1">
-    <thead>
-      <tr>
-        <!-- Dynamically populated -->
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Dynamically populated -->
-    </tbody>
-  </table>
-</body>
+  <title>Upload and Extract Data</title>
 
-<script>
-  function processExcel() {
-    const input = document.getElementById("excelFileInput");
-    const file = input.files[0];
-    
-    if (!file) {
-      alert("Please select an Excel file.");
-      return;
+  <!-- Link to Google Fonts for better typography -->
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Link to Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f4f7fa;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
     }
 
-    const reader = new FileReader();
-    
-    reader.onload = function (event) {
-      const data = new Uint8Array(event.target.result);
-      const workbook = XLSX.read(data, { type: "array" });
-      
-      // Assuming first sheet is the template
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
+    .container {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      width: 80%;
+      max-width: 600px;
+    }
 
-      // Parse sheet into JSON format
-      const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-      console.log("Excel Data:", jsonData);
+    h1 {
+      color: #2c3e50;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
 
-      if (jsonData.length > 0) {
-        // Extract headers and data
-        const headers = jsonData[0];
-        const rows = jsonData.slice(1);
+    h2 {
+      color: #34495e;
+      font-size: 20px;
+      margin-top: 30px;
+    }
 
-        // Sort data by the first column (for example)
-        rows.sort((a, b) => (a[0] > b[0] ? 1 : -1)); // Adjust column index for sorting as needed
+    input[type="file"] {
+      margin: 20px 0;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
 
-        // Display data in the table
-        displayData(headers, rows);
-      } else {
-        alert("The Excel file is empty or not formatted correctly.");
+    button {
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border-radius: 4px;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #3498db;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+
+    .icon {
+      font-size: 20px;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1><i class="fas fa-upload icon"></i> Upload Excel File (.xlsx)</h1>
+
+    <!-- File upload input -->
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <br />
+    <button onclick="readFile()"><i class="fas fa-play-circle icon"></i> Read and Store Data</button>
+
+    <!-- Display extracted data -->
+    <h2><i class="fas fa-table icon"></i> Extracted Data</h2>
+    <table id="dataTable">
+      <thead>
+        <tr id="headerRow"></tr>
+      </thead>
+      <tbody id="dataBody"></tbody>
+    </table>
+  </div>
+
+  <!-- Include the SheetJS library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+
+  <script>
+    // Function to handle file reading
+    function readFile() {
+      const fileInput = document.getElementById('fileInput');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        alert('Please select a file first!');
+        return;
       }
-    };
 
-    reader.onerror = function () {
-      alert("An error occurred while reading the Excel file.");
-    };
+      const reader = new FileReader();
 
-    reader.readAsArrayBuffer(file);
-  }
+      reader.onload = function(event) {
+        const arrayBuffer = event.target.result;
 
-  function displayData(headers, rows) {
-    const tableHead = document.querySelector("#dataTable thead tr");
-    const tableBody = document.querySelector("#dataTable tbody");
+        // Use SheetJS to parse the .xlsx file
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
-    // Clear existing table content
-    tableHead.innerHTML = "";
-    tableBody.innerHTML = "";
+        // Get the first sheet (you can modify this to handle multiple sheets)
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
 
-    // Populate headers
-    headers.forEach((header) => {
-      const th = document.createElement("th");
-      th.textContent = header;
-      tableHead.appendChild(th);
-    });
+        // Convert the sheet data to JSON format
+        const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-    // Populate rows
-    rows.forEach((row) => {
-      const tr = document.createElement("tr");
-      row.forEach((cell) => {
-        const td = document.createElement("td");
-        td.textContent = cell;
-        tr.appendChild(td);
-      });
-      tableBody.appendChild(tr);
-    });
-  }
-</script>
+        // Create the table headers
+        const headerRow = document.getElementById('headerRow');
+        headerRow.innerHTML = '';
+        const headers = jsonData[0];
+        headers.forEach(header => {
+          const th = document.createElement('th');
+          th.textContent = header;
+          headerRow.appendChild(th);
+        });
+
+        // Create the table rows and store data
+        const dataBody = document.getElementById('dataBody');
+        dataBody.innerHTML = '';
+        const data = [];
+        for (let i = 1; i < jsonData.length; i++) {
+          const row = document.createElement('tr');
+          const rowData = {};
+          const cells = jsonData[i];
+          cells.forEach((cell, index) => {
+            const td = document.createElement('td');
+            td.textContent = cell;
+            row.appendChild(td);
+
+            // Map headers to data for storage
+            rowData[headers[index]] = cell;
+          });
+          dataBody.appendChild(row);
+          data.push(rowData);
+        }
+
+        // Store data in local storage
+        localStorage.setItem('extractedData', JSON.stringify(data));
+        alert('Data has been stored in local storage.');
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
 </html>
