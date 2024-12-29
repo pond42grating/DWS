@@ -65,8 +65,6 @@
       background-color: #da190b;
     }
   </style>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
 <body>
 
@@ -193,9 +191,6 @@
 
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
-  <button id="exportExcelButton" onclick="exportExcel()">Export to Excel</button>
-  <button id="exportPdfButton" onclick="exportPdf()">Export to PDF</button>
-
   <script>
     let dwsCounter = 1; // Initial DWS number
 
@@ -285,7 +280,7 @@
       if (isValid) {
         const table = document.getElementById('equipmentTable');
         const row = table.insertRow();
-        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
+                row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
         document.getElementById('equipmentName').value = '';
@@ -324,159 +319,115 @@
     }
 
     function saveData() {
-      const dwsNo = `DWS-${dwsCounter++}`;
+      const dwsNo = document.getElementById('dwsNo').value || dwsCounter++;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
       const workDescription = document.getElementById('workDescription').value;
       const location = document.getElementById('location').value;
 
+      // Validation for required fields
       if (!structureName || !siNo || !workDescription || !location) {
-        alert('Please fill all the required fields!');
+        alert('Please fill all required fields.');
         return;
       }
 
-      // Save data in local storage or database
-      const dwsData = {
-        dwsNo: dwsNo,
-        structureName: structureName,
-        siNo: siNo,
-        workDescription: workDescription,
-        location: location,
-        manpower: getTableData('manpowerTable'),
-        equipment: getTableData('equipmentTable'),
-        consumables: getTableData('consumableTable')
-      };
-
-      let savedData = JSON.parse(localStorage.getItem('dwsData')) || [];
-      savedData.push(dwsData);
-      localStorage.setItem('dwsData', JSON.stringify(savedData));
-
-      alert('DWS saved successfully!');
-      clearAllFields();
-    }
-
-    function getTableData(tableId) {
-      const rows = document.getElementById(tableId).rows;
-      const data = [];
-      for (let i = 1; i < rows.length; i++) {
-        const row = rows[i].cells;
-        let rowData = [];
-        for (let j = 0; j < row.length; j++) {
-          rowData.push(row[j].innerText);
-        }
-        data.push(rowData);
+      const manpowerData = [];
+      const manpowerTable = document.getElementById('manpowerTable');
+      for (let i = 1; i < manpowerTable.rows.length; i++) {
+        const cells = manpowerTable.rows[i].cells;
+        manpowerData.push({
+          badgeNo: cells[0].innerText,
+          name: cells[1].innerText,
+          normalHour: cells[2].innerText,
+          otHour: cells[3].innerText,
+          holiday: cells[4].innerText
+        });
       }
-      return data;
-    }
 
-    function clearAllFields() {
-      document.getElementById('structureName').value = '';
-      document.getElementById('siNo').value = '';
-      document.getElementById('workDescription').value = '';
-      document.getElementById('location').value = '';
-      document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
-      document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
-      document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
+      const equipmentData = [];
+      const equipmentTable = document.getElementById('equipmentTable');
+      for (let i = 1; i < equipmentTable.rows.length; i++) {
+        const cells = equipmentTable.rows[i].cells;
+        equipmentData.push({
+          equipmentName: cells[0].innerText,
+          workingHours: cells[1].innerText
+        });
+      }
+
+      const consumableData = [];
+      const consumableTable = document.getElementById('consumableTable');
+      for (let i = 1; i < consumableTable.rows.length; i++) {
+        const cells = consumableTable.rows[i].cells;
+        consumableData.push({
+          consumableName: cells[0].innerText,
+          quantity: cells[1].innerText
+        });
+      }
+
+      // Creating the Excel file with a single sheet
+      const wb = XLSX.utils.book_new();
+      const wsData = [];
+
+      // Header Row
+      const header = [
+        'DWS No.', 'Date', 'Structure Name', 'SI No.', 'Work Description', 'Location',
+        'Manpower - Badge No.', 'Manpower - Name', 'Manpower - Normal Hour', 'Manpower - OT Hour', 'Manpower - Holiday',
+        'Equipment - Name', 'Equipment - Working Hours',
+        'Consumables - Name', 'Consumables - Quantity'
+      ];
+      wsData.push(header);
+
+      // Data Row
+      const rowData = [];
+      rowData.push(dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location);
+
+      // Add Manpower Data
+      manpowerData.forEach((manpower) => {
+        wsData.push([
+          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
+          manpower.badgeNo, manpower.name, manpower.normalHour, manpower.otHour, manpower.holiday,
+          '', ''
+        ]);
+      });
+
+      // Add Equipment Data
+      equipmentData.forEach((equipment) => {
+        wsData.push([
+          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
+          '', '', '', '', '',
+          equipment.equipmentName, equipment.workingHours
+        ]);
+      });
+
+      // Add Consumable Data
+      consumableData.forEach((consumable) => {
+        wsData.push([
+          dwsNo, new Date().toLocaleDateString(), structureName, siNo, workDescription, location,
+          '', '', '', '', '',
+          '', consumable.consumableName, consumable.quantity
+        ]);
+      });
+
+      // Create worksheet and add data
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      XLSX.utils.book_append_sheet(wb, ws, "DWS Data");
+
+      // Save the Excel file
+      XLSX.writeFile(wb, 'DWS_Data.xlsx');
     }
 
     function goBack() {
-      // Implement your back navigation here
-      alert('Returning to the main page...');
-      // Example: window.location.href = 'index.html';
+      window.history.back();
     }
 
-    function exportExcel() {
-      const dwsNo = `DWS-${dwsCounter++}`;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      const manpowerData = getTableData('manpowerTable');
-      const equipmentData = getTableData('equipmentTable');
-      const consumableData = getTableData('consumableTable');
-
-      const wsManpower = [
-        ['Badge No.', 'Name', 'Normal Hour', 'OT Hour', 'Holiday'],
-        ...manpowerData
-      ];
-
-      const wsEquipment = [
-        ['Equipment Name', 'Working Hours'],
-        ...equipmentData
-      ];
-
-      const wsConsumable = [
-        ['Consumable Name', 'Quantity'],
-        ...consumableData
-      ];
-
-      const wb = XLSX.utils.book_new();
-      const ws1 = XLSX.utils.aoa_to_sheet([
-        ['DWS No.', 'Structure Name', 'SI No.', 'Work Description', 'Location'],
-        [dwsNo, structureName, siNo, workDescription, location],
-      ]);
-      const ws2 = XLSX.utils.aoa_to_sheet(wsManpower);
-      const ws3 = XLSX.utils.aoa_to_sheet(wsEquipment);
-      const ws4 = XLSX.utils.aoa_to_sheet(wsConsumable);
-
-            XLSX.utils.book_append_sheet(wb, ws1, "DWS Overview");
-      XLSX.utils.book_append_sheet(wb, ws2, "Manpower");
-      XLSX.utils.book_append_sheet(wb, ws3, "Equipment");
-      XLSX.utils.book_append_sheet(wb, ws4, "Consumables");
-
-      // Generate the Excel file and trigger the download
-      XLSX.writeFile(wb, `DWS-${dwsNo}.xlsx`);
-    }
-
-    function exportPdf() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-
-      const dwsNo = `DWS-${dwsCounter++}`;
-      const structureName = document.getElementById('structureName').value;
-      const siNo = document.getElementById('siNo').value;
-      const workDescription = document.getElementById('workDescription').value;
-      const location = document.getElementById('location').value;
-
-      doc.setFontSize(16);
-      doc.text(`DWS No.: ${dwsNo}`, 10, 10);
-      doc.text(`Structure Name: ${structureName}`, 10, 20);
-      doc.text(`SI No.: ${siNo}`, 10, 30);
-      doc.text(`Work Description: ${workDescription}`, 10, 40);
-      doc.text(`Location: ${location}`, 10, 50);
-
-      // Manpower Section
-      doc.text('Manpower:', 10, 60);
-      const manpowerData = getTableData('manpowerTable');
-      let yOffset = 70;
-      manpowerData.forEach(row => {
-        doc.text(row.join(' | '), 10, yOffset);
-        yOffset += 10;
-      });
-
-      // Equipment Section
-      doc.text('Equipment:', 10, yOffset + 10);
-      const equipmentData = getTableData('equipmentTable');
-      yOffset += 20;
-      equipmentData.forEach(row => {
-        doc.text(row.join(' | '), 10, yOffset);
-        yOffset += 10;
-      });
-
-      // Consumable Section
-      doc.text('Consumables:', 10, yOffset + 10);
-      const consumableData = getTableData('consumableTable');
-      yOffset += 20;
-      consumableData.forEach(row => {
-        doc.text(row.join(' | '), 10, yOffset);
-        yOffset += 10;
-      });
-
-      // Save PDF file
-      doc.save(`DWS-${dwsNo}.pdf`);
-    }
+    // Auto-assign DWS No.
+    window.onload = function () {
+      document.getElementById('dwsNo').value = dwsCounter++;
+    };
   </script>
+
+  <!-- Include the XLSX library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 
 </body>
 </html>
