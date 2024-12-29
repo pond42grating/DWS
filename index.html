@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DWS Management</title>
+  <title>DWS Management System</title>
   <style>
     /* General Styling */
     body {
@@ -20,10 +20,9 @@
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       border-radius: 8px;
     }
-    h1 {
+    h1, h2 {
       text-align: center;
       color: #333;
-      margin-bottom: 20px;
     }
     .button-container {
       display: flex;
@@ -51,16 +50,6 @@
     .section.active {
       display: block;
     }
-    #searchDWSSection input {
-      padding: 10px;
-      margin-top: 10px;
-      width: 80%;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-    #searchResult {
-      margin-top: 20px;
-    }
     .back-button {
       background-color: #f44336;
       width: 150px;
@@ -68,14 +57,39 @@
     .back-button:hover {
       background-color: #e53935;
     }
+    .form-section {
+      margin-bottom: 20px;
+    }
+    input[type="text"], input[type="number"], input[type="date"] {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .error {
+      color: red;
+      font-size: 12px;
+    }
+    .preview-section table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .preview-section table, th, td {
+      border: 1px solid #ccc;
+    }
+    th, td {
+      padding: 8px;
+      text-align: left;
+    }
   </style>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
 </head>
 <body>
-
   <div class="container">
     <h1>DWS Management System</h1>
 
-    <!-- Main Navigation Page -->
+    <!-- Main Navigation Section -->
     <div id="mainPage" class="section active">
       <div class="button-container">
         <button onclick="showSection('createDWSSection')">Create DWS</button>
@@ -87,16 +101,121 @@
     <!-- Create DWS Section -->
     <div id="createDWSSection" class="section">
       <h2>Create New DWS</h2>
-      <!-- Add form or input fields for creating DWS here -->
-      <button onclick="createDWS()">Create DWS</button>
+      <div class="form-section">
+        <label for="dwsNo">DWS No.</label>
+        <input type="text" id="dwsNo" readonly value="DWS-001">
+      </div>
+      <div class="form-section">
+        <label for="structureName">Structure Name</label>
+        <input type="text" id="structureName">
+        <div class="error" id="structureNameError"></div>
+      </div>
+      <div class="form-section">
+        <label for="date">Date</label>
+        <input type="date" id="date">
+        <div class="error" id="dateError"></div>
+      </div>
+      <div class="form-section">
+        <label for="siNo">SI No.</label>
+        <input type="text" id="siNo">
+        <div class="error" id="siNoError"></div>
+      </div>
+      <div class="form-section">
+        <label for="workDescription">Work Description</label>
+        <input type="text" id="workDescription">
+        <div class="error" id="workDescriptionError"></div>
+      </div>
+      <div class="form-section">
+        <label for="location">Location</label>
+        <input type="text" id="location">
+        <div class="error" id="locationError"></div>
+      </div>
+
+      <!-- Manpower -->
+      <div class="form-section">
+        <h3>Manpower</h3>
+        <label for="badgeNo">Badge No.</label>
+        <input type="text" id="badgeNo">
+        <div class="error" id="badgeNoError"></div>
+        <label for="manpowerName">Name</label>
+        <input type="text" id="manpowerName">
+        <div class="error" id="manpowerNameError"></div>
+        <label for="normalHour">Normal Hour</label>
+        <input type="number" id="normalHour">
+        <div class="error" id="normalHourError"></div>
+        <label for="otHour">OT Hour</label>
+        <input type="number" id="otHour">
+        <div class="error" id="otHourError"></div>
+        <label for="holiday">Holiday</label>
+        <input type="text" id="holiday">
+        <div class="error" id="holidayError"></div>
+        <button type="button" onclick="addManpower()">Add Manpower</button>
+        <div class="preview-section">
+          <h4>Manpower Preview</h4>
+          <table id="manpowerTable">
+            <tr>
+              <th>Badge No.</th>
+              <th>Name</th>
+              <th>Normal Hour</th>
+              <th>OT Hour</th>
+              <th>Holiday</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Equipment -->
+      <div class="form-section">
+        <h3>Equipment</h3>
+        <label for="equipmentName">Equipment Name</label>
+        <input type="text" id="equipmentName">
+        <div class="error" id="equipmentNameError"></div>
+        <label for="workingHours">Working Hours</label>
+        <input type="number" id="workingHours">
+        <div class="error" id="workingHoursError"></div>
+        <button type="button" onclick="addEquipment()">Add Equipment</button>
+        <div class="preview-section">
+          <h4>Equipment Preview</h4>
+          <table id="equipmentTable">
+            <tr>
+              <th>Equipment Name</th>
+              <th>Working Hours</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- Consumable -->
+      <div class="form-section">
+        <h3>Consumables</h3>
+        <label for="consumableName">Consumable Name</label>
+        <input type="text" id="consumableName">
+        <div class="error" id="consumableNameError"></div>
+        <label for="quantity">Quantity</label>
+        <input type="number" id="quantity">
+        <div class="error" id="quantityError"></div>
+        <button type="button" onclick="addConsumable()">Add Consumable</button>
+        <div class="preview-section">
+          <h4>Consumable Preview</h4>
+          <table id="consumableTable">
+            <tr>
+              <th>Consumable Name</th>
+              <th>Quantity</th>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <button onclick="saveData()">Save DWS</button>
+      <button onclick="exportToExcel()">Export to Excel</button>
       <button class="back-button" onclick="showSection('mainPage')">Back</button>
     </div>
 
     <!-- Manage DWS Section -->
     <div id="manageDWSSection" class="section">
       <h2>Manage DWS</h2>
-      <button onclick="editDWS()">Edit DWS</button>
-      <button onclick="deleteDWS()">Delete DWS</button>
+      <button>Edit DWS</button>
+      <button>Delete DWS</button>
       <button class="back-button" onclick="showSection('mainPage')">Back</button>
     </div>
 
@@ -104,75 +223,89 @@
     <div id="searchDWSSection" class="section">
       <h2>Search DWS</h2>
       <input type="text" id="searchQuery" placeholder="Search by DWS Number or Name">
-      <button onclick="searchDWS()">Search</button>
-      <button onclick="exportToExcel()" class="back-button">Export</button>
+      <button>Search</button>
       <button class="back-button" onclick="showSection('mainPage')">Back</button>
-      <div id="searchResult"></div>
     </div>
   </div>
 
   <script>
-    // Function to toggle visibility of different sections
     function showSection(sectionId) {
-      const sections = document.querySelectorAll('.section');
-      sections.forEach(section => section.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(section => section.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
     }
 
-    // Export to Excel function
-    function exportToExcel() {
-      const wb = XLSX.utils.book_new();
-      const data = [
-        ['DWS No.', 'Structure Name', 'SI No.', 'Work Description', 'Location'],
-        ['DWS-001', 'Structure A', 'SI123', 'Description 1', 'Location 1'],
-        ['DWS-002', 'Structure B', 'SI124', 'Description 2', 'Location 2'],
-      ];
-
-      const sheet = XLSX.utils.aoa_to_sheet(data);
-      XLSX.utils.book_append_sheet(wb, sheet, 'DWS Data');
-      XLSX.writeFile(wb, 'DWS_Data.xlsx');
+    function addManpower() {
+      // Manpower adding logic here...
     }
 
-    // Search DWS function
-    function searchDWS() {
-      const query = document.getElementById('searchQuery').value.toLowerCase();
-      const results = [
-        { dwsNo: 'DWS-001', structureName: 'Structure A', siNo: 'SI123' },
-        { dwsNo: 'DWS-002', structureName: 'Structure B', siNo: 'SI124' },
-      ];
-      const filteredResults = results.filter(item => item.dwsNo.toLowerCase().includes(query) || item.structureName.toLowerCase().includes(query));
-      displaySearchResults(filteredResults);
+    function addEquipment() {
+      // Equipment adding logic here...
     }
 
-    function displaySearchResults(results) {
-      const resultDiv = document.getElementById('searchResult');
-      if (results.length === 0) {
-        resultDiv.innerHTML = 'No results found.';
-      } else {
-        let html = '<ul>';
-        results.forEach(result => {
-          html += `<li>${result.dwsNo} - ${result.structureName} (SI No: ${result.siNo})</li>`;
-        });
-        html += '</ul>';
-        resultDiv.innerHTML = html;
-      }
-    }
+    function addEquipment() {
+const equipmentName = document.getElementById(“equipmentName”).value;
+const workingHours = document.getElementById(“workingHours”).value;
+       if (!equipmentName || !workingHours) {  
+    alert("Please fill out all fields for equipment.");  
+    return;  
+  }  
 
-    // Placeholder functions for Create, Edit, and Delete DWS (you can replace these with your actual logic)
-    function createDWS() {
-      alert('Create DWS clicked!');
-    }
+  const table = document.getElementById("equipmentTable");  
+  const row = table.insertRow();  
 
-    function editDWS() {
-      alert('Edit DWS clicked!');
-    }
+  const cell1 = row.insertCell(0);  
+  const cell2 = row.insertCell(1);  
 
-    function deleteDWS() {
-      alert('Delete DWS clicked!');
-    }
-  </script>
+  cell1.textContent = equipmentName;  
+  cell2.textContent = workingHours;  
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.1/xlsx.full.min.js"></script>
+  // Clear input fields  
+  document.getElementById("equipmentName").value = "";  
+  document.getElementById("workingHours").value = "";  
+}  
 
-</body>
-</html>
+function addConsumable() {  
+  const consumableName = document.getElementById("consumableName").value;  
+  const quantity = document.getElementById("quantity").value;  
+
+  if (!consumableName || !quantity) {  
+    alert("Please fill out all fields for consumables.");  
+    return;  
+  }  
+
+  const table = document.getElementById("consumableTable");  
+  const row = table.insertRow();  
+
+  const cell1 = row.insertCell(0);  
+  const cell2 = row.insertCell(1);  
+
+  cell1.textContent = consumableName;  
+  cell2.textContent = quantity;  
+
+  // Clear input fields  
+  document.getElementById("consumableName").value = "";  
+  document.getElementById("quantity").value = "";  
+}  
+
+function saveData() {  
+  alert("DWS data has been saved!");  
+}  
+
+function exportToExcel() {  
+  const tables = ["manpowerTable", "equipmentTable", "consumableTable"];  
+  const workbook = XLSX.utils.book_new();  
+
+  tables.forEach((tableId, index) => {  
+    const table = document.getElementById(tableId);  
+    const worksheet = XLSX.utils.table_to_sheet(table);  
+    XLSX.utils.book_append_sheet(workbook, worksheet, `Sheet${index + 1}`);  
+  });  
+
+  XLSX.writeFile(workbook, "DWS_Data.xlsx");  
+}  
+  </script>  
+</body>  
+</html>  
+```
+
+    
