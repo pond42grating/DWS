@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
+  <title>Login and Sign Up</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +16,7 @@
       height: 100vh;
     }
 
-    .login-container {
+    .container {
       background-color: #fff;
       padding: 30px;
       border-radius: 8px;
@@ -75,13 +75,52 @@
     .forgot-password a:hover, .sign-up-link a:hover {
       text-decoration: underline;
     }
+
+    /* Sign-up Form Styles */
+    .sign-up-container {
+      display: none; /* Initially hidden */
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 20px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
   </style>
 </head>
 <body>
 
-  <!-- Login Container -->
-  <div class="login-container">
+  <!-- Main Container -->
+  <div class="container" id="login-container">
     <h2>Login</h2>
+    
+    <!-- Username Input -->
+    <input type="text" id="login-username" class="input-field" placeholder="Username" required>
+    
+    <!-- Password Input -->
+    <input type="password" id="login-password" class="input-field" placeholder="Password" required>
+    
+    <!-- Sign In Button -->
+    <button class="button" onclick="showMsg('Sign In')">Sign In</button>
+    
+    <!-- Sign Up Link -->
+    <div class="sign-up-link">
+      <p>Don't have an account? <a href="#" onclick="showSignUpForm()">Sign Up</a></p>
+    </div>
+    
+    <!-- Forgot Password Link -->
+    <div class="forgot-password">
+      <p><a href="#" onclick="showMsg('Forgot Password')">Forgot Password?</a></p>
+    </div>
+  </div>
+
+  <!-- Sign Up Form -->
+  <div class="sign-up-container" id="sign-up-container">
+    <h2>Sign Up</h2>
     
     <!-- Username Input -->
     <input type="text" id="username" class="input-field" placeholder="Username" required>
@@ -89,17 +128,18 @@
     <!-- Password Input -->
     <input type="password" id="password" class="input-field" placeholder="Password" required>
     
-    <!-- Sign In Button -->
-    <button class="button" onclick="showMsg('Sign In')">Sign In</button>
+    <!-- Confirm Password Input -->
+    <input type="password" id="confirm-password" class="input-field" placeholder="Confirm Password" required>
     
-    <!-- Sign Up Link -->
-    <div class="sign-up-link">
-      <p>Don't have an account? <a href="#" onclick="showMsg('Sign Up')">Sign Up</a></p>
-    </div>
+    <!-- Secret Code Input -->
+    <input type="text" id="secret-code" class="input-field" placeholder="Generated Secret Code" readonly>
     
-    <!-- Forgot Password Link -->
+    <!-- Create Account Button -->
+    <button class="button" onclick="generateSecretCode()">Create Account</button>
+    
+    <!-- Back to Login Link -->
     <div class="forgot-password">
-      <p><a href="#" onclick="showMsg('Forgot Password')">Forgot Password?</a></p>
+      <p><a href="#" onclick="showLoginForm()">Back to Login</a></p>
     </div>
   </div>
 
@@ -123,6 +163,47 @@
     // Function to close the modal
     function closeModal() {
       document.getElementById('msgModal').style.display = 'none';
+    }
+
+    // Function to show the Sign-Up form and hide Login
+    function showSignUpForm() {
+      document.getElementById('login-container').style.display = 'none';
+      document.getElementById('sign-up-container').style.display = 'block';
+    }
+
+    // Function to show the Login form and hide Sign-Up
+    function showLoginForm() {
+      document.getElementById('sign-up-container').style.display = 'none';
+      document.getElementById('login-container').style.display = 'block';
+    }
+
+    // Function to generate a secret code
+    function generateSecretCode() {
+      var username = document.getElementById('username').value;
+      var password = document.getElementById('password').value;
+      var confirmPassword = document.getElementById('confirm-password').value;
+      
+      var secretCode = Math.random().toString(36).substr(2, 8); // Generate random code
+
+      // Validate fields
+      if (username === '' || password === '' || confirmPassword === '') {
+        showMsg('Please fill in all fields.');
+        return;
+      }
+      
+      if (password !== confirmPassword) {
+        showMsg('Passwords do not match.');
+        return;
+      }
+
+      // If validation passes, show success message and redirect to login
+      document.getElementById('secret-code').value = secretCode;
+      showMsg('Account created successfully. Redirecting to login...');
+      
+      // Automatically redirect to the login page after 2 seconds
+      setTimeout(function() {
+        showLoginForm();
+      }, 2000);
     }
   </script>
 
