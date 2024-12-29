@@ -90,6 +90,33 @@
       font-size: 16px;
       box-sizing: border-box;
     }
+
+    /* Modal for displaying messages */
+    #msgModal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    #msgModal div {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      width: 300px;
+    }
+
+    #msgModal button {
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -143,13 +170,11 @@
     </div>
   </div>
 
-  <!-- Modal for displaying messages -->
-  <div id="msgModal" style="display: none;">
-    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-      <div style="background-color: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px;">
-        <h4 id="msgText">Message</h4>
-        <button onclick="closeModal()">Close</button>
-      </div>
+  <!-- Modal for displaying secret code -->
+  <div id="msgModal">
+    <div>
+      <h4 id="msgText">Message</h4>
+      <button onclick="closeModal()">Close</button>
     </div>
   </div>
 
@@ -177,7 +202,7 @@
       document.getElementById('login-container').style.display = 'block';
     }
 
-    // Function to generate a secret code
+    // Function to generate a secret code and show in modal
     function generateSecretCode() {
       var username = document.getElementById('username').value;
       var password = document.getElementById('password').value;
@@ -196,14 +221,35 @@
         return;
       }
 
-      // If validation passes, show success message and redirect to login
+      // If validation passes, show success message and secret code
       document.getElementById('secret-code').value = secretCode;
-      showMsg('Account created successfully. Redirecting to login...');
-      
+      showSecretCodeModal(secretCode);
+
       // Automatically redirect to the login page after 2 seconds
       setTimeout(function() {
         showLoginForm();
       }, 2000);
+    }
+
+    // Function to display the modal with the secret code
+    function showSecretCodeModal(secretCode) {
+      var modal = document.getElementById('msgModal');
+      var msgText = document.getElementById('msgText');
+
+      msgText.innerHTML = `Your Secret Code: <strong>${secretCode}</strong><br><button onclick="copyToClipboard('${secretCode}')">Copy</button>`;
+      modal.style.display = 'flex';
+    }
+
+    // Function to copy the secret code to clipboard
+    function copyToClipboard(secretCode) {
+      var textArea = document.createElement('textarea');
+      textArea.value = secretCode;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+
+      showMsg('Secret code copied to clipboard!');
     }
   </script>
 
