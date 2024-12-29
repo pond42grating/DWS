@@ -17,7 +17,7 @@
       display: block;
       margin-bottom: 8px;
     }
-    input[type="text"], input[type="number"] {
+    input[type="text"], input[type="number"], input[type="date"] {
       width: 100%;
       padding: 8px;
       margin-bottom: 10px;
@@ -64,17 +64,6 @@
     .back-button:hover {
       background-color: #da190b;
     }
-    .export-button {
-      margin-top: 20px;
-      padding: 10px 15px;
-      background-color: #008CBA;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    .export-button:hover {
-      background-color: #006F8E;
-    }
   </style>
 </head>
 <body>
@@ -85,6 +74,12 @@
   <div class="form-section">
     <label for="dwsNo">DWS No.</label>
     <input type="text" id="dwsNo" readonly>
+  </div>
+
+  <!-- Date Field -->
+  <div class="form-section">
+    <label for="date">Date</label>
+    <input type="date" id="date">
   </div>
 
   <div class="form-section">
@@ -204,9 +199,6 @@
   </div>
 
   <button id="saveButton" onclick="saveData()">Save DWS</button>
-  <button class="export-button" onclick="exportToExcel()">Export to Excel</button>
-  <button class="export-button" onclick="exportToPDF()">Export to PDF</button>
-
   <button class="back-button" onclick="goBack()">Back to Home</button>
 
   <script>
@@ -306,7 +298,7 @@
       if (isValid) {
         const table = document.getElementById('equipmentTable');
         const row = table.insertRow();
-                row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
+        row.innerHTML = `<td>${equipmentName}</td><td>${workingHours}</td>`;
 
         // Clear input fields
         document.getElementById('equipmentName').value = '';
@@ -327,7 +319,7 @@
         clearError('consumableNameError');
       }
       if (!quantity) {
-        showError('quantityError', 'Quantity is required');
+                showError('quantityError', 'Quantity is required');
         isValid = false;
       } else {
         clearError('quantityError');
@@ -345,67 +337,36 @@
     }
 
     function saveData() {
-      const dwsNo = document.getElementById('dwsNo').value || `DWS-${dwsCounter++}`;
+      const dwsNo = document.getElementById('dwsNo').value;
+      const date = document.getElementById('date').value;
       const structureName = document.getElementById('structureName').value;
       const siNo = document.getElementById('siNo').value;
       const workDescription = document.getElementById('workDescription').value;
       const location = document.getElementById('location').value;
 
-      // Validation
-      let isValid = true;
-      if (!structureName) {
-        showError('structureNameError', 'Structure Name is required');
-        isValid = false;
+      if (!date || !structureName || !siNo || !workDescription || !location) {
+        alert('Please fill in all fields before saving.');
       } else {
-        clearError('structureNameError');
-      }
-      if (!siNo) {
-        showError('siNoError', 'SI No. is required');
-        isValid = false;
-      } else {
-        clearError('siNoError');
-      }
-      if (!workDescription) {
-        showError('workDescriptionError', 'Work Description is required');
-        isValid = false;
-      } else {
-        clearError('workDescriptionError');
-      }
-      if (!location) {
-        showError('locationError', 'Location is required');
-        isValid = false;
-      } else {
-        clearError('locationError');
-      }
-
-      if (isValid) {
-        alert(`DWS data saved for ${structureName} (DWS No. ${dwsNo})`);
-        // Reset the form for new entry
+        alert(`DWS saved successfully! DWS No.: ${dwsNo}, Date: ${date}`);
+        // Clear all fields after save
+        document.getElementById('dwsNo').value = `DWS-${dwsCounter++}`;
+        document.getElementById('date').value = '';
         document.getElementById('structureName').value = '';
         document.getElementById('siNo').value = '';
         document.getElementById('workDescription').value = '';
         document.getElementById('location').value = '';
+        document.getElementById('manpowerTable').innerHTML = '<tr><th>Badge No.</th><th>Name</th><th>Job Title/Qualifications</th><th>Normal Hour</th><th>OT Hour</th><th>Holiday</th></tr>';
+        document.getElementById('equipmentTable').innerHTML = '<tr><th>Equipment Name</th><th>Working Hours</th></tr>';
+        document.getElementById('consumableTable').innerHTML = '<tr><th>Consumable Name</th><th>Quantity</th></tr>';
       }
     }
 
-    function exportToExcel() {
-      // Export data to Excel logic (not implemented in this example)
-      alert('Export to Excel feature is not implemented yet.');
-    }
-
-    function exportToPDF() {
-      // Export data to PDF logic (not implemented in this example)
-      alert('Export to PDF feature is not implemented yet.');
-    }
-
     function goBack() {
-      // Redirect to the homepage or another page
-      window.location.href = 'index.html'; // Adjust the URL as necessary
+      window.history.back();
     }
 
-    // Automatically assign DWS No.
-    document.getElementById('dwsNo').value = `DWS-${dwsCounter}`;
+    // Initialize DWS No.
+    document.getElementById('dwsNo').value = `DWS-${dwsCounter++}`;
   </script>
-
 </body>
 </html>
