@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Import and Display</title>
+    <title>Improved DWS Import</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
@@ -122,7 +122,7 @@
                 15, // Starting row for manpower
                 20, // Ending row for manpower
                 document.getElementById('manpower-fields'),
-                ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]
+                ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]
             );
 
             // Populate Equipment fields
@@ -131,7 +131,7 @@
                 25, // Starting row for equipment
                 30, // Ending row for equipment
                 document.getElementById('equipment-fields'),
-                ["Equipment Name", "Working Hours"]
+                ["Sl. No.", "Equipment Name", "Working Hours"]
             );
 
             // Populate Materials fields
@@ -140,7 +140,7 @@
                 35, // Starting row for materials
                 40, // Ending row for materials
                 document.getElementById('materials-fields'),
-                ["Description", "Quantity", "Unit (NOS/ML)"]
+                ["Sl. No.", "Description", "Quantity", "Unit (NOS/ML)"]
             );
         });
 
@@ -151,10 +151,11 @@
                 const row = sheetData[i];
                 if (!row) continue;
 
-                const rowElements = headers.map((header, index) =>
-                    createField(header, row[index] || "")
-                );
-                const tableRow = createTableRow(rowElements);
+                // Skip Sl. No. for fields, but retain it for display
+                const fields = headers.slice(1).map((header, index) => createField(header, row[index + 1] || ""));
+                const slNoField = createField("Sl. No.", row[0] || ""); // Include Sl. No. in a separate cell
+
+                const tableRow = createTableRow([slNoField, ...fields]);
                 container.appendChild(tableRow);
             }
         }
