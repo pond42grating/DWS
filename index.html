@@ -14,27 +14,36 @@
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 5px;
+            background: #f9f9f9;
         }
         .section h3 {
             margin-top: 0;
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
         }
-        .fields {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
+        .table-container {
+            display: table;
+            width: 100%;
+            border-spacing: 10px;
         }
-        .fields .field {
-            display: flex;
-            flex-direction: column;
-            margin-bottom: 10px;
+        .table-row {
+            display: table-row;
         }
-        .fields .field label {
+        .table-cell {
+            display: table-cell;
+            padding: 5px;
+            vertical-align: top;
+        }
+        .table-cell label {
+            display: block;
+            font-weight: bold;
             margin-bottom: 5px;
         }
-        .fields .field input {
+        .table-cell input {
+            width: 100%;
             padding: 8px;
-            width: 200px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
@@ -60,7 +69,7 @@
     <!-- Manpower Section -->
     <div class="section" id="manpower-section">
         <h3>Manpower</h3>
-        <div class="fields" id="manpower-fields">
+        <div class="table-container" id="manpower-fields">
             <!-- Fields will be dynamically populated -->
         </div>
     </div>
@@ -68,7 +77,7 @@
     <!-- Equipment Section -->
     <div class="section" id="equipment-section">
         <h3>Equipment</h3>
-        <div class="fields" id="equipment-fields">
+        <div class="table-container" id="equipment-fields">
             <!-- Fields will be dynamically populated -->
         </div>
     </div>
@@ -76,7 +85,7 @@
     <!-- Materials Section -->
     <div class="section" id="materials-section">
         <h3>Materials</h3>
-        <div class="fields" id="materials-fields">
+        <div class="table-container" id="materials-fields">
             <!-- Fields will be dynamically populated -->
         </div>
     </div>
@@ -114,12 +123,15 @@
                 const row = excelData[i];
                 if (!row) continue;
 
-                manpowerFields.appendChild(createField("Trade", row[2]));
-                manpowerFields.appendChild(createField("Name", row[3]));
-                manpowerFields.appendChild(createField("Badge Number", row[4]));
-                manpowerFields.appendChild(createField("Normal Hours", row[5]));
-                manpowerFields.appendChild(createField("Overtime", row[6]));
-                manpowerFields.appendChild(createField("Holiday", row[7]));
+                const manpowerRow = createTableRow([
+                    createField("Trade", row[2]),
+                    createField("Name", row[3]),
+                    createField("Badge Number", row[4]),
+                    createField("Normal Hours", row[5]),
+                    createField("Overtime", row[6]),
+                    createField("Holiday", row[7])
+                ]);
+                manpowerFields.appendChild(manpowerRow);
             }
 
             // Populate Equipment fields (update row range as needed)
@@ -129,8 +141,11 @@
                 const row = excelData[i];
                 if (!row) continue;
 
-                equipmentFields.appendChild(createField("Equipment Name", row[1]));
-                equipmentFields.appendChild(createField("Working Hours", row[2]));
+                const equipmentRow = createTableRow([
+                    createField("Equipment Name", row[1]),
+                    createField("Working Hours", row[2])
+                ]);
+                equipmentFields.appendChild(equipmentRow);
             }
 
             // Populate Materials fields (update row range as needed)
@@ -140,15 +155,18 @@
                 const row = excelData[i];
                 if (!row) continue;
 
-                materialsFields.appendChild(createField("Description", row[1]));
-                materialsFields.appendChild(createField("Quantity", row[2]));
-                materialsFields.appendChild(createField("NOS/ML", row[3]));
+                const materialsRow = createTableRow([
+                    createField("Description", row[1]),
+                    createField("Quantity", row[2]),
+                    createField("NOS/ML", row[3])
+                ]);
+                materialsFields.appendChild(materialsRow);
             }
         });
 
         function createField(labelText, value = "") {
-            const field = document.createElement('div');
-            field.className = 'field';
+            const container = document.createElement('div');
+            container.className = 'table-cell';
 
             const label = document.createElement('label');
             label.textContent = labelText;
@@ -157,10 +175,17 @@
             input.type = 'text';
             input.value = value;
 
-            field.appendChild(label);
-            field.appendChild(input);
+            container.appendChild(label);
+            container.appendChild(input);
 
-            return field;
+            return container;
+        }
+
+        function createTableRow(cells) {
+            const row = document.createElement('div');
+            row.className = 'table-row';
+            cells.forEach(cell => row.appendChild(cell));
+            return row;
         }
     </script>
 </body>
