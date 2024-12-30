@@ -9,19 +9,13 @@
         body {
             font-family: Arial, sans-serif;
             margin: 20px;
-            line-height: 1.6;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 30px;
         }
         .section {
             margin-top: 20px;
-            padding: 20px;
+            padding: 15px;
             border: 1px solid #ddd;
-            border-radius: 8px;
+            border-radius: 5px;
             background: #f9f9f9;
-            margin-bottom: 30px;
         }
         .section h3 {
             margin-top: 0;
@@ -29,27 +23,24 @@
             color: white;
             padding: 10px;
             border-radius: 5px;
-            text-align: center;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            font-size: 14px;
         }
         table, th, td {
             border: 1px solid #ccc;
-            padding: 10px;
         }
         th, td {
+            padding: 8px;
             text-align: left;
         }
         input {
-            width: 100%;
-            padding: 8px;
+            width: 95%;
+            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            margin: 5px 0;
         }
         button {
             padding: 10px 15px;
@@ -58,8 +49,6 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            display: block;
-            margin: 20px auto;
         }
         button:hover {
             background-color: #0056b3;
@@ -134,6 +123,7 @@
             let rows = "";
             for (let i = 1; i <= numRows; i++) {
                 rows += `<tr><td>${i}</td>`;
+                // Insert inputs starting from the second column
                 columns.slice(1).forEach(() => {
                     rows += `<td><input type="text"></td>`;
                 });
@@ -156,14 +146,14 @@
                 const sheet = workbook.Sheets["Form"];
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                // Manpower (Rows 17 to 36, Columns 3 to 8)
-                populateRows("manpower-table", json.slice(16, 36), ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+                // Manpower (Skip first 15 rows, fill 20 rows, skip 5 rows after)
+                populateRows("manpower-table", json.slice(15, 35), [ "Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
 
-                // Equipment (Rows 42 to 51, Columns 3 and 6)
-                populateRows("equipment-table", json.slice(41, 51), ["Sl. No.", "Equipment Name", "Working Hours"]);
+                // Equipment (Skip 5 rows, fill 10 rows, skip 4 rows after)
+                populateRows("equipment-table", json.slice(40, 50), ["Sl. No.", "Equipment Name", "Working Hours"]);
 
-                // Materials (Rows 56 to 65, Columns 3, 7, and 10)
-                populateRows("materials-table", json.slice(55, 65), ["Sl. No.", "Description", "Quantity", "Unit"]);
+                // Materials (Skip 4 rows, fill 10 rows)
+                populateRows("materials-table", json.slice(54, 64), ["Sl. No.", "Description", "Quantity", "Unit"]);
             };
             reader.readAsArrayBuffer(file);
         });
@@ -174,9 +164,15 @@
             data.forEach((row, i) => {
                 if (i < rows.length) {
                     const inputs = rows[i].querySelectorAll("input");
-                    // Insert data starting from the second column (index 1)
+                    // Insert data starting from the 3rd, 6th, or respective columns as specified
                     columns.slice(1).forEach((col, j) => {
-                        inputs[j].value = row[j + 2] || "";  // Adjust index for proper column mapping
+                        if (j === 0) {
+                            inputs[j].value = row[2] || "";  // Manpower Trade, Equipment Name, Materials Description
+                        } else if (j === 1) {
+                            inputs[j].value = row[3] || "";  // Manpower Name, Equipment Working Hours, Materials Quantity
+                        } else if (j === 2) {
+                            inputs[j].value = row[6] || "";  // Manpower Badge Number, Materials Unit
+                        }
                     });
                 }
             });
