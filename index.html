@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload and Display Excel</title>
+    <title>Upload, Display, and Export Excel</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         table {
             width: 100%;
@@ -21,14 +22,22 @@
         th {
             background-color: #f4f4f4;
         }
+        button {
+            margin-top: 10px;
+            margin-right: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>Upload and Display Excel File</h1>
+    <h1>Upload, Display, and Export Excel File</h1>
     <input type="file" id="upload" accept=".xlsx, .xls">
     <div id="table-container"></div>
+    <button id="export-excel" style="display: none;">Export as Excel</button>
+    <button id="export-pdf" style="display: none;">Export as PDF</button>
 
     <script>
+        let tableData = [];
+
         document.getElementById('upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -43,8 +52,12 @@
                 // Get the data of the first sheet
                 const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
 
-                // Render the table
+                tableData = sheetData; // Store the data globally for export
                 displayTable(sheetData);
+
+                // Show export buttons
+                document.getElementById('export-excel').style.display = 'inline-block';
+                document.getElementById('export-pdf').style.display = 'inline-block';
             };
             reader.readAsArrayBuffer(file);
         });
@@ -66,6 +79,29 @@
 
             container.appendChild(table);
         }
+
+        // Export as Excel
+        document.getElementById('export-excel').addEventListener('click', function() {
+            const worksheet = XLSX.utils.aoa_to_sheet(tableData);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+            XLSX.writeFile(workbook, 'ExportedData.xlsx');
+        });
+
+        // Export as PDF
+        document.getElementById('export-pdf').addEventListener('click', async function() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            let y = 10; // Starting y position for content
+            tableData.forEach((row, rowIndex) => {
+                let text = row.join('   '); // Join row data with spaces
+                pdf.text(text, 10, y);
+                y += 10; // Move to next line
+            });
+
+            pdf.save('ExportedData.pdf');
+        });
     </script>
 </body>
 </html>
