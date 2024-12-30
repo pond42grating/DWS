@@ -77,7 +77,6 @@
             </thead>
             <tbody>
                 <!-- 20 preset rows for Manpower -->
-                ${generateRows(20, ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"])}
             </tbody>
         </table>
     </div>
@@ -95,7 +94,6 @@
             </thead>
             <tbody>
                 <!-- 10 preset rows for Equipment -->
-                ${generateRows(10, ["Equipment Name", "Working Hours"])}
             </tbody>
         </table>
     </div>
@@ -114,14 +112,14 @@
             </thead>
             <tbody>
                 <!-- 10 preset rows for Materials -->
-                ${generateRows(10, ["Description", "Quantity", "Unit"])}
             </tbody>
         </table>
     </div>
 
     <script>
         // Function to generate preset rows for a table
-        function generateRows(numRows, columns) {
+        function generateRows(tableId, numRows, columns) {
+            let table = document.getElementById(tableId);
             let rows = "";
             for (let i = 1; i <= numRows; i++) {
                 rows += `<tr><td>${i}</td>`;
@@ -130,7 +128,7 @@
                 });
                 rows += "</tr>";
             }
-            return rows;
+            table.querySelector("tbody").innerHTML = rows;
         }
 
         // Import Excel file and populate fields
@@ -167,6 +165,13 @@
                 }
             });
         }
+
+        // Generate fixed rows for each section on page load
+        window.onload = function() {
+            generateRows("manpower-table", 20, ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+            generateRows("equipment-table", 10, ["Equipment Name", "Working Hours"]);
+            generateRows("materials-table", 10, ["Description", "Quantity", "Unit"]);
+        };
     </script>
 </body>
 </html>
