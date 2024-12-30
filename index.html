@@ -147,7 +147,7 @@
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
                 // Manpower (Skip first 15 rows, fill 20 rows, skip 5 rows after)
-                populateRows("manpower-table", json.slice(15, 35), [ "Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+                populateRows("manpower-table", json.slice(15, 35), ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
 
                 // Equipment (Skip 5 rows, fill 10 rows, skip 4 rows after)
                 populateRows("equipment-table", json.slice(40, 50), ["Sl. No.", "Equipment Name", "Working Hours"]);
@@ -164,15 +164,9 @@
             data.forEach((row, i) => {
                 if (i < rows.length) {
                     const inputs = rows[i].querySelectorAll("input");
-                    // Insert data starting from the 3rd, 6th, or respective columns as specified
+                    // Start filling data from the second column (index 1)
                     columns.slice(1).forEach((col, j) => {
-                        if (j === 0) {
-                            inputs[j].value = row[2] || "";  // Manpower Trade, Equipment Name, Materials Description
-                        } else if (j === 1) {
-                            inputs[j].value = row[3] || "";  // Manpower Name, Equipment Working Hours, Materials Quantity
-                        } else if (j === 2) {
-                            inputs[j].value = row[6] || "";  // Manpower Badge Number, Materials Unit
-                        }
+                        inputs[j].value = row[j + 1] || "";  // Skip first column (index 0) while inserting data
                     });
                 }
             });
