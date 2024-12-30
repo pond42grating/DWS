@@ -1,3 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DWS Fixed Rows</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .section {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #f9f9f9;
+        }
+        .section h3 {
+            margin-top: 0;
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+        input {
+            width: 95%;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>DWS Fixed Rows Form</h1>
+    <input type="file" id="upload" accept=".csv">
+    <button id="import">Import CSV Data</button>
+
+    <!-- Manpower Section -->
+    <div class="section">
+        <h3>Manpower</h3>
+        <table id="manpower-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Trade</th>
+                    <th>Name</th>
+                    <th>Badge Number</th>
+                    <th>Normal Hours</th>
+                    <th>Overtime</th>
+                    <th>Holiday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 20 preset rows for Manpower -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Equipment Section -->
+    <div class="section">
+        <h3>Equipment</h3>
+        <table id="equipment-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Equipment Name</th>
+                    <th>Working Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 10 preset rows for Equipment -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Materials Section -->
+    <div class="section">
+        <h3>Materials</h3>
+        <table id="materials-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit (NOS/ML)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 10 preset rows for Materials -->
+            </tbody>
+        </table>
+    </div>
+
 <script>
     // Function to parse CSV data with proper handling of double quotes
     function parseCSV(content) {
@@ -119,3 +236,5 @@
         });
     }
 </script>
+</body>
+</html>
