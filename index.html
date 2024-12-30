@@ -145,10 +145,14 @@
                 const sheet = workbook.Sheets["Form"];
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                // Populate the preset rows with data
-                populateRows("manpower-table", json.slice(15, 35), ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
-                populateRows("equipment-table", json.slice(35, 45), ["Equipment Name", "Working Hours"]);
-                populateRows("materials-table", json.slice(45, 55), ["Description", "Quantity", "Unit"]);
+                // Manpower (Skip 1 header row, fill 20 rows, skip 5 rows after)
+                populateRows("manpower-table", json.slice(1, 21), ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+
+                // Equipment (Skip 5 rows, fill 10 rows, skip 4 rows after)
+                populateRows("equipment-table", json.slice(26, 36), ["Equipment Name", "Working Hours"]);
+
+                // Materials (Skip 4 rows, fill 10 rows)
+                populateRows("materials-table", json.slice(40, 50), ["Description", "Quantity", "Unit"]);
             };
             reader.readAsArrayBuffer(file);
         });
