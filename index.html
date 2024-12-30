@@ -3,40 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload, Display, and Export Excel</title>
+    <title>DWS Import and Display</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .section {
             margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
         }
-        table, th, td {
-            border: 1px solid #000;
+        .section h3 {
+            margin-top: 0;
         }
-        th, td {
+        .fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .fields .field {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+        .fields .field label {
+            margin-bottom: 5px;
+        }
+        .fields .field input {
             padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
+            width: 200px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
         button {
             margin-top: 10px;
-            margin-right: 10px;
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
 <body>
-    <h1>Upload, Display, and Export Excel File</h1>
+    <h1>DWS Import and Display</h1>
     <input type="file" id="upload" accept=".xlsx, .xls">
-    <div id="table-container"></div>
-    <button id="export-excel" style="display: none;">Export as Excel</button>
-    <button id="export-pdf" style="display: none;">Export as PDF</button>
+    <button id="import">Import Excel Data</button>
+
+    <!-- Manpower Section -->
+    <div class="section" id="manpower-section">
+        <h3>Manpower</h3>
+        <div class="fields" id="manpower-fields">
+            <!-- Fields will be dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Equipment Section -->
+    <div class="section" id="equipment-section">
+        <h3>Equipment</h3>
+        <div class="fields" id="equipment-fields">
+            <!-- Fields will be dynamically populated -->
+        </div>
+    </div>
+
+    <!-- Materials Section -->
+    <div class="section" id="materials-section">
+        <h3>Materials</h3>
+        <div class="fields" id="materials-fields">
+            <!-- Fields will be dynamically populated -->
+        </div>
+    </div>
 
     <script>
-        let tableData = [];
+        let excelData = null;
 
         document.getElementById('upload').addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -47,61 +93,75 @@
                 const data = new Uint8Array(e.target.result);
                 const workbook = XLSX.read(data, { type: 'array' });
 
-                // Get the first sheet name
-                const sheetName = workbook.SheetNames[0];
-                // Get the data of the first sheet
-                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { header: 1 });
-
-                tableData = sheetData; // Store the data globally for export
-                displayTable(sheetData);
-
-                // Show export buttons
-                document.getElementById('export-excel').style.display = 'inline-block';
-                document.getElementById('export-pdf').style.display = 'inline-block';
+                // Read data from the "Form" sheet
+                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets["Form"], { header: 1 });
+                excelData = sheetData;
+                alert("Excel file loaded successfully!");
             };
             reader.readAsArrayBuffer(file);
         });
 
-        function displayTable(data) {
-            const container = document.getElementById('table-container');
-            container.innerHTML = ""; // Clear any previous table
+        document.getElementById('import').addEventListener('click', function() {
+            if (!excelData) {
+                alert("Please upload an Excel file first.");
+                return;
+            }
 
-            const table = document.createElement('table');
-            data.forEach((row, rowIndex) => {
-                const tr = document.createElement('tr');
-                row.forEach(cell => {
-                    const cellElement = document.createElement(rowIndex === 0 ? 'th' : 'td');
-                    cellElement.textContent = cell || ''; // Handle empty cells
-                    tr.appendChild(cellElement);
-                });
-                table.appendChild(tr);
-            });
+            // Populate Manpower fields
+            const manpowerFields = document.getElementById('manpower-fields');
+            manpowerFields.innerHTML = ''; // Clear existing fields
+            for (let i = 15; i <= 20; i++) { // Rows 15-20 for Manpower
+                const row = excelData[i];
+                if (!row) continue;
 
-            container.appendChild(table);
+                manpowerFields.appendChild(createField("Trade", row[2]));
+                manpowerFields.appendChild(createField("Name", row[3]));
+                manpowerFields.appendChild(createField("Badge Number", row[4]));
+                manpowerFields.appendChild(createField("Normal Hours", row[5]));
+                manpowerFields.appendChild(createField("Overtime", row[6]));
+                manpowerFields.appendChild(createField("Holiday", row[7]));
+            }
+
+            // Populate Equipment fields (update row range as needed)
+            const equipmentFields = document.getElementById('equipment-fields');
+            equipmentFields.innerHTML = ''; // Clear existing fields
+            for (let i = 25; i <= 30; i++) { // Example row range for Equipment
+                const row = excelData[i];
+                if (!row) continue;
+
+                equipmentFields.appendChild(createField("Equipment Name", row[1]));
+                equipmentFields.appendChild(createField("Working Hours", row[2]));
+            }
+
+            // Populate Materials fields (update row range as needed)
+            const materialsFields = document.getElementById('materials-fields');
+            materialsFields.innerHTML = ''; // Clear existing fields
+            for (let i = 35; i <= 40; i++) { // Example row range for Materials
+                const row = excelData[i];
+                if (!row) continue;
+
+                materialsFields.appendChild(createField("Description", row[1]));
+                materialsFields.appendChild(createField("Quantity", row[2]));
+                materialsFields.appendChild(createField("NOS/ML", row[3]));
+            }
+        });
+
+        function createField(labelText, value = "") {
+            const field = document.createElement('div');
+            field.className = 'field';
+
+            const label = document.createElement('label');
+            label.textContent = labelText;
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = value;
+
+            field.appendChild(label);
+            field.appendChild(input);
+
+            return field;
         }
-
-        // Export as Excel
-        document.getElementById('export-excel').addEventListener('click', function() {
-            const worksheet = XLSX.utils.aoa_to_sheet(tableData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-            XLSX.writeFile(workbook, 'ExportedData.xlsx');
-        });
-
-        // Export as PDF
-        document.getElementById('export-pdf').addEventListener('click', async function() {
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
-
-            let y = 10; // Starting y position for content
-            tableData.forEach((row, rowIndex) => {
-                let text = row.join('   '); // Join row data with spaces
-                pdf.text(text, 10, y);
-                y += 10; // Move to next line
-            });
-
-            pdf.save('ExportedData.pdf');
-        });
     </script>
 </body>
 </html>
