@@ -1,11 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Fixed Rows</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <title>DWS Fixed Rows - CSV Only</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -58,8 +56,8 @@
 </head>
 <body>
     <h1>DWS Fixed Rows Form</h1>
-    <input type="file" id="upload" accept=".xlsx, .xls">
-    <button id="import">Import Excel Data</button>
+    <input type="file" id="upload" accept=".csv">
+    <button id="import">Import CSV Data</button>
 
     <!-- Manpower Section -->
     <div class="section">
@@ -118,46 +116,28 @@
     </div>
 
     <script>
-        // Function to generate preset rows for a table
-        function generateRows(tableId, numRows, columns) {
-            let table = document.getElementById(tableId);
-            let rows = "";
-            for (let i = 1; i <= numRows; i++) {
-                rows += `<tr><td>${i}</td>`;
-                // Insert inputs starting from the second column
-                columns.slice(1).forEach(() => {
-                    rows += `<td><input type="text"></td>`;
-                });
-                rows += "</tr>";
-            }
-            table.querySelector("tbody").innerHTML = rows;
+        // Function to parse CSV data
+        function parseCSV(csv) {
+            const rows = csv.split('\n');
+            const result = [];
+            rows.forEach(row => {
+                const columns = row.split(',');
+                result.push(columns);
+            });
+            return result;
         }
 
-        // Import Excel file and populate fields
-        document.getElementById("upload").addEventListener("change", function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+        // Function to populate tables from parsed CSV data
+        function populateDataFromCSV(data) {
+            // Manpower: Rows 17-36, Columns 3-8
+            populateManpowerRows(data.slice(16, 36));
 
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: "array" });
+            // Equipment: Rows 42-51, Columns 3 and 6
+            populateEquipmentRows(data.slice(41, 51));
 
-                // Extract data from the "Form" sheet
-                const sheet = workbook.Sheets["Form"];
-                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-
-                // Manpower (Rows 17-36, Columns 3-8)
-                populateManpowerRows(json.slice(16, 36));
-
-                // Equipment (Rows 42-51, Columns 3 and 6)
-                populateEquipmentRows(json.slice(41, 51));
-
-                // Materials (Rows 56-65, Columns 3, 7, and 10)
-                populateMaterialsRows(json.slice(55, 65));
-            };
-            reader.readAsArrayBuffer(file);
-        });
+            // Materials: Rows 56-65, Columns 3, 7, and 10
+            populateMaterialsRows(data.slice(55, 65));
+        }
 
         // Function to populate the Manpower table
         function populateManpowerRows(data) {
@@ -206,12 +186,40 @@
             });
         }
 
+        // Handle CSV file upload
+        document.getElementById("upload").addEventListener("change", function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const csv = e.target.result;
+                const parsedData = parseCSV(csv);
+                populateDataFromCSV(parsedData);
+            };
+            reader.readAsText(file);
+        });
+
         // Generate fixed rows for each section on page load
         window.onload = function() {
             generateRows("manpower-table", 20, ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
             generateRows("equipment-table", 10, ["Sl. No.", "Equipment Name", "Working Hours"]);
             generateRows("materials-table", 10, ["Sl. No.", "Description", "Quantity", "Unit"]);
         };
+
+        // Function to generate preset rows for a table
+        function generateRows(tableId, numRows, columns) {
+            let table = document.getElementById(tableId);
+            let rows = "";
+            for (let i = 1; i <= numRows; i++) {
+                rows += `<tr><td>${i}</td>`;
+                columns.slice(1).forEach(() => {
+                    rows += `<td><input type="text"></td>`;
+                });
+                rows += "</tr>";
+            }
+            table.querySelector("tbody").innerHTML = rows;
+        }
     </script>
 </body>
 </html>
