@@ -117,13 +117,14 @@
     </div>
 
     <script>
-        // Function to generate preset rows for a table
+        // Function to generate preset rows for a table, starting from the second column
         function generateRows(tableId, numRows, columns) {
             let table = document.getElementById(tableId);
             let rows = "";
             for (let i = 1; i <= numRows; i++) {
                 rows += `<tr><td>${i}</td>`;
-                columns.forEach(() => {
+                // Insert inputs starting from the second column
+                columns.slice(1).forEach(() => {
                     rows += `<td><input type="text"></td>`;
                 });
                 rows += "</tr>";
@@ -146,13 +147,13 @@
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
                 // Manpower (Skip first 15 rows, fill 20 rows, skip 5 rows after)
-                populateRows("manpower-table", json.slice(16, 36), ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+                    populateRows("manpower-table", json.slice(16, 36), ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
 
                 // Equipment (Skip 5 rows, fill 10 rows, skip 4 rows after)
-                populateRows("equipment-table", json.slice(41, 51), ["Equipment Name", "Working Hours"]);
+                populateRows("equipment-table", json.slice(41, 51), ["Sl. No.", "Equipment Name", "Working Hours"]);
 
                 // Materials (Skip 4 rows, fill 10 rows)
-                populateRows("materials-table", json.slice(55, 65), ["Description", "Quantity", "Unit"]);
+                populateRows("materials-table", json.slice(55, 65), ["Sl. No.", "Description", "Quantity", "Unit"]);
             };
             reader.readAsArrayBuffer(file);
         });
@@ -163,8 +164,9 @@
             data.forEach((row, i) => {
                 if (i < rows.length) {
                     const inputs = rows[i].querySelectorAll("input");
-                    columns.forEach((col, j) => {
-                        inputs[j].value = row[j] || "";
+                    // Start filling data from the second column (index 1)
+                    columns.slice(1).forEach((col, j) => {
+                        inputs[j].value = row[j + 1] || "";  // Skip first column (index 0) while inserting data
                     });
                 }
             });
@@ -172,9 +174,9 @@
 
         // Generate fixed rows for each section on page load
         window.onload = function() {
-            generateRows("manpower-table", 20, ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
-            generateRows("equipment-table", 10, ["Equipment Name", "Working Hours"]);
-            generateRows("materials-table", 10, ["Description", "Quantity", "Unit"]);
+            generateRows("manpower-table", 20, ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+            generateRows("equipment-table", 10, ["Sl. No.", "Equipment Name", "Working Hours"]);
+            generateRows("materials-table", 10, ["Sl. No.", "Description", "Quantity", "Unit"]);
         };
     </script>
 </body>
