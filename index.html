@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DWS Fixed Rows</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -56,8 +57,8 @@
 </head>
 <body>
     <h1>DWS Fixed Rows Form</h1>
-    <input type="file" id="upload" accept=".csv">
-    <button id="import">Import CSV Data</button>
+    <input type="file" id="upload" accept=".xlsx, .xls">
+    <button id="import">Import Excel Data</button>
 
     <!-- Manpower Section -->
     <div class="section">
@@ -116,74 +117,77 @@
     </div>
 
     <script>
-        // Function to handle CSV file upload and parsing
-        document.getElementById('upload').addEventListener('change', function(event) {
+        // Function to sanitize text before populating it into the input fields
+        function sanitizeText(text) {
+            // Replace curly quotes with standard quotes
+            return text.replace(/[“”]/g, '"');
+        }
+
+        // Function to generate preset rows for a table, starting from the second column
+        function generateRows(tableId, numRows, columns) {
+            let table = document.getElementById(tableId);
+            let rows = "";
+            for (let i = 1; i <= numRows; i++) {
+                rows += `<tr><td>${i}</td>`;
+                // Insert inputs starting from the second column
+                columns.slice(1).forEach(() => {
+                    rows += `<td><input type="text"></td>`;
+                });
+                rows += "</tr>";
+            }
+            table.querySelector("tbody").innerHTML = rows;
+        }
+
+        // Import Excel file and populate fields
+        document.getElementById("upload").addEventListener("change", function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const content = e.target.result;
-                const rows = content.split('\n').map(row => row.split(','));
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: "array" });
 
-                // Manpower (Rows 17-36, Columns 2-6)
-                populateManpower(rows.slice(18, 37));
+                // Extract data from the "Form" sheet
+                const sheet = workbook.Sheets["Form"];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                // Equipment (Rows 42-51, Columns 2 and 5)
-                populateEquipment(rows.slice(43, 52));
+                // Manpower (Skip first 15 rows, fill 20 rows, skip 5 rows after)
+                populateRows("manpower-table", json.slice(18, 38), ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
 
-                // Materials (Rows 56-65, Columns 2, 6, and 9)
-                populateMaterials(rows.slice(57, 66));
+                // Equipment (Skip 5 rows, fill 10 rows, skip 4 rows after)
+                populateRows("equipment-table", json.slice(43, 53), ["Sl. No.", "Equipment Name", "Working Hours"]);
+
+                // Materials (Skip 4 rows, fill 10 rows)
+                populateRows("materials-table", json.slice(57, 67), ["Sl. No.", "Description", "Quantity", "Unit"]);
             };
-            reader.readAsText(file);
+            reader.readAsArrayBuffer(file);
         });
 
-        // Populate the Manpower table (Rows 17-36, Columns 2-6)
-        function populateManpower(data) {
-            const table = document.getElementById("manpower-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${row[1] || ''}"></td> <!-- Column 2: Trade -->
-                    <td><input type="text" value="${row[2] || ''}"></td> <!-- Column 3: Name -->
-                    <td><input type="text" value="${row[3] || ''}"></td> <!-- Column 4: Badge Number -->
-                    <td><input type="text" value="${row[4] || ''}"></td> <!-- Column 5: Normal Hours -->
-                    <td><input type="text" value="${row[5] || ''}"></td> <!-- Column 6: Overtime -->
-                    <td><input type="text" value="${row[6] || ''}"></td> <!-- Column 7: Holiday -->
-                `;
-                table.appendChild(tr);
+        // Populate rows for each table
+        function populateRows(tableId, data, columns) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll("tbody tr");
+
+            data.forEach((row, i) => {
+                if (i < rows.length) {
+                    const inputs = rows[i].querySelectorAll("input");
+                    columns.slice(1).forEach((col, j) => {
+                        let value = row[j + 1] || "";  // Skip first column (index 0) while inserting data
+                        value = sanitizeText(value);   // Sanitize the value before assigning
+                        
+                        inputs[j].value = value; // Insert value into input field
+                    });
+                }
             });
         }
 
-        // Populate the Equipment table (Rows 42-51, Columns 2 and 5)
-        function populateEquipment(data) {
-            const table = document.getElementById("equipment-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${row[1] || ''}"></td> <!-- Column 2: Equipment Name -->
-                    <td><input type="text" value="${row[4] || ''}"></td> <!-- Column 5: Working Hours -->
-                `;
-                table.appendChild(tr);
-            });
-        }
-
-        // Populate the Materials table (Rows 56-65, Columns 2, 6, and 9)
-        function populateMaterials(data) {
-            const table = document.getElementById("materials-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${row[1] || ''}"></td> <!-- Column 2: Description -->
-                    <td><input type="text" value="${row[5] || ''}"></td> <!-- Column 6: Quantity -->
-                    <td><input type="text" value="${row[8] || ''}"></td> <!-- Column 9: Unit -->
-                `;
-                table.appendChild(tr);
-            });
-        }
+        // Generate fixed rows for each section on page load
+        window.onload = function() {
+            generateRows("manpower-table", 20, ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+            generateRows("equipment-table", 10, ["Sl. No.", "Equipment Name", "Working Hours"]);
+            generateRows("materials-table", 10, ["Sl. No.", "Description", "Quantity", "Unit"]);
+        };
     </script>
 </body>
 </html>
