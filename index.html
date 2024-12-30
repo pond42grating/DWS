@@ -1,203 +1,121 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Fixed Rows</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .section {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #f9f9f9;
-        }
-        .section h3 {
-            margin-top: 0;
-            background: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        input {
-            width: 95%;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <h1>DWS Fixed Rows Form</h1>
-    <input type="file" id="upload" accept=".csv">
-    <button id="import">Import CSV Data</button>
+<script>
+    // Function to parse CSV data with proper handling of double quotes
+    function parseCSV(content) {
+        const rows = [];
+        const lines = content.split('\n');
 
-    <!-- Manpower Section -->
-    <div class="section">
-        <h3>Manpower</h3>
-        <table id="manpower-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Trade</th>
-                    <th>Name</th>
-                    <th>Badge Number</th>
-                    <th>Normal Hours</th>
-                    <th>Overtime</th>
-                    <th>Holiday</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 20 preset rows for Manpower -->
-            </tbody>
-        </table>
-    </div>
+        lines.forEach(line => {
+            const values = [];
+            let value = '';
+            let insideQuotes = false;
 
-    <!-- Equipment Section -->
-    <div class="section">
-        <h3>Equipment</h3>
-        <table id="equipment-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Equipment Name</th>
-                    <th>Working Hours</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 10 preset rows for Equipment -->
-            </tbody>
-        </table>
-    </div>
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
 
-    <!-- Materials Section -->
-    <div class="section">
-        <h3>Materials</h3>
-        <table id="materials-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit (NOS/ML)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 10 preset rows for Materials -->
-            </tbody>
-        </table>
-    </div>
+                if (char === '"') {
+                    if (insideQuotes && line[i + 1] === '"') {
+                        // Handle escaped double quotes ("")
+                        value += '"';
+                        i++; // Skip next quote
+                    } else {
+                        // Toggle insideQuotes state
+                        insideQuotes = !insideQuotes;
+                    }
+                } else if (char === ',' && !insideQuotes) {
+                    // End of a value
+                    values.push(value.trim());
+                    value = '';
+                } else {
+                    // Regular character
+                    value += char;
+                }
+            }
 
-    <script>
-        // Function to handle CSV file upload and parsing
-        document.getElementById('upload').addEventListener('change', function(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const content = e.target.result;
-
-                // Log the raw content of the CSV to see if there's an issue
-                console.log("Raw CSV Content:", content);
-
-                const rows = content.split('\n').map(row => row.split(','));
-
-                // Log rows to check for any unexpected characters or empty values
-                console.log("Parsed Rows:", rows);
-
-                // Manpower (Rows 17-36, Columns 2-6)
-                populateManpower(rows.slice(16, 36));
-
-                // Equipment (Rows 42-51, Columns 2 and 5)
-                populateEquipment(rows.slice(41, 51));
-
-                // Materials (Rows 56-65, Columns 2, 6, and 9)
-                populateMaterials(rows.slice(55, 65));
-            };
-            reader.readAsText(file);
+            // Add the last value in the line
+            values.push(value.trim());
+            rows.push(values);
         });
 
-        // Function to sanitize text before populating it (Replace curly quotes and trim)
-        function sanitizeText(text) {
-            if (text === undefined || text === null) return '';
-            // Replace curly quotes with standard quotes, and trim any extra spaces
-            return text.replace(/[“”]/g, '"').replace(/[^\x00-\x7F]/g, "").trim();
-        }
+        return rows;
+    }
 
-        // Populate the Manpower table (Rows 17-36, Columns 2-6)
-        function populateManpower(data) {
-            const table = document.getElementById("manpower-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Trade -->
-                    <td><input type="text" value="${sanitizeText(row[2])}"></td> <!-- Column 3: Name -->
-                    <td><input type="text" value="${sanitizeText(row[3])}"></td> <!-- Column 4: Badge Number -->
-                    <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Normal Hours -->
-                    <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Overtime -->
-                    <td><input type="text" value="${sanitizeText(row[6])}"></td> <!-- Column 7: Holiday -->
-                `;
-                table.appendChild(tr);
-            });
-        }
+    document.getElementById('upload').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (!file) return;
 
-        // Populate the Equipment table (Rows 42-51, Columns 2 and 5)
-        function populateEquipment(data) {
-            const table = document.getElementById("equipment-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Equipment Name -->
-                    <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Working Hours -->
-                `;
-                table.appendChild(tr);
-            });
-        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            const content = e.target.result;
 
-        // Populate the Materials table (Rows 56-65, Columns 2, 6, and 9)
-        function populateMaterials(data) {
-            const table = document.getElementById("materials-table").querySelector("tbody");
-            data.forEach((row, index) => {
-                const tr = document.createElement("tr");
-                tr.innerHTML = `
-                    <td>${index + 1}</td>
-                    <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Description -->
-                    <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Quantity -->
-                    <td><input type="text" value="${sanitizeText(row[8])}"></td> <!-- Column 9: Unit -->
-                `;
-                table.appendChild(tr);
-            });
-        }
-    </script>
-</body>
-</html>
+            // Parse the CSV content
+            const rows = parseCSV(content);
+
+            console.log("Parsed Rows:", rows);
+
+            // Manpower (Rows 17-36, Columns 2-6)
+            populateManpower(rows.slice(16, 36));
+
+            // Equipment (Rows 42-51, Columns 2 and 5)
+            populateEquipment(rows.slice(41, 51));
+
+            // Materials (Rows 56-65, Columns 2, 6, and 9)
+            populateMaterials(rows.slice(55, 65));
+        };
+        reader.readAsText(file);
+    });
+
+    function sanitizeText(text) {
+        if (text === undefined || text === null) return '';
+        return text.replace(/[“”]/g, '"').replace(/[^\x00-\x7F]/g, "").trim();
+    }
+
+    // Populate the Manpower table (Rows 17-36, Columns 2-6)
+    function populateManpower(data) {
+        const table = document.getElementById("manpower-table").querySelector("tbody");
+        table.innerHTML = ''; // Clear existing rows
+        data.forEach((row, index) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Trade -->
+                <td><input type="text" value="${sanitizeText(row[2])}"></td> <!-- Column 3: Name -->
+                <td><input type="text" value="${sanitizeText(row[3])}"></td> <!-- Column 4: Badge Number -->
+                <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Normal Hours -->
+                <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Overtime -->
+                <td><input type="text" value="${sanitizeText(row[6])}"></td> <!-- Column 7: Holiday -->
+            `;
+            table.appendChild(tr);
+        });
+    }
+
+    // Populate the Equipment table (Rows 42-51, Columns 2 and 5)
+    function populateEquipment(data) {
+        const table = document.getElementById("equipment-table").querySelector("tbody");
+        table.innerHTML = ''; // Clear existing rows
+        data.forEach((row, index) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Equipment Name -->
+                <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Working Hours -->
+            `;
+            table.appendChild(tr);
+        });
+    }
+
+    // Populate the Materials table (Rows 56-65, Columns 2, 6, and 9)
+    function populateMaterials(data) {
+        const table = document.getElementById("materials-table").querySelector("tbody");
+        table.innerHTML = ''; // Clear existing rows
+        data.forEach((row, index) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Description -->
+                <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Quantity -->
+                <td><input type="text" value="${sanitizeText(row[8])}"></td> <!-- Column 9: Unit -->
+            `;
+            table.appendChild(tr);
+        });
+    }
+</script>
