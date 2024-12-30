@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Improved DWS Import</title>
+    <title>DWS Fixed Rows</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 20px;
         }
         .section {
             margin-top: 20px;
@@ -23,32 +24,25 @@
             padding: 10px;
             border-radius: 5px;
         }
-        .table-container {
-            display: table;
+        table {
             width: 100%;
-            border-spacing: 10px;
+            border-collapse: collapse;
+            margin-bottom: 20px;
         }
-        .table-row {
-            display: table-row;
+        table, th, td {
+            border: 1px solid #ccc;
         }
-        .table-cell {
-            display: table-cell;
-            padding: 5px;
-            vertical-align: top;
-        }
-        .table-cell label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        .table-cell input {
-            width: 100%;
+        th, td {
             padding: 8px;
+            text-align: left;
+        }
+        input {
+            width: 95%;
+            padding: 5px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
         button {
-            margin-top: 10px;
             padding: 10px 15px;
             background-color: #007bff;
             color: white;
@@ -62,126 +56,116 @@
     </style>
 </head>
 <body>
-    <h1>DWS Import and Display</h1>
+    <h1>DWS Fixed Rows Form</h1>
     <input type="file" id="upload" accept=".xlsx, .xls">
     <button id="import">Import Excel Data</button>
 
     <!-- Manpower Section -->
-    <div class="section" id="manpower-section">
+    <div class="section">
         <h3>Manpower</h3>
-        <div class="table-container" id="manpower-fields">
-            <!-- Fields will be dynamically populated -->
-        </div>
+        <table id="manpower-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Trade</th>
+                    <th>Name</th>
+                    <th>Badge Number</th>
+                    <th>Normal Hours</th>
+                    <th>Overtime</th>
+                    <th>Holiday</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 20 preset rows for Manpower -->
+                ${generateRows(20, ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"])}
+            </tbody>
+        </table>
     </div>
 
     <!-- Equipment Section -->
-    <div class="section" id="equipment-section">
+    <div class="section">
         <h3>Equipment</h3>
-        <div class="table-container" id="equipment-fields">
-            <!-- Fields will be dynamically populated -->
-        </div>
+        <table id="equipment-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Equipment Name</th>
+                    <th>Working Hours</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 10 preset rows for Equipment -->
+                ${generateRows(10, ["Equipment Name", "Working Hours"])}
+            </tbody>
+        </table>
     </div>
 
     <!-- Materials Section -->
-    <div class="section" id="materials-section">
+    <div class="section">
         <h3>Materials</h3>
-        <div class="table-container" id="materials-fields">
-            <!-- Fields will be dynamically populated -->
-        </div>
+        <table id="materials-table">
+            <thead>
+                <tr>
+                    <th>Sl. No.</th>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit (NOS/ML)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 10 preset rows for Materials -->
+                ${generateRows(10, ["Description", "Quantity", "Unit"])}
+            </tbody>
+        </table>
     </div>
 
     <script>
-        let excelData = null;
+        // Function to generate preset rows for a table
+        function generateRows(numRows, columns) {
+            let rows = "";
+            for (let i = 1; i <= numRows; i++) {
+                rows += `<tr><td>${i}</td>`;
+                columns.forEach(() => {
+                    rows += `<td><input type="text"></td>`;
+                });
+                rows += "</tr>";
+            }
+            return rows;
+        }
 
-        document.getElementById('upload').addEventListener('change', function(event) {
+        // Import Excel file and populate fields
+        document.getElementById("upload").addEventListener("change", function(event) {
             const file = event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
+                const workbook = XLSX.read(data, { type: "array" });
 
-                // Read data from the "Form" sheet
-                const sheetData = XLSX.utils.sheet_to_json(workbook.Sheets["Form"], { header: 1 });
-                excelData = sheetData;
-                alert("Excel file loaded successfully!");
+                // Extract data from the "Form" sheet
+                const sheet = workbook.Sheets["Form"];
+                const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+                // Populate the preset rows with data
+                populateRows("manpower-table", json.slice(15, 35), ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+                populateRows("equipment-table", json.slice(35, 45), ["Equipment Name", "Working Hours"]);
+                populateRows("materials-table", json.slice(45, 55), ["Description", "Quantity", "Unit"]);
             };
             reader.readAsArrayBuffer(file);
         });
 
-        document.getElementById('import').addEventListener('click', function() {
-            if (!excelData) {
-                alert("Please upload an Excel file first.");
-                return;
-            }
-
-            // Populate Manpower fields
-            populateFields(
-                excelData,
-                15, // Starting row for manpower
-                20, // Ending row for manpower
-                document.getElementById('manpower-fields'),
-                ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]
-            );
-
-            // Populate Equipment fields
-            populateFields(
-                excelData,
-                25, // Starting row for equipment
-                30, // Ending row for equipment
-                document.getElementById('equipment-fields'),
-                ["Sl. No.", "Equipment Name", "Working Hours"]
-            );
-
-            // Populate Materials fields
-            populateFields(
-                excelData,
-                35, // Starting row for materials
-                40, // Ending row for materials
-                document.getElementById('materials-fields'),
-                ["Sl. No.", "Description", "Quantity", "Unit (NOS/ML)"]
-            );
-        });
-
-        function populateFields(sheetData, startRow, endRow, container, headers) {
-            container.innerHTML = ''; // Clear existing fields
-
-            for (let i = startRow; i <= endRow; i++) {
-                const row = sheetData[i];
-                if (!row) continue;
-
-                // Skip Sl. No. for fields, but retain it for display
-                const fields = headers.slice(1).map((header, index) => createField(header, row[index + 1] || ""));
-                const slNoField = createField("Sl. No.", row[0] || ""); // Include Sl. No. in a separate cell
-
-                const tableRow = createTableRow([slNoField, ...fields]);
-                container.appendChild(tableRow);
-            }
-        }
-
-        function createField(labelText, value = "") {
-            const container = document.createElement('div');
-            container.className = 'table-cell';
-
-            const label = document.createElement('label');
-            label.textContent = labelText;
-
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = value;
-
-            container.appendChild(label);
-            container.appendChild(input);
-
-            return container;
-        }
-
-        function createTableRow(cells) {
-            const row = document.createElement('div');
-            row.className = 'table-row';
-            cells.forEach(cell => row.appendChild(cell));
-            return row;
+        function populateRows(tableId, data, columns) {
+            const table = document.getElementById(tableId);
+            const rows = table.querySelectorAll("tbody tr");
+            data.forEach((row, i) => {
+                if (i < rows.length) {
+                    const inputs = rows[i].querySelectorAll("input");
+                    columns.forEach((col, j) => {
+                        inputs[j].value = row[j] || "";
+                    });
+                }
+            });
         }
     </script>
 </body>
