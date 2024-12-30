@@ -3,238 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DWS Fixed Rows</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .section {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            background: #f9f9f9;
-        }
-        .section h3 {
-            margin-top: 0;
-            background: #007bff;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        table, th, td {
-            border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
-            text-align: left;
-        }
-        input {
-            width: 95%;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        button {
-            padding: 10px 15px;
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>XLSX to CSV Converter</title>
 </head>
 <body>
-    <h1>DWS Fixed Rows Form</h1>
-    <input type="file" id="upload" accept=".csv">
-    <button id="import">Import CSV Data</button>
+    <h1>XLSX to CSV Converter</h1>
+    <input type="file" id="fileInput" accept=".xlsx" />
+    <button onclick="convertToCSV()">Convert and Download CSV</button>
 
-    <!-- Manpower Section -->
-    <div class="section">
-        <h3>Manpower</h3>
-        <table id="manpower-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Trade</th>
-                    <th>Name</th>
-                    <th>Badge Number</th>
-                    <th>Normal Hours</th>
-                    <th>Overtime</th>
-                    <th>Holiday</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 20 preset rows for Manpower -->
-            </tbody>
-        </table>
-    </div>
+    <script>
+        async function convertToCSV() {
+            const fileInput = document.getElementById("fileInput");
 
-    <!-- Equipment Section -->
-    <div class="section">
-        <h3>Equipment</h3>
-        <table id="equipment-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Equipment Name</th>
-                    <th>Working Hours</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 10 preset rows for Equipment -->
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Materials Section -->
-    <div class="section">
-        <h3>Materials</h3>
-        <table id="materials-table">
-            <thead>
-                <tr>
-                    <th>Sl. No.</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Unit (NOS/ML)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- 10 preset rows for Materials -->
-            </tbody>
-        </table>
-    </div>
-
-<script>
-    // Function to parse CSV data with proper handling of double quotes
-    function parseCSV(content) {
-        const rows = [];
-        const lines = content.split('\n');
-
-        lines.forEach(line => {
-            const values = [];
-            let value = '';
-            let insideQuotes = false;
-
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-
-                if (char === '"') {
-                    if (insideQuotes && line[i + 1] === '"') {
-                        // Handle escaped double quotes ("")
-                        value += '"';
-                        i++; // Skip next quote
-                    } else {
-                        // Toggle insideQuotes state
-                        insideQuotes = !insideQuotes;
-                    }
-                } else if (char === ',' && !insideQuotes) {
-                    // End of a value
-                    values.push(value.trim());
-                    value = '';
-                } else {
-                    // Regular character
-                    value += char;
-                }
+            if (!fileInput.files.length) {
+                alert("Please select an XLSX file to convert.");
+                return;
             }
 
-            // Add the last value in the line
-            values.push(value.trim());
-            rows.push(values);
-        });
+            const file = fileInput.files[0];
+            const arrayBuffer = await file.arrayBuffer();
 
-        return rows;
-    }
+            // Step 1: Extract the XLSX file (ZIP format)
+            const zip = new Uint8Array(arrayBuffer);
+            const unzippedFiles = extractZip(zip);
 
-    document.getElementById('upload').addEventListener('change', function (event) {
-        const file = event.target.files[0];
-        if (!file) return;
+            // Step 2: Locate the `xl/worksheets/sheet1.xml` file
+            const sheetXML = unzippedFiles["xl/worksheets/sheet1.xml"];
+            if (!sheetXML) {
+                alert("Cannot find sheet1.xml in the XLSX file.");
+                return;
+            }
 
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            const content = e.target.result;
+            // Step 3: Parse the sheet XML
+            const csvData = parseSheetXML(sheetXML);
 
-            // Parse the CSV content
-            const rows = parseCSV(content);
+            // Step 4: Trigger CSV file download
+            downloadCSV(csvData, "output.csv");
+        }
 
-            console.log("Parsed Rows:", rows);
+        // Function to extract ZIP content manually (simplified, not implemented)
+        function extractZip(zipData) {
+            const files = {}; // Example: {"xl/worksheets/sheet1.xml": "<xml data>"}
+            // Manual ZIP extraction logic should go here
+            console.error("Manual ZIP extraction is extremely complex and not implemented here.");
+            return files; // Placeholder
+        }
 
-            // Manpower (Rows 17-36, Columns 2-6)
-            populateManpower(rows.slice(18, 38));
+        // Function to parse the XML content of a sheet
+        function parseSheetXML(sheetXML) {
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(sheetXML, "application/xml");
+            const rows = xmlDoc.getElementsByTagName("row");
+            const csvData = [];
 
-            // Equipment (Rows 42-51, Columns 2 and 5)
-            populateEquipment(rows.slice(43, 53));
+            for (let row of rows) {
+                const cells = row.getElementsByTagName("c");
+                const rowData = [];
+                for (let cell of cells) {
+                    const value = cell.getElementsByTagName("v")[0]?.textContent || "";
+                    rowData.push(value);
+                }
+                csvData.push(rowData.join(","));
+            }
 
-            // Materials (Rows 56-65, Columns 2, 6, and 9)
-            populateMaterials(rows.slice(57, 67));
-        };
-        reader.readAsText(file);
-    });
+            return csvData.join("\n");
+        }
 
-    function sanitizeText(text) {
-        if (text === undefined || text === null) return '';
-        return text.replace(/[“”]/g, '"').replace(/[^\x00-\x7F]/g, "").trim();
-    }
-
-    // Populate the Manpower table (Rows 17-36, Columns 2-6)
-    function populateManpower(data) {
-        const table = document.getElementById("manpower-table").querySelector("tbody");
-        table.innerHTML = ''; // Clear existing rows
-        data.forEach((row, index) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Trade -->
-                <td><input type="text" value="${sanitizeText(row[2])}"></td> <!-- Column 3: Name -->
-                <td><input type="text" value="${sanitizeText(row[3])}"></td> <!-- Column 4: Badge Number -->
-                <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Normal Hours -->
-                <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Overtime -->
-                <td><input type="text" value="${sanitizeText(row[6])}"></td> <!-- Column 7: Holiday -->
-            `;
-            table.appendChild(tr);
-        });
-    }
-
-    // Populate the Equipment table (Rows 42-51, Columns 2 and 5)
-    function populateEquipment(data) {
-        const table = document.getElementById("equipment-table").querySelector("tbody");
-        table.innerHTML = ''; // Clear existing rows
-        data.forEach((row, index) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Equipment Name -->
-                <td><input type="text" value="${sanitizeText(row[4])}"></td> <!-- Column 5: Working Hours -->
-            `;
-            table.appendChild(tr);
-        });
-    }
-
-    // Populate the Materials table (Rows 56-65, Columns 2, 6, and 9)
-    function populateMaterials(data) {
-        const table = document.getElementById("materials-table").querySelector("tbody");
-        table.innerHTML = ''; // Clear existing rows
-        data.forEach((row, index) => {
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-                <td>${index + 1}</td>
-                <td><input type="text" value="${sanitizeText(row[1])}"></td> <!-- Column 2: Description -->
-                <td><input type="text" value="${sanitizeText(row[5])}"></td> <!-- Column 6: Quantity -->
-                <td><input type="text" value="${sanitizeText(row[8])}"></td> <!-- Column 9: Unit -->
-            `;
-            table.appendChild(tr);
-        });
-    }
-</script>
+        // Function to download CSV data as a file
+        function downloadCSV(data, filename) {
+            const blob = new Blob([data], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
