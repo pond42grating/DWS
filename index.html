@@ -127,13 +127,13 @@
                 const rows = content.split('\n').map(row => row.split(','));
 
                 // Manpower (Rows 17-36, Columns 2-6)
-                populateManpower(rows.slice(17, 37));
+                populateManpower(rows.slice(17, 36));
 
                 // Equipment (Rows 42-51, Columns 2 and 5)
-                populateEquipment(rows.slice(42, 52));
+                populateEquipment(rows.slice(42, 51));
 
                 // Materials (Rows 56-65, Columns 2, 6, and 9)
-                populateMaterials(rows.slice(56, 66));
+                populateMaterials(rows.slice(56, 65));
             };
             reader.readAsText(file);
         });
