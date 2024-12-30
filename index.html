@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -146,28 +147,61 @@
                 const sheet = workbook.Sheets["Form"];
                 const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                // Manpower (Skip first 15 rows, fill 20 rows from rows 17 to 36)
-                populateRows("manpower-table", json.slice(16, 36), ["Sl. No.", "Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]);
+                // Manpower (Rows 17-36, Columns 3-8)
+                populateManpowerRows(json.slice(16, 36));
 
-                // Equipment (Skip 5 rows, fill 10 rows from rows 42 to 51)
-                populateRows("equipment-table", json.slice(41, 51), ["Sl. No.", "Equipment Name", "Working Hours"]);
+                // Equipment (Rows 42-51, Columns 3 and 6)
+                populateEquipmentRows(json.slice(41, 51));
 
-                // Materials (Skip 4 rows, fill 10 rows from rows 56 to 65)
-                populateRows("materials-table", json.slice(55, 65), ["Sl. No.", "Description", "Quantity", "Unit"]);
+                // Materials (Rows 56-65, Columns 3, 7, and 10)
+                populateMaterialsRows(json.slice(55, 65));
             };
             reader.readAsArrayBuffer(file);
         });
 
-        function populateRows(tableId, data, columns) {
-            const table = document.getElementById(tableId);
+        // Function to populate the Manpower table
+        function populateManpowerRows(data) {
+            const table = document.getElementById("manpower-table");
             const rows = table.querySelectorAll("tbody tr");
             data.forEach((row, i) => {
                 if (i < rows.length) {
                     const inputs = rows[i].querySelectorAll("input");
-                    // Start filling data from the second column (index 1)
-                    columns.slice(1).forEach((col, j) => {
-                        inputs[j].value = row[j + 1] || "";  // Skip first column (index 0) while inserting data
-                    });
+                    // Fill data into the appropriate columns (3-8)
+                    inputs[1].value = row[2] || "";  // Trade
+                    inputs[2].value = row[3] || "";  // Name
+                    inputs[3].value = row[4] || "";  // Badge Number
+                    inputs[4].value = row[5] || "";  // Normal Hours
+                    inputs[5].value = row[6] || "";  // Overtime
+                    inputs[6].value = row[7] || "";  // Holiday
+                }
+            });
+        }
+
+        // Function to populate the Equipment table
+        function populateEquipmentRows(data) {
+            const table = document.getElementById("equipment-table");
+            const rows = table.querySelectorAll("tbody tr");
+            data.forEach((row, i) => {
+                if (i < rows.length) {
+                    const inputs = rows[i].querySelectorAll("input");
+                    // Fill data into the appropriate columns (3 and 6)
+                    inputs[1].value = row[2] || "";  // Equipment Name
+                    inputs[2].value = row[5] || "";  // Working Hours
+                }
+            });
+        }
+
+        // Function to populate the Materials table
+        function populateMaterialsRows(data) {
+            const table = document.getElementById("materials-table");
+            const rows = table.querySelectorAll("tbody tr");
+            data.forEach((row, i) => {
+                if (i < rows.length) {
+                    const inputs = rows[i].querySelectorAll("input");
+                    // Fill data into the appropriate columns (3, 7, and 10)
+                    inputs[1].value = row[2] || "";  // Description
+                    inputs[2].value = row[6] || "";  // Quantity
+                    inputs[3].value = row[9] || "";  // Unit (NOS/ML)
                 }
             });
         }
