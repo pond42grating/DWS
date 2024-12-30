@@ -117,52 +117,47 @@
             }
 
             // Populate Manpower fields
-            const manpowerFields = document.getElementById('manpower-fields');
-            manpowerFields.innerHTML = ''; // Clear existing fields
-            for (let i = 15; i <= 20; i++) { // Rows 15-20 for Manpower
-                const row = excelData[i];
-                if (!row) continue;
+            populateFields(
+                excelData,
+                15, // Starting row for manpower
+                20, // Ending row for manpower
+                document.getElementById('manpower-fields'),
+                ["Trade", "Name", "Badge Number", "Normal Hours", "Overtime", "Holiday"]
+            );
 
-                const manpowerRow = createTableRow([
-                    createField("Trade", row[2]),
-                    createField("Name", row[3]),
-                    createField("Badge Number", row[4]),
-                    createField("Normal Hours", row[5]),
-                    createField("Overtime", row[6]),
-                    createField("Holiday", row[7])
-                ]);
-                manpowerFields.appendChild(manpowerRow);
-            }
+            // Populate Equipment fields
+            populateFields(
+                excelData,
+                25, // Starting row for equipment
+                30, // Ending row for equipment
+                document.getElementById('equipment-fields'),
+                ["Equipment Name", "Working Hours"]
+            );
 
-            // Populate Equipment fields (update row range as needed)
-            const equipmentFields = document.getElementById('equipment-fields');
-            equipmentFields.innerHTML = ''; // Clear existing fields
-            for (let i = 25; i <= 30; i++) { // Example row range for Equipment
-                const row = excelData[i];
-                if (!row) continue;
-
-                const equipmentRow = createTableRow([
-                    createField("Equipment Name", row[1]),
-                    createField("Working Hours", row[2])
-                ]);
-                equipmentFields.appendChild(equipmentRow);
-            }
-
-            // Populate Materials fields (update row range as needed)
-            const materialsFields = document.getElementById('materials-fields');
-            materialsFields.innerHTML = ''; // Clear existing fields
-            for (let i = 35; i <= 40; i++) { // Example row range for Materials
-                const row = excelData[i];
-                if (!row) continue;
-
-                const materialsRow = createTableRow([
-                    createField("Description", row[1]),
-                    createField("Quantity", row[2]),
-                    createField("NOS/ML", row[3])
-                ]);
-                materialsFields.appendChild(materialsRow);
-            }
+            // Populate Materials fields
+            populateFields(
+                excelData,
+                35, // Starting row for materials
+                40, // Ending row for materials
+                document.getElementById('materials-fields'),
+                ["Description", "Quantity", "Unit (NOS/ML)"]
+            );
         });
+
+        function populateFields(sheetData, startRow, endRow, container, headers) {
+            container.innerHTML = ''; // Clear existing fields
+
+            for (let i = startRow; i <= endRow; i++) {
+                const row = sheetData[i];
+                if (!row) continue;
+
+                const rowElements = headers.map((header, index) =>
+                    createField(header, row[index] || "")
+                );
+                const tableRow = createTableRow(rowElements);
+                container.appendChild(tableRow);
+            }
+        }
 
         function createField(labelText, value = "") {
             const container = document.createElement('div');
