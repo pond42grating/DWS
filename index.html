@@ -1,225 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f9;
-      margin: 0;
-      padding: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DWS Management - UI Design</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9fafb;
+            margin: 0;
+            padding: 0;
+        }
 
-    .login-container {
-      background-color: #fff;
-      padding: 30px;
-      border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      width: 100%;
-      max-width: 400px;
-    }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 15px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+        }
 
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #333;
-    }
+        header h1 {
+            margin: 0;
+        }
 
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 20px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
+        .logout-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
 
-    .input-field:focus {
-      border-color: #007BFF;
-      outline: none;
-    }
+        .main-content {
+            margin-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: calc(100vh - 80px);
+            gap: 20px;
+        }
 
-    .button {
-      width: 100%;
-      padding: 12px;
-      background-color: #007BFF;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s;
-    }
+        .button {
+            background-color: #2196F3;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            cursor: pointer;
+            border-radius: 8px;
+            width: 250px;
+            text-align: center;
+        }
 
-    .button:hover {
-      background-color: #0056b3;
-    }
+        .button:hover {
+            background-color: #1976D2;
+        }
 
-    .forgot-password, .sign-up-link {
-      text-align: center;
-      margin-top: 15px;
-    }
+        .dashboard-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 200px;
+        }
 
-    .forgot-password a, .sign-up-link a {
-      color: #007BFF;
-      text-decoration: none;
-    }
+        .dashboard-card h3 {
+            margin: 0;
+            font-size: 24px;
+        }
 
-    .forgot-password a:hover, .sign-up-link a:hover {
-      text-decoration: underline;
-    }
+        .dashboard-card p {
+            font-size: 16px;
+            color: #888;
+        }
 
-    /* Password strength bar */
-    .strength-bar {
-      height: 5px;
-      margin-top: 10px;
-      background-color: #ddd;
-      border-radius: 5px;
-      overflow: hidden;
-      width: 100%;
-    }
+        .dashboard-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 20px;
+        }
 
-    .strength-bar span {
-      display: block;
-      height: 100%;
-    }
+        .help-btn {
+            background-color: #9C27B0;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
 
-    /* Limit height of password strength indicator to prevent overlap */
-    .password-strength-indicator {
-      margin-bottom: 20px;
-      height: 20px; /* Adjust height to prevent overlap */
-    }
+        .help-btn:hover {
+            background-color: #8E24AA;
+        }
 
-  </style>
+        .manage-dws-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            padding-top: 100px;
+        }
+
+        .search-input {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 300px;
+        }
+
+        .search-btn {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background-color: #388E3C;
+        }
+
+        .filter-btn {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            background-color: #FB8C00;
+        }
+
+        .export-btn {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .export-btn:hover {
+            background-color: #FB8C00;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .modal-body {
+            padding: 10px 0;
+        }
+
+        /* New Option Styles */
+        .filter-container {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .filter-container select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background-color: #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tab:hover {
+            background-color: #bbb;
+        }
+
+        .team-table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+
+        .team-table th, .team-table td {
+            padding: 10px;
+            border: 1px solid #ccc;
+            text-align: center;
+        }
+
+        .team-table th {
+            background-color: #f4f4f4;
+        }
+
+        /* Notification Bell */
+        .notification-bell {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-bell::after {
+            content: "⚡";
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            font-size: 20px;
+            color: red;
+        }
+    </style>
 </head>
 <body>
+    <header>
+        <h1>DWS Management</h1>
+        <div>
+            <button class="logout-btn" onclick="showModal('logoutModal')">Logout</button>
+            <span class="notification-bell" onclick="showModal('notificationModal')"></span>
+        </div>
+    </header>
 
-  <!-- Login Container -->
-  <div class="login-container">
-    <h2>Login</h2>
-    
-    <!-- Username Input -->
-    <input type="text" id="username" class="input-field" placeholder="Username" required>
-    
-    <!-- Password Input -->
-    <input type="password" id="password" class="input-field" placeholder="Password" required>
-    
-    <!-- Password Strength Indicator -->
-    <div class="password-strength-indicator" id="passwordStrengthIndicator"></div>
-    
-    <!-- Sign In Button -->
-    <button class="button" onclick="login()">Sign In</button>
-    
-    <!-- Sign Up Link -->
-    <div class="sign-up-link">
-      <p>Don't have an account? <a href="#" onclick="showMsg('Sign Up')">Sign Up</a></p>
+    <div class="main-content">
+        <button class="button" onclick="showCreateDWS()">Create DWS</button>
+        <button class="button" onclick="showManageDWS()">Manage DWS</button>
+        <button class="help-btn" onclick="showModal('helpModal')">Help</button>
     </div>
-    
-    <!-- Forgot Password Link -->
-    <div class="forgot-password">
-      <p><a href="#" onclick="showMsg('Forgot Password')">Forgot Password?</a></p>
+
+    <!-- Dashboard Overview -->
+    <div class="dashboard-container">
+        <div class="dashboard-card">
+            <h3>10</h3>
+            <p>Total DWS Created</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>3</h3>
+            <p>Pending DWS</p>
+        </div>
+        <div class="dashboard-card">
+            <h3>5</h3>
+            <p>Upcoming Tasks</p>
+        </div>
     </div>
-  </div>
 
-  <!-- Modal for displaying messages -->
-  <div id="msgModal" style="display: none;">
-    <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; justify-content: center; align-items: center; z-index: 1000;">
-      <div style="background-color: white; padding: 20px; border-radius: 8px; text-align: center; width: 300px;">
-        <h4 id="msgText">Message</h4>
-        <button onclick="closeModal()">Close</button>
-      </div>
+    <!-- Manage DWS Section -->
+    <div class="manage-dws-container" id="manageDWS">
+        <div class="filter-container">
+            <select>
+                <option value="date-range">Date Range</option>
+                <option value="status">Status</option>
+            </select>
+            <select>
+                <option value="pending">Pending</option>
+                <option value="completed">Completed</option>
+                <option value="in-progress">In Progress</option>
+            </select>
+        </div>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by Structure/TQ/SI No./DWS No." />
+        <button class="search-btn" onclick="searchDWS()">Search</button>
+        <div>
+            <button class="export-btn" onclick="showModal('exportPdfModal')">Export as PDF</button>
+            <button class="export-btn" onclick="showModal('exportExcelModal')">Export as Excel</button>
+        </div>
+        <button class="button" onclick="backToMain()">Back</button>
     </div>
-  </div>
 
-  <script>
-    // Function to show the message box
-    function showMsg(message) {
-      document.getElementById('msgText').innerText = `${message} functionality is being developed.`;
-      document.getElementById('msgModal').style.display = 'flex';
-    }
+    <!-- Team Management Section -->
+    <div class="team-table">
+        <h3>Team Members</h3>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+            <tr>
+                <td>John Doe</td>
+                <td>Admin</td>
+                <td>Active</td>
+                <td>
+                    <button onclick="alert('Edit User')">Edit</button>
+                    <button onclick="alert('Delete User')">Delete</button>
+                </td>
+            </tr>
+        </table>
+        <button class="button" onclick="alert('Add New User')">Add User</button>
+    </div>
 
-    // Function to close the modal
-    function closeModal() {
-      document.getElementById('msgModal').style.display = 'none';
-    }
+    <!-- Modal for Logout -->
+    <div id="logoutModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('logoutModal')">&times;</span>
+            <div class="modal-header">Logout</div>
+            <div class="modal-body">You have logged out successfully!</div>
+        </div>
+    </div>
 
-    // Handle user login
-    function login() {
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
+    <!-- Modal for Help -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('helpModal')">&times;</span>
+            <div class="modal-header">Help Section</div>
+            <div class="modal-body">Help functionality will be added here.</div>
+        </div>
+    </div>
 
-      // Admin credentials check
-      if (username === "admin" && password === "admin123") {
-        localStorage.setItem("role", "admin");
-        window.location.href = "admin-dashboard.html"; // Redirect to admin dashboard
-        return; // Stop further checks if admin login successful
-      }
+    <!-- Modal for Export as PDF -->
+    <div id="exportPdfModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('exportPdfModal')">&times;</span>
+            <div class="modal-header">Export as PDF</div>
+            <div class="modal-body">Exporting as PDF functionality will be implemented here.</div>
+        </div>
+    </div>
 
-      // Check if user exists in localStorage
-      var user = JSON.parse(localStorage.getItem(username));
+    <!-- Modal for Export as Excel -->
+    <div id="exportExcelModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('exportExcelModal')">&times;</span>
+            <div class="modal-header">Export as Excel</div>
+            <div class="modal-body">Exporting as Excel functionality will be implemented here.</div>
+        </div>
+    </div>
 
-      if (user && user.password === password) {
-        localStorage.setItem("role", "user");
-        window.location.href = "user-dashboard.html"; // Redirect to user dashboard
-      } else {
-        showMessage("Invalid username or password.");
-      }
-    }
+    <!-- Modal for Notification -->
+    <div id="notificationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('notificationModal')">&times;</span>
+            <div class="modal-header">Notifications</div>
+            <div class="modal-body">You have new notifications!</div>
+        </div>
+    </div>
 
-    // Function to display a message
-    function showMessage(message) {
-      document.getElementById('msgText').innerText = message;
-      document.getElementById('msgModal').style.display = 'flex';
-    }
+    <script>
+        function showCreateDWS() {
+            alert("Create DWS functionality will be implemented here.");
+        }
 
-    // Password Strength Indicator (for sign up)
-    function updatePasswordStrength(password) {
-      var strength = 0;
-      if (password.length >= 8) strength += 1;
-      if (password.match(/[a-z]/)) strength += 1;
-      if (password.match(/[A-Z]/)) strength += 1;
-      if (password.match(/[0-9]/)) strength += 1;
-      if (password.match(/[\W_]/)) strength += 1;
+        function showManageDWS() {
+            document.querySelector('.main-content').style.display = 'none';
+            document.getElementById('manageDWS').style.display = 'flex';
+            history.pushState({ page: "manageDWS" }, "Manage DWS", "#manageDWS");
+        }
 
-      var strengthBar = document.getElementById('passwordStrengthIndicator');
-      var strengthLevel = "";
+        function backToMain() {
+            document.querySelector('.main-content').style.display = 'flex';
+            document.getElementById('manageDWS').style.display = 'none';
+            history.replaceState({ page: "main" }, "Main Page", "#main");
+        }
 
-      if (strength === 1) {
-        strengthLevel = "Weak";
-        strengthBar.innerHTML = `<div style="width: 20%; background-color: red;"></div>`;
-      } else if (strength === 2) {
-        strengthLevel = "Medium";
-        strengthBar.innerHTML = `<div style="width: 40%; background-color: orange;"></div>`;
-      } else if (strength === 3) {
-        strengthLevel = "Strong";
-        strengthBar.innerHTML = `<div style="width: 60%; background-color: yellow;"></div>`;
-      } else if (strength === 4) {
-        strengthLevel = "Very Strong";
-        strengthBar.innerHTML = `<div style="width: 80%; background-color: lightgreen;"></div>`;
-      } else if (strength === 5) {
-        strengthLevel = "Excellent";
-        strengthBar.innerHTML = `<div style="width: 100%; background-color: green;"></div>`;
-      } else {
-        strengthLevel = "Very Weak";
-        strengthBar.innerHTML = `<div style="width: 0%; background-color: red;"></div>`;
-      }
+        function searchDWS() {
+            var searchValue = document.getElementById('searchInput').value;
+            alert('Searching for: ' + searchValue);
+        }
 
-      return strengthLevel;
-    }
+        // Modal functionality
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
 
-    // Call the password strength function when typing password (for signup)
-    document.getElementById('password').addEventListener('input', function() {
-      updatePasswordStrength(this.value);
-    });
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
 
-  </script>
+        window.onpopstate = function (event) {
+                        if (event.state && event.state.page === "manageDWS") {
+                document.querySelector('.main-content').style.display = 'none';
+                document.getElementById('manageDWS').style.display = 'flex';
+            } else {
+                document.querySelector('.main-content').style.display = 'flex';
+                document.getElementById('manageDWS').style.display = 'none';
+            }
+        };
 
+    </script>
 </body>
 </html>
