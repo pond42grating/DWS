@@ -170,13 +170,13 @@
             console.log("Parsed Rows:", rows);
 
             // Manpower (Rows 17-36, Columns 2-6)
-            populateManpower(rows.slice(16, 36));
+            populateManpower(rows.slice(18, 38));
 
             // Equipment (Rows 42-51, Columns 2 and 5)
-            populateEquipment(rows.slice(41, 51));
+            populateEquipment(rows.slice(43, 53));
 
             // Materials (Rows 56-65, Columns 2, 6, and 9)
-            populateMaterials(rows.slice(55, 65));
+            populateMaterials(rows.slice(57, 67));
         };
         reader.readAsText(file);
     });
