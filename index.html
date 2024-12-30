@@ -124,7 +124,14 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const content = e.target.result;
+
+                // Log the raw content of the CSV to see if there's an issue
+                console.log("Raw CSV Content:", content);
+
                 const rows = content.split('\n').map(row => row.split(','));
+
+                // Log rows to check for any unexpected characters or empty values
+                console.log("Parsed Rows:", rows);
 
                 // Manpower (Rows 17-36, Columns 2-6)
                 populateManpower(rows.slice(16, 36));
@@ -142,7 +149,7 @@
         function sanitizeText(text) {
             if (text === undefined || text === null) return '';
             // Replace curly quotes with standard quotes, and trim any extra spaces
-            return text.replace(/[“”]/g, '"').trim();
+            return text.replace(/[“”]/g, '"').replace(/[^\x00-\x7F]/g, "").trim();
         }
 
         // Populate the Manpower table (Rows 17-36, Columns 2-6)
