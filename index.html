@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>User Login</title>
-
-  <!-- Styling -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - DWS Management</title>
   <style>
+    /* Basic styling */
     * {
       margin: 0;
       padding: 0;
@@ -20,8 +19,8 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
-      color: #333;
       transition: background-color 0.3s ease, color 0.3s ease;
+      color: #333;
     }
 
     .dark-mode {
@@ -35,10 +34,22 @@
       border-radius: 8px;
       padding: 2rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      animation: fadeInUp 0.8s ease forwards;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .dark-mode .container {
-      background-color: #444;
+      background: #444;
       color: #fff;
     }
 
@@ -54,6 +65,7 @@
       margin: 0.5rem 0;
       border: 1px solid #ddd;
       border-radius: 5px;
+      font-size: 1rem;
     }
 
     .password-container {
@@ -82,6 +94,7 @@
       border-radius: 5px;
       margin-top: 1rem;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
 
     .button:hover {
@@ -97,10 +110,10 @@
     }
 
     .link {
-      display: block;
       text-align: center;
       margin-top: 1rem;
       color: #4CAF50;
+      text-decoration: none;
     }
 
     .dark-mode .link {
@@ -115,10 +128,8 @@
     }
   </style>
 </head>
-
 <body>
   <div class="toggle-theme" onclick="toggleTheme()">🌙</div>
-
   <div class="container">
     <h2>Login to DWS</h2>
     <input type="text" id="emailOrUsername" class="input-field" placeholder="Email or Username" required>
@@ -134,11 +145,24 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-    import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { 
+      getFirestore, 
+      doc, 
+      getDoc, 
+      query, 
+      where, 
+      collection, 
+      getDocs 
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { 
+      getAuth, 
+      signInWithEmailAndPassword, 
+      GoogleAuthProvider, 
+      signInWithPopup 
+    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
+      apiKey: "YOUR_API_KEY",
       authDomain: "dws-management.firebaseapp.com",
       projectId: "dws-management",
       storageBucket: "dws-management.firebaseapp.com",
@@ -176,38 +200,26 @@
       const password = document.getElementById("password").value.trim();
 
       if (!userInput || !password) {
-        alert("Please fill out all fields.");
+        alert("Please enter both email/username and password.");
         return;
       }
 
       try {
-        const adminRef = doc(db, "Admin", "Details");
-        const adminSnap = await getDoc(adminRef);
-
-        if (
-          adminSnap.exists() &&
-          (adminSnap.data().username === userInput || adminSnap.data().email === userInput) &&
-          adminSnap.data().password === password
-        ) {
-          alert("Welcome Admin!");
-          window.location.href = "admin.html";
-          return;
-        }
-
-        let email = userInput;
+        let email = userInput; // Default to email input
         let isApproved = false;
 
         if (!userInput.includes("@")) {
-          const userDoc = doc(db, "Users", userInput);
-          const userSnap = await getDoc(userDoc);
+          const userDocRef = doc(db, "Users", userInput);
+          const userSnap = await getDoc(userDocRef);
 
           if (!userSnap.exists()) {
             alert("No user found with that username.");
             return;
           }
 
-          email = userSnap.data().email;
-          isApproved = userSnap.data().isApproved;
+          const userData = userSnap.data();
+          email = userData.email;
+          isApproved = userData.isApproved;
         } else {
           const usersRef = collection(db, "Users");
           const q = query(usersRef, where("email", "==", userInput));
@@ -227,7 +239,9 @@
           return;
         }
 
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+
         alert("Login successful!");
         window.location.href = "login.html";
       } catch (error) {
@@ -241,17 +255,33 @@
 
       try {
         const result = await signInWithPopup(auth, provider);
-        alert("Google Sign-in successful!");
+        const user = result.user;
+
+        const userDocRef = doc(db, "Users", user.uid);
+        const userSnap = await getDoc(userDocRef);
+
+        if (!userSnap.exists()) {
+          alert("No user record found in Firestore.");
+          return;
+        }
+
+        const userData = userSnap.data();
+        if (!userData.isApproved) {
+          alert("Your account is pending admin approval.");
+          return;
+        }
+
+        alert(`Welcome ${user.displayName}!`);
         window.location.href = "login.html";
       } catch (error) {
         console.error("Google login error:", error);
-        alert("Error: " + error.message);
+        alert("Google login error: " + error.message);
       }
     }
 
     window.login = login;
-    window.toggleTheme = toggleTheme;
     window.googleLogin = googleLogin;
+    window.toggleTheme = toggleTheme;
   </script>
 </body>
 </html>
