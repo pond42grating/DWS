@@ -186,12 +186,6 @@
       <label for="rememberMe">Remember Me</label>
     </div>
     
-    <div style="position: relative; display: inline-block; width: 100%;">
-  <input type="password" id="password" class="input-field" placeholder="Password" required>
-  <span id="togglePassword" 
-        style="position: absolute; top: 50%; right: 10px; transform: translateY(-50%); cursor: pointer;">
-    👁️
-  </span>
 </div>
     
     <button class="button" onclick="login()">Login</button>
@@ -345,14 +339,7 @@
     }
   }
   
-  const togglePassword = document.getElementById("togglePassword");
-  const passwordField = document.getElementById("password");
 
-  togglePassword.addEventListener("click", () => {
-    const type = passwordField.type === "password" ? "text" : "password";
-    passwordField.type = type;
-    togglePassword.textContent = type === "password" ? "👁️" : "🙈"; // Change icon
-  });
 
   // Expose globally
   window.login = login;
