@@ -1,17 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Login - DWS Management</title>
   <style>
-    /* Basic styling */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
+    /* UI Styling */
     body {
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #a8edea, #fed6e3);
@@ -19,8 +13,9 @@
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
       transition: background-color 0.3s ease, color 0.3s ease;
-      color: #333;
+      overflow: hidden;
     }
 
     .dark-mode {
@@ -29,34 +24,16 @@
     }
 
     .container {
-      width: 400px;
       background: #fff;
       border-radius: 8px;
-      padding: 2rem;
       box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      animation: fadeInUp 0.8s ease forwards;
-    }
-
-    @keyframes fadeInUp {
-      from {
-        opacity: 0;
-        transform: translateY(30px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      padding: 2rem;
+      width: 400px;
+      text-align: center;
     }
 
     .dark-mode .container {
-      background: #444;
-      color: #fff;
-    }
-
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-      font-size: 1.6rem;
+      background-color: #444;
     }
 
     .input-field {
@@ -68,23 +45,6 @@
       font-size: 1rem;
     }
 
-    .password-container {
-      position: relative;
-    }
-
-    .toggle-password {
-      position: absolute;
-      top: 50%;
-      right: 10px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      color: #888;
-    }
-
-    .dark-mode .toggle-password {
-      color: #ccc;
-    }
-
     .button {
       width: 100%;
       padding: 0.75rem;
@@ -92,32 +52,29 @@
       color: #fff;
       border: none;
       border-radius: 5px;
-      margin-top: 1rem;
+      font-size: 1rem;
+      margin-top: 0.75rem;
       cursor: pointer;
-      transition: background 0.3s ease;
     }
 
     .button:hover {
       background-color: #45a049;
     }
 
-    .google-signin-btn {
-      background-color: #4285F4;
-    }
-
-    .google-signin-btn:hover {
-      background-color: #357ae8;
-    }
-
     .link {
-      text-align: center;
       margin-top: 1rem;
+      display: block;
       color: #4CAF50;
       text-decoration: none;
     }
 
-    .dark-mode .link {
-      color: #57e4ff;
+    .google-signin-btn {
+      background-color: #4285F4;
+      margin-top: 0.75rem;
+    }
+
+    .google-signin-btn:hover {
+      background-color: #357ae8;
     }
 
     .toggle-theme {
@@ -128,15 +85,14 @@
     }
   </style>
 </head>
+
 <body>
   <div class="toggle-theme" onclick="toggleTheme()">🌙</div>
+
   <div class="container">
     <h2>Login to DWS</h2>
-    <input type="text" id="emailOrUsername" class="input-field" placeholder="Email or Username" required>
-    <div class="password-container">
-      <input type="password" id="password" class="input-field" placeholder="Password" required>
-      <span id="togglePassword" class="toggle-password">👁️</span>
-    </div>
+    <input type="text" id="emailOrUsername" class="input-field" placeholder="Email or Username" required/>
+    <input type="password" id="password" class="input-field" placeholder="Password" required/>
     <button class="button" onclick="login()">Login</button>
     <p class="link"><a href="signup.html">Sign Up</a></p>
     <p class="link"><a href="forget.html">Forgot Password?</a></p>
@@ -145,21 +101,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { 
-      getFirestore, 
-      doc, 
-      getDoc, 
-      query, 
-      where, 
-      collection, 
-      getDocs 
-    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-    import { 
-      getAuth, 
-      signInWithEmailAndPassword, 
-      GoogleAuthProvider, 
-      signInWithPopup 
-    } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
@@ -175,26 +118,6 @@
     const db = getFirestore(app);
     const auth = getAuth(app);
 
-    function toggleTheme() {
-      document.body.classList.toggle("dark-mode");
-      localStorage.setItem("theme", document.body.classList.contains("dark-mode") ? "dark" : "light");
-    }
-
-    window.onload = function () {
-      if (localStorage.getItem("theme") === "dark") {
-        document.body.classList.add("dark-mode");
-      }
-    };
-
-    const togglePassword = document.getElementById("togglePassword");
-    const passwordField = document.getElementById("password");
-
-    togglePassword.addEventListener("click", () => {
-      const type = passwordField.type === "password" ? "text" : "password";
-      passwordField.type = type;
-      togglePassword.textContent = type === "password" ? "👁️" : "🙈";
-    });
-
     async function login() {
       const userInput = document.getElementById("emailOrUsername").value.trim();
       const password = document.getElementById("password").value.trim();
@@ -205,33 +128,44 @@
       }
 
       try {
-        let email = userInput; // Default to email input
+        // Admin Login Check
+        const adminRef = doc(db, "Admin", "Details");
+        const adminSnap = await getDoc(adminRef);
+
+        if (
+          adminSnap.exists() &&
+          (
+            adminSnap.data().username === userInput ||
+            adminSnap.data().email === userInput
+          ) &&
+          adminSnap.data().password === password
+        ) {
+          alert("Welcome Admin!");
+          window.location.href = "admin.html";
+          return;
+        }
+
+        // Normal User Login Check
+        let email = userInput.includes("@") ? userInput : null;
         let isApproved = false;
 
-        if (!userInput.includes("@")) {
+        if (!email) {
           const userDocRef = doc(db, "Users", userInput);
           const userSnap = await getDoc(userDocRef);
-
           if (!userSnap.exists()) {
             alert("No user found with that username.");
             return;
           }
-
           const userData = userSnap.data();
           email = userData.email;
           isApproved = userData.isApproved;
         } else {
-          const usersRef = collection(db, "Users");
-          const q = query(usersRef, where("email", "==", userInput));
-          const qSnap = await getDocs(q);
-
-          if (qSnap.empty) {
+          const userSnap = await getDoc(doc(db, "Users", email));
+          if (!userSnap.exists()) {
             alert("No user found with that email.");
             return;
           }
-
-          const userData = qSnap.docs[0].data();
-          isApproved = userData.isApproved;
+          isApproved = userSnap.data().isApproved;
         }
 
         if (!isApproved) {
@@ -239,29 +173,24 @@
           return;
         }
 
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
+        await signInWithEmailAndPassword(auth, email, password);
         alert("Login successful!");
         window.location.href = "login.html";
       } catch (error) {
         console.error("Login error:", error);
-        alert("Error: " + error.message);
+        alert(error.message);
       }
     }
 
     async function googleLogin() {
       const provider = new GoogleAuthProvider();
-
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
 
-        const userDocRef = doc(db, "Users", user.uid);
-        const userSnap = await getDoc(userDocRef);
-
+        const userSnap = await getDoc(doc(db, "Users", user.email));
         if (!userSnap.exists()) {
-          alert("No user record found in Firestore.");
+          alert("No user record found.");
           return;
         }
 
@@ -274,10 +203,24 @@
         alert(`Welcome ${user.displayName}!`);
         window.location.href = "login.html";
       } catch (error) {
-        console.error("Google login error:", error);
-        alert("Google login error: " + error.message);
+        console.error("Google sign-in error:", error);
+        alert(error.message);
       }
     }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark-mode");
+      localStorage.setItem(
+        "theme",
+        document.body.classList.contains("dark-mode") ? "dark" : "light"
+      );
+    }
+
+    window.onload = () => {
+      if (localStorage.getItem("theme") === "dark") {
+        document.body.classList.add("dark-mode");
+      }
+    };
 
     window.login = login;
     window.googleLogin = googleLogin;
