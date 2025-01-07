@@ -37,31 +37,31 @@
 
         function generateQRCode() {
             const inputText = document.getElementById("input-text").value.trim();
+
             if (!inputText) {
                 alert("Please enter text to generate a QR code.");
                 return;
             }
 
+            // Construct the full URL
+            const fullUrl = `${baseUrl}${inputText}.html`;
+
+            console.log("Generated URL:", fullUrl); // Debugging log to ensure URL correctness
+
             const qrCodeContainer = document.getElementById("qr-code-container");
             qrCodeContainer.innerHTML = ""; // Clear previous QR code
 
             // Display the input text above the QR code
-            const textElement = document.createElement("div");
-            textElement.textContent = `Text: ${inputText}`;
-            textElement.className = "input-text";
-            qrCodeContainer.appendChild(textElement);
+            const label = document.createElement("div");
+            label.textContent = `Generated URL: ${fullUrl}`;
+            label.className = "input-text";
+            qrCodeContainer.appendChild(label);
 
-            // Generate the full URL
-            const fullUrl = `${baseUrl}${inputText}.html`;
-
-            // Log the full URL for debugging purposes
-            console.log("Generated URL:", fullUrl);
-
-            // Create the QR code
+            // Generate the QR code
             const qr = new QRious({
                 element: document.createElement("canvas"),
                 value: fullUrl,
-                size: 256,
+                size: 256, // QR code size
             });
 
             qrCodeContainer.appendChild(qr.element);
