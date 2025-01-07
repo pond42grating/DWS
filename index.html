@@ -3,91 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Equipment Status</title>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
-  <script type="module" src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js"></script>
+  <title>QR Code Generator</title>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
-  <h1>Equipment Status</h1>
-  <div id="statusContainer">
-    <p><strong>Equipment ID:</strong> <span id="equipmentId"></span></p>
-    <p><strong>Current Status:</strong> <span id="currentStatus"></span></p>
-    <button id="statusButton" style="display: none;"></button>
-  </div>
+  <h1>QR Code Generator</h1>
 
-  <script type="module">
-    // Firebase Configuration
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+  <!-- Input Fields -->
+  <label for="equipmentNo">Equipment or Manlift No.:</label>
+  <input type="text" id="equipmentNo" placeholder="Enter Equipment or Manlift No." required /><br><br>
 
-    const firebaseConfig = {
-    apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
-    authDomain: "dws-management.firebaseapp.com",
-    projectId: "dws-management",
-    storageBucket: "dws-management.firebasestorage.app",
-    messagingSenderId: "23827231923",
-    appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
-    measurementId: "G-L14GLJDYW7"
-  };
+  <button id="generateQR">Generate QR Code</button>
 
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+  <!-- QR Code Output -->
+  <h2>Generated QR Code:</h2>
+  <div id="qrcode"></div>
 
-    // Get Equipment ID from URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const equipmentId = urlParams.get("equipmentId");
-    document.getElementById("equipmentId").textContent = equipmentId;
+  <!-- Script -->
+  <script>
+    // Base URL for QR Code
+    const baseUrl = "https://pond42grating.github.io/DWS/";
 
-    // Fetch Current Status from Firestore
-    const fetchStatus = async () => {
-      if (!equipmentId) return;
+    // Event Listener for Generate QR Button
+    document.getElementById("generateQR").addEventListener("click", () => {
+      const equipmentNo = document.getElementById("equipmentNo").value.trim();
 
-      const docRef = doc(db, "EquipmentStatus", equipmentId);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        document.getElementById("currentStatus").textContent = data.status;
-        updateButton(data.status);
-      } else {
-        // If no data exists, initialize with "Ready" status
-        await setDoc(docRef, { status: "Ready", updatedAt: new Date().toISOString() });
-        document.getElementById("currentStatus").textContent = "Ready";
-        updateButton("Ready");
+      // Check if equipment number is provided
+      if (!equipmentNo) {
+        alert("Please enter an Equipment or Manlift Number!");
+        return;
       }
-    };
 
-    // Update Button Based on Current Status
-    const updateButton = (status) => {
-      const button = document.getElementById("statusButton");
-      button.style.display = "inline-block";
+      // Construct the final URL for the QR Code
+      const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
 
-      if (status === "Breakdown") {
-        button.textContent = "Set to Ready";
-        button.onclick = () => updateStatus("Ready");
-      } else {
-        button.textContent = "Set to Breakdown";
-        button.onclick = () => updateStatus("Breakdown");
-      }
-    };
-
-    // Update Status in Firestore
-    const updateStatus = async (newStatus) => {
-      const docRef = doc(db, "EquipmentStatus", equipmentId);
-
-      await setDoc(docRef, {
-        status: newStatus,
-        updatedAt: new Date().toISOString(),
-      }, { merge: true });
-
-      alert(`Status updated to ${newStatus}`);
-      document.getElementById("currentStatus").textContent = newStatus;
-      updateButton(newStatus);
-    };
-
-    // Initialize
-    fetchStatus();
+      // Generate the QR Code
+      const qrCodeContainer = document.getElementById("qrcode");
+      qrCodeContainer.innerHTML = ""; // Clear any previous QR code
+      QRCode.toCanvas(qrCodeContainer, qrUrl, { width: 200, margin: 2 }, (error) => {
+        if (error) {
+          console.error("Error generating QR Code:", error);
+          alert("Failed to generate QR Code. Please try again.");
+        } else {
+          console.log("QR Code generated:", qrUrl);
+        }
+      });
+    });
   </script>
 </body>
 </html>
