@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -17,12 +17,17 @@
         #qr-code-container {
             margin-top: 20px;
         }
+        .input-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
-    <h1>QR Code Gener</h1>
+    <h1>QR Code</h1>
     <div class="input-container">
-        <input type="text" id="input-text" placeholder="Enter text" />
+        <input type="text" id="input-text" placeholder="Enter text (e.g., 'example')" />
         <button onclick="generateQRCode()">Generate QR Code</button>
     </div>
     <div id="qr-code-container"></div>
@@ -42,21 +47,21 @@
 
             // Display the input text above the QR code
             const textElement = document.createElement("div");
-            textElement.textContent = inputText;
-            textElement.style.fontSize = "18px";
-            textElement.style.marginBottom = "10px";
+            textElement.textContent = `Text: ${inputText}`;
+            textElement.className = "input-text";
             qrCodeContainer.appendChild(textElement);
 
-            // Generate QR code
+            // Generate the full URL
             const fullUrl = `${baseUrl}${inputText}.html`;
-            QRCode.toCanvas(fullUrl, { width: 256 }, function (error, canvas) {
-                if (error) {
-                    console.error(error);
-                    alert("Failed to generate QR code.");
-                    return;
-                }
-                qrCodeContainer.appendChild(canvas);
+
+            // Create the QR code
+            const qr = new QRious({
+                element: document.createElement("canvas"),
+                value: fullUrl,
+                size: 256,
             });
+
+            qrCodeContainer.appendChild(qr.element);
         }
     </script>
 </body>
