@@ -19,7 +19,6 @@
   <h2>Generated QR Code:</h2>
   <div id="qrcode"></div>
 
-  <!-- Script -->
   <script>
     // Base URL for QR Code
     const baseUrl = "https://pond42grating.github.io/DWS/";
@@ -37,6 +36,9 @@
       // Construct the final URL for the QR Code
       const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
 
+      // Debug: Log the generated URL
+      console.log("Generated QR Code URL:", qrUrl);
+
       // Generate the QR Code
       const qrCodeContainer = document.getElementById("qrcode");
       qrCodeContainer.innerHTML = ""; // Clear any previous QR code
@@ -45,7 +47,7 @@
           console.error("Error generating QR Code:", error);
           alert("Failed to generate QR Code. Please try again.");
         } else {
-          console.log("QR Code generated:", qrUrl);
+          console.log("QR Code generated successfully:", qrUrl);
         }
       });
     });
