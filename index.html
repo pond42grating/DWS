@@ -1,24 +1,60 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Firebase Notification Test</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Push Notifications Test</title>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging.js"></script>
 </head>
 <body>
-  <h1>Firebase Notification Test</h1>
-  <button id="enable-notifs">Enable Notifications</button>
-  <p id="token"></p>
+    <h1>Push Notifications Test</h1>
+    <button id="enableNotifications">Enable Notifications</button>
+    
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
+            authDomain: "dws-management.firebaseapp.com",
+            projectId: "dws-management",
+            storageBucket: "dws-management.appspot.com",
+            messagingSenderId: "23827231923",
+            appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
+            measurementId: "G-L14GLJDYW7",
+        };
 
-  <!-- Include Firebase SDKs -->
-  <!-- Core Firebase SDK -->
-  <script
-    src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"
-  ></script>
-  <!-- Firebase Cloud Messaging SDK -->
-  <script
-    src="https://www.gstatic.com/firebasejs/9.22.2/firebase-messaging-compat.js"
-  ></script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
 
-  <script src="script.js"></script>
+        // Initialize Firebase Messaging
+        const messaging = firebase.messaging();
+
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker
+                .register('firebase-messaging-sw.js') // Ensure this file exists
+                .then((registration) => {
+                    console.log("Service Worker registered:", registration);
+                    messaging.useServiceWorker(registration);
+                })
+                .catch((error) => {
+                    console.error("Service Worker registration failed:", error);
+                });
+        }
+
+        // Request Notification Permission and Get FCM Token
+        document.getElementById("enableNotifications").addEventListener("click", () => {
+            messaging
+                .requestPermission()
+                .then(() => messaging.getToken({ vapidKey: "BHqZJFePTYnP_TQ10ENHJrP2z7oWxXIduub8RLEGXnlewjqmLE6lhypZ8h3bb5LjiCKBSGrsw4uj8zbkj8-rsNA" }))
+                .then((token) => {
+                    console.log("FCM Token:", token);
+                    alert("Push Notifications Enabled. Check the console for your FCM Token.");
+                })
+                .catch((error) => {
+                    console.error("Permission denied or error getting token:", error);
+                });
+        });
+    </script>
 </body>
 </html>
