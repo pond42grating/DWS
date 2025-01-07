@@ -14,13 +14,14 @@
     <script>
         // Firebase Configuration (Replace with correct values from Firebase Console)
         const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID",
-        };
+    apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
+    authDomain: "dws-management.firebaseapp.com",
+    projectId: "dws-management",
+    storageBucket: "dws-management.firebasestorage.app",
+    messagingSenderId: "23827231923",
+    appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
+    measurementId: "G-L14GLJDYW7"
+  };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
@@ -71,7 +72,7 @@
         // Request Notification Permission and Get FCM Token
         document.getElementById("enableNotifications").addEventListener("click", () => {
             messaging.requestPermission()
-                .then(() => messaging.getToken({ vapidKey: "YOUR_VAPID_KEY" }))
+                .then(() => messaging.getToken({ vapidKey: "BEEpj9we6se7W7mwygvgU_SIJN02GxVrkfiqJ-yhQTz-Z5orFlanu0CP_PyQyWAGhQHOnOeAjtUKUjGTyzVoiqw" }))
                 .then((token) => {
                     console.log("FCM Token:", token);
                     alert("Push Notifications Enabled. Check the console for your FCM Token.");
