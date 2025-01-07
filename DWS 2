@@ -1,194 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - DWS Management</title>
-  <script type="module">
-    // Import Firebase
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
-
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
-      authDomain: "dws-management.firebaseapp.com",
-      projectId: "dws-management",
-      storageBucket: "dws-management.appspot.com",
-      messagingSenderId: "23827231923",
-      appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
-      measurementId: "G-L14GLJDYW7"
-    };
-
-    // Initialize Firebase
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // Login Function
-    async function login() {
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (!email || !password) {
-        alert("Please enter both email and password.");
-        return;
-      }
-
-      try {
-        // Sign in the user with Firebase Authentication
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        // Fetch admin details from Firestore to check if the user is an admin (if needed)
-        const adminRef = doc(db, "Admin", "Details");
-        const adminDoc = await getDoc(adminRef);
-
-        if (adminDoc.exists()) {
-          const adminData = adminDoc.data();
-          // Check if the user matches admin credentials
-          if (email === adminData.id && password === adminData.password) {
-            window.location.href = "admin.html"; // Redirect to admin page
-          } else {
-            alert("Invalid credentials.");
-          }
-        } else {
-          alert("Admin data not found.");
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
         }
-      } catch (error) {
-        console.error("Error during login: ", error);
-        alert("Error: " + error.message);
-      }
-    }
-
-    // Toggle theme (dark/light mode)
-    
-
-    // Export functions to global scope for HTML buttons
-    
-    
-    function toggleTheme() {
-      document.body.classList.toggle('dark-mode');
-      if (document.body.classList.contains('dark-mode')) {
-        localStorage.setItem('theme', 'dark');
-      } else {
-        localStorage.setItem('theme', 'light');
-      }
-    }
-
-    // Apply the stored theme when the page loads
-    window.onload = function() {
-      const storedTheme = localStorage.getItem('theme');
-      if (storedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-      } else {
-        document.body.classList.remove('dark-mode');
-      }
-    };
-    
-    window.login = login;
-    window.toggleTheme = toggleTheme;
-    
-  </script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f9;
-      transition: background-color 0.3s ease;
-    }
-
-    .dark-mode {
-      background-color: #333;
-      color: white;
-    }
-
-    .container {
-      max-width: 400px;
-      margin: 50px auto;
-      background: white;
-      padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .dark-mode .container {
-      background-color: #444;
-    }
-
-    h2 {
-      text-align: center;
-    }
-
-    .input-field {
-      width: 100%;
-      padding: 12px;
-      margin: 10px 0;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-
-    .button {
-      width: 100%;
-      padding: 12px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .button:hover {
-      background-color: #45a049;
-    }
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      margin: 10px 0;
-    }
-
-    .remember-me input {
-      margin-right: 5px;
-    }
-
-    .toggle-theme {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      cursor: pointer;
-    }
-
-    .link {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      color: #4CAF50;
-      text-decoration: none;
-    }
-
-    .link:hover {
-      text-decoration: underline;
-    }
-  </style>
+        .input-container {
+            margin-bottom: 20px;
+        }
+        #qr-code-container {
+            margin-top: 20px;
+        }
+        .input-text {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+    </style>
 </head>
-
 <body>
-  <div class="toggle-theme" onclick="toggleTheme()">🌙</div>
-  <div class="container">
-    <h2>Login to DWS</h2>
-    <input type="email" id="email" class="input-field" placeholder="Email" required>
-    <input type="password" id="password" class="input-field" placeholder="Password" required>
-    <div class="remember-me">
-      <input type="checkbox" id="rememberMe">
-      <label for="rememberMe">Remember Me</label>
+    <h1>QR Code Generator</h1>
+    <div class="input-container">
+        <input type="text" id="input-text" placeholder="Enter text (e.g., 'example')" />
+        <button onclick="generateQRCode()">Generate QR Code</button>
     </div>
-    <button class="button" onclick="login()">Login</button>
-    <p class="link"><a href="signup.html">Sign Up</a></p>
-    <p class="link"><a href="forget.html">Forgot Password?</a></p>
-  </div>
+    <div id="qr-code-container"></div>
+
+    <script>
+        const baseUrl = "https://pond42grating.github.io/DWS/";
+
+        function generateQRCode() {
+            const inputText = document.getElementById("input-text").value.trim();
+
+            if (!inputText) {
+                alert("Please enter text to generate a QR code.");
+                return;
+            }
+
+            // Construct the full URL
+            const fullUrl = `${baseUrl}${inputText}.html`;
+
+            console.log("Generated URL:", fullUrl); // Debugging log to ensure URL correctness
+
+            const qrCodeContainer = document.getElementById("qr-code-container");
+            qrCodeContainer.innerHTML = ""; // Clear previous QR code
+
+            // Display the input text above the QR code
+            const label = document.createElement("div");
+            label.textContent = `Generated URL: ${fullUrl}`;
+            label.className = "input-text";
+            qrCodeContainer.appendChild(label);
+
+            // Generate the QR code
+            const qr = new QRious({
+                element: document.createElement("canvas"),
+                value: fullUrl,
+                size: 256, // QR code size
+            });
+
+            qrCodeContainer.appendChild(qr.element);
+        }
+    </script>
 </body>
 </html>
