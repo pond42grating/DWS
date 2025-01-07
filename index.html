@@ -1,52 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>QR Code Generator</title>
-  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Code Generator</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .input-container {
+            margin-bottom: 20px;
+        }
+        #qr-code-container {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h1>QR Code Generator</h1>
+    <h1>QR Code Generator</h1>
+    <div class="input-container">
+        <input type="text" id="input-text" placeholder="Enter text" />
+        <button onclick="generateQRCode()">Generate QR Code</button>
+    </div>
+    <div id="qr-code-container"></div>
 
-  <!-- Input Fields -->
-  <label for="equipmentNo">Equipment or Manlift No.:</label>
-  <input type="text" id="equipmentNo" placeholder="Enter Equipment or Manlif" required /><br><br>
+    <script>
+        const baseUrl = "https://pond42grating.github.io/DWS/";
 
-  <button id="generateQR">Generate QR Code</button>
+        function generateQRCode() {
+            const inputText = document.getElementById("input-text").value.trim();
+            if (!inputText) {
+                alert("Please enter text to generate a QR code.");
+                return;
+            }
 
-  <!-- QR Code Output -->
-  <h2>Generated QR Code:</h2>
-  <div id="qrcode"></div>
+            const qrCodeContainer = document.getElementById("qr-code-container");
+            qrCodeContainer.innerHTML = ""; // Clear previous QR code
 
-  <script>
-    // Event Listener for Generate QR Button
-    document.getElementById("generateQR").addEventListener("click", () => {
-      const baseUrl = "https://pond42grating.github.io/DWS/";
-      const equipmentNo = document.getElementById("equipmentNo").value.trim();
+            // Display the input text above the QR code
+            const textElement = document.createElement("div");
+            textElement.textContent = inputText;
+            textElement.style.fontSize = "18px";
+            textElement.style.marginBottom = "10px";
+            qrCodeContainer.appendChild(textElement);
 
-      if (!equipmentNo) {
-        alert("Please enter an Equipment or Manlift Number!");
-        return;
-      }
-
-      const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
-
-      console.log("Generated URL:", qrUrl); // Debug log
-
-      const qrCodeContainer = document.getElementById("qrcode");
-      qrCodeContainer.innerHTML = ""; // Clear any previous QR codes
-
-      // Generate QR Code
-      QRCode.toCanvas(qrCodeContainer, qrUrl, { width: 200, margin: 2 }, (error) => {
-        if (error) {
-          console.error("Error generating QR Code:", error); // Log error
-          alert("Failed to generate QR Code. Please try again.");
-        } else {
-          console.log("QR Code generated successfully:", qrUrl);
+            // Generate QR code
+            const fullUrl = baseUrl + inputText + ".html";
+            QRCode.toCanvas(fullUrl, { width: 256 }, function (error, canvas) {
+                if (error) {
+                    console.error(error);
+                    alert("Failed to generate QR code.");
+                    return;
+                }
+                qrCodeContainer.appendChild(canvas);
+            });
         }
-      });
-    });
-  </script>
+    </script>
 </body>
 </html>
