@@ -3,55 +3,91 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Import Manpower</title>
+  <title>Equipment Status</title>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js"></script>
+  <script type="module" src="https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js"></script>
+</head>
+<body>
+  <h1>Equipment Status</h1>
+  <div id="statusContainer">
+    <p><strong>Equipment ID:</strong> <span id="equipmentId"></span></p>
+    <p><strong>Current Status:</strong> <span id="currentStatus"></span></p>
+    <button id="statusButton" style="display: none;"></button>
+  </div>
+
   <script type="module">
+    // Firebase Configuration
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-app.js";
-    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.1.0/firebase-firestore.js";
 
     const firebaseConfig = {
-      apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
-      authDomain: "dws-management.firebaseapp.com",
-      projectId: "dws-management",
-      storageBucket: "dws-management.firebasestorage.app",
-      messagingSenderId: "23827231923",
-      appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
-      measurementId: "G-L14GLJDYW7"
-    };
+    apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
+    authDomain: "dws-management.firebaseapp.com",
+    projectId: "dws-management",
+    storageBucket: "dws-management.firebasestorage.app",
+    messagingSenderId: "23827231923",
+    appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
+    measurementId: "G-L14GLJDYW7"
+  };
 
+    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    document.getElementById("csvFile").addEventListener("change", async function (event) {
-      const file = event.target.files[0];
-      if (!file) return alert("Please select a file!");
+    // Get Equipment ID from URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const equipmentId = urlParams.get("equipmentId");
+    document.getElementById("equipmentId").textContent = equipmentId;
 
-      const reader = new FileReader();
-      reader.onload = async function (e) {
-        const csvData = e.target.result.split("\n").map(row => row.split(","));
-        csvData.shift(); // Remove the header row
+    // Fetch Current Status from Firestore
+    const fetchStatus = async () => {
+      if (!equipmentId) return;
 
-        for (const [badgeNo, name, trade] of csvData) {
-          if (badgeNo && name && trade) {
-            try {
-              await setDoc(doc(db, "Manpower", badgeNo.trim()), {
-                name: name.trim(),
-                trade: trade.trim()
-              });
-              console.log(`Imported: ${badgeNo}`);
-            } catch (error) {
-              console.error(`Error importing ${badgeNo}:`, error);
-            }
-          }
-        }
+      const docRef = doc(db, "EquipmentStatus", equipmentId);
+      const docSnap = await getDoc(docRef);
 
-        alert("CSV data imported successfully!");
-      };
-      reader.readAsText(file);
-    });
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        document.getElementById("currentStatus").textContent = data.status;
+        updateButton(data.status);
+      } else {
+        // If no data exists, initialize with "Ready" status
+        await setDoc(docRef, { status: "Ready", updatedAt: new Date().toISOString() });
+        document.getElementById("currentStatus").textContent = "Ready";
+        updateButton("Ready");
+      }
+    };
+
+    // Update Button Based on Current Status
+    const updateButton = (status) => {
+      const button = document.getElementById("statusButton");
+      button.style.display = "inline-block";
+
+      if (status === "Breakdown") {
+        button.textContent = "Set to Ready";
+        button.onclick = () => updateStatus("Ready");
+      } else {
+        button.textContent = "Set to Breakdown";
+        button.onclick = () => updateStatus("Breakdown");
+      }
+    };
+
+    // Update Status in Firestore
+    const updateStatus = async (newStatus) => {
+      const docRef = doc(db, "EquipmentStatus", equipmentId);
+
+      await setDoc(docRef, {
+        status: newStatus,
+        updatedAt: new Date().toISOString(),
+      }, { merge: true });
+
+      alert(`Status updated to ${newStatus}`);
+      document.getElementById("currentStatus").textContent = newStatus;
+      updateButton(newStatus);
+    };
+
+    // Initialize
+    fetchStatus();
   </script>
-</head>
-<body>
-  <h1>Import CSV to Firestore</h1>
-  <input type="file" id="csvFile" accept=".csv">
 </body>
 </html>
