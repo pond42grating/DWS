@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Code Generator</title>
+  <!-- Use a trusted QR Code library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
@@ -28,7 +29,7 @@
     document.getElementById("generateQR").addEventListener("click", () => {
       const equipmentNo = document.getElementById("equipmentNo").value.trim();
 
-      // Check if equipment number is valid
+      // Validate input
       if (!equipmentNo) {
         alert("Please enter an Equipment or Manlift Number!");
         return;
@@ -40,11 +41,14 @@
 
       // Construct the final URL for the QR Code
       const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
-      console.log("Generated URL:", qrUrl); // Debugging log
+
+      // Debug: Log the generated URL
+      console.log("Generated URL:", qrUrl);
 
       // Generate the QR Code
       const qrCodeContainer = document.getElementById("qrcode");
       qrCodeContainer.innerHTML = ""; // Clear any previous QR code
+
       QRCode.toCanvas(qrCodeContainer, qrUrl, { width: 200, margin: 2 }, (error) => {
         if (error) {
           console.error("Error generating QR Code:", error); // Log the error
