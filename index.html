@@ -48,7 +48,7 @@
             qrCodeContainer.appendChild(textElement);
 
             // Generate QR code
-            const fullUrl = baseUrl + inputText + ".html";
+            const fullUrl = `${baseUrl}${inputText}.html`;
             QRCode.toCanvas(fullUrl, { width: 256 }, function (error, canvas) {
                 if (error) {
                     console.error(error);
