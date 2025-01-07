@@ -12,12 +12,12 @@
     <button id="enableNotifications">Enable Notifications</button>
 
     <script>
-        // Firebase Configuration
+        // Firebase Configuration (Replace with your actual Firebase project details)
         const firebaseConfig = {
             apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
             authDomain: "dws-management.firebaseapp.com",
             projectId: "dws-management",
-            storageBucket: "dws-management.appspot.com", // Corrected storageBucket
+            storageBucket: "dws-management.appspot.com",
             messagingSenderId: "23827231923",
             appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
             measurementId: "G-L14GLJDYW7"
@@ -29,16 +29,44 @@
         // Initialize Firebase Messaging
         const messaging = firebase.messaging();
 
-        // Register the Service Worker
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('firebase-messaging-sw.js')
+        // Register Service Worker Inline
+        const registerServiceWorker = () => {
+            const blob = new Blob([
+                `
+                importScripts("https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js");
+                importScripts("https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging.js");
+
+                const firebaseConfig = ${JSON.stringify(firebaseConfig)};
+                firebase.initializeApp(firebaseConfig);
+
+                const messaging = firebase.messaging();
+                messaging.onBackgroundMessage((payload) => {
+                    console.log("Received background message: ", payload);
+                    const notificationTitle = payload.notification.title;
+                    const notificationOptions = {
+                        body: payload.notification.body,
+                        icon: payload.notification.icon,
+                    };
+                    self.registration.showNotification(notificationTitle, notificationOptions);
+                });
+                `
+            ], { type: 'application/javascript' });
+
+            const serviceWorkerURL = URL.createObjectURL(blob);
+            navigator.serviceWorker.register(serviceWorkerURL)
                 .then((registration) => {
                     console.log("Service Worker registered:", registration);
-                    messaging.useServiceWorker(registration);
                 })
                 .catch((error) => {
                     console.error("Service Worker registration failed:", error);
                 });
+        };
+
+        // Ensure Service Worker is Registered
+        if ('serviceWorker' in navigator) {
+            registerServiceWorker();
+        } else {
+            console.error("Service Workers are not supported in this browser.");
         }
 
         // Request Notification Permission and Get FCM Token
@@ -53,53 +81,6 @@
                     console.error("Permission denied or error getting token:", error);
                 });
         });
-    </script>
-
-    <script>
-        // Inline Service Worker Script
-        const firebaseConfigSW = {
-            apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
-            authDomain: "dws-management.firebaseapp.com",
-            projectId: "dws-management",
-            storageBucket: "dws-management.appspot.com", // Corrected storageBucket
-            messagingSenderId: "23827231923",
-            appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
-            measurementId: "G-L14GLJDYW7"
-        };
-
-        const registerInlineServiceWorker = () => {
-            const blob = new Blob([
-                `
-                importScripts("https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js");
-                importScripts("https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging.js");
-
-                firebase.initializeApp(${JSON.stringify(firebaseConfigSW)});
-                const messaging = firebase.messaging();
-
-                messaging.onBackgroundMessage((payload) => {
-                    console.log("Received background message:", payload);
-                    const notificationTitle = payload.notification.title;
-                    const notificationOptions = {
-                        body: payload.notification.body,
-                        icon: payload.notification.icon,
-                    };
-                    self.registration.showNotification(notificationTitle, notificationOptions);
-                });
-                `
-            ], { type: 'application/javascript' });
-
-            const url = URL.createObjectURL(blob);
-            navigator.serviceWorker.register(url)
-                .then((registration) => {
-                    console.log("Inline Service Worker registered:", registration);
-                })
-                .catch((error) => {
-                    console.error("Inline Service Worker registration failed:", error);
-                });
-        };
-
-        // Register the Inline Service Worker
-        registerInlineServiceWorker();
     </script>
 </body>
 </html>
