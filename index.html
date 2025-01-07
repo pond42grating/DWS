@@ -19,6 +19,7 @@
   <h2>Generated QR Code:</h2>
   <div id="qrcode"></div>
 
+  <!-- Script -->
   <script>
     // Base URL for QR Code
     const baseUrl = "https://pond42grating.github.io/DWS/";
@@ -27,27 +28,29 @@
     document.getElementById("generateQR").addEventListener("click", () => {
       const equipmentNo = document.getElementById("equipmentNo").value.trim();
 
-      // Check if equipment number is provided
+      // Check if equipment number is valid
       if (!equipmentNo) {
         alert("Please enter an Equipment or Manlift Number!");
+        return;
+      }
+      if (!/^[a-zA-Z0-9-]+$/.test(equipmentNo)) {
+        alert("Invalid characters in Equipment Number. Please use only letters, numbers, and hyphens.");
         return;
       }
 
       // Construct the final URL for the QR Code
       const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
-
-      // Debug: Log the generated URL
-      console.log("Generated QR Code URL:", qrUrl);
+      console.log("Generated URL:", qrUrl); // Debugging log
 
       // Generate the QR Code
       const qrCodeContainer = document.getElementById("qrcode");
       qrCodeContainer.innerHTML = ""; // Clear any previous QR code
       QRCode.toCanvas(qrCodeContainer, qrUrl, { width: 200, margin: 2 }, (error) => {
         if (error) {
-          console.error("Error generating QR Code:", error);
+          console.error("Error generating QR Code:", error); // Log the error
           alert("Failed to generate QR Code. Please try again.");
         } else {
-          console.log("QR Code generated successfully:", qrUrl);
+          console.log("QR Code generated successfully:", qrUrl); // Log success
         }
       });
     });
