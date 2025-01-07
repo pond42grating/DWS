@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>QR Code Generator</title>
-  <!-- Use a trusted QR Code library -->
   <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 <body>
@@ -20,41 +19,31 @@
   <h2>Generated QR Code:</h2>
   <div id="qrcode"></div>
 
-  <!-- Script -->
   <script>
-    // Base URL for QR Code
-    const baseUrl = "https://pond42grating.github.io/DWS/";
-
     // Event Listener for Generate QR Button
     document.getElementById("generateQR").addEventListener("click", () => {
+      const baseUrl = "https://pond42grating.github.io/DWS/";
       const equipmentNo = document.getElementById("equipmentNo").value.trim();
 
-      // Validate input
       if (!equipmentNo) {
         alert("Please enter an Equipment or Manlift Number!");
         return;
       }
-      if (!/^[a-zA-Z0-9-]+$/.test(equipmentNo)) {
-        alert("Invalid characters in Equipment Number. Please use only letters, numbers, and hyphens.");
-        return;
-      }
 
-      // Construct the final URL for the QR Code
       const qrUrl = `${baseUrl}${encodeURIComponent(equipmentNo)}.html`;
 
-      // Debug: Log the generated URL
-      console.log("Generated URL:", qrUrl);
+      console.log("Generated URL:", qrUrl); // Debug log
 
-      // Generate the QR Code
       const qrCodeContainer = document.getElementById("qrcode");
-      qrCodeContainer.innerHTML = ""; // Clear any previous QR code
+      qrCodeContainer.innerHTML = ""; // Clear any previous QR codes
 
+      // Generate QR Code
       QRCode.toCanvas(qrCodeContainer, qrUrl, { width: 200, margin: 2 }, (error) => {
         if (error) {
-          console.error("Error generating QR Code:", error); // Log the error
+          console.error("Error generating QR Code:", error); // Log error
           alert("Failed to generate QR Code. Please try again.");
         } else {
-          console.log("QR Code generated successfully:", qrUrl); // Log success
+          console.log("QR Code generated successfully:", qrUrl);
         }
       });
     });
