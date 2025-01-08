@@ -3,87 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Firebase Push Notifications</title>
-    <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.19.1/firebase-messaging.js"></script>
+    <title>QR Code Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
             text-align: center;
-            padding: 50px;
+            margin-top: 50px;
         }
-
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-            background-color: #007bff;
-            color: white;
+        .input-container {
+            margin-bottom: 20px;
         }
-
-        button:hover {
-            background-color: #0056b3;
-        }
-
-        #notificationStatus {
+        #qr-code-container {
             margin-top: 20px;
-            color: green;
+        }
+        .input-text {
+            font-size: 18px;
             font-weight: bold;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <h1>Firebase Push Notifications</h1>
-    <button id="enableNotifications">Enable Notifications</button>
-    <p id="notificationStatus"></p>
+    <h1>QR Code Generator</h1>
+    <div class="input-container">
+        <input type="text" id="input-text" placeholder="Enter text (e.g., 'example')" />
+        <button onclick="generateQRCode()">Generate QR Code</button>
+    </div>
+    <div id="qr-code-container"></div>
 
     <script>
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAXZgxM6PU-T3D2811KnBszblRWju7rv1Y",
-            authDomain: "dws-management.firebaseapp.com",
-            projectId: "dws-management",
-            storageBucket: "dws-management.firebasestorage.app",
-            messagingSenderId: "23827231923",
-            appId: "1:23827231923:web:97141b6d19c7cd109d2cc6",
-            measurementId: "G-L14GLJDYW7"
-        };
+        const baseUrl = "https://pond42grating.github.io/DWS/";
 
-        // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
+        function generateQRCode() {
+            const inputText = document.getElementById("input-text").value.trim();
 
-        // Initialize Firebase Messaging
-        const messaging = firebase.messaging();
-
-        // Request permission and get FCM token
-        document.getElementById("enableNotifications").addEventListener("click", async () => {
-            try {
-                const token = await messaging.getToken({
-                    vapidKey: "BEEpj9we6se7W7mwygvgU_SIJN02GxVrkfiqJ-yhQTz-Z5orFlanu0CP_PyQyWAGhQHOnOeAjtUKUjGTyzVoiqw"
-                });
-
-                if (token) {
-                    document.getElementById("notificationStatus").textContent =
-                        "Notifications enabled! Token: " + token;
-                    console.log("FCM Token:", token);
-                } else {
-                    document.getElementById("notificationStatus").textContent =
-                        "No registration token available. Request permission to generate one.";
-                }
-            } catch (err) {
-                document.getElementById("notificationStatus").textContent =
-                    "Error enabling notifications: " + err.message;
-                console.error("Error getting token:", err);
+            if (!inputText) {
+                alert("Please enter text to generate a QR code.");
+                return;
             }
-        });
 
-        // Handle incoming messages
-        messaging.onMessage((payload) => {
-            console.log("Message received: ", payload);
-            alert(`New Notification: ${payload.notification.title} - ${payload.notification.body}`);
-        });
+            // Construct the full URL
+            const fullUrl = `${baseUrl}${inputText}.html`;
+
+            console.log("Generated URL:", fullUrl); // Debugging log to ensure URL correctness
+
+            const qrCodeContainer = document.getElementById("qr-code-container");
+            qrCodeContainer.innerHTML = ""; // Clear previous QR code
+
+            // Display the input text above the QR code
+            const label = document.createElement("div");
+            label.textContent = `Generated URL: ${fullUrl}`;
+            label.className = "input-text";
+            qrCodeContainer.appendChild(label);
+
+            // Generate the QR code
+            const qr = new QRious({
+                element: document.createElement("canvas"),
+                value: fullUrl,
+                size: 256, // QR code size
+            });
+
+            qrCodeContainer.appendChild(qr.element);
+        }
     </script>
 </body>
-</html>
+</html> 
